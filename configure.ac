@@ -2,22 +2,23 @@
 # Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
 # $Id$
 
-AC_INIT(libEMF, 0.5, libemf@lignumcomputing.com)
-AM_INIT_AUTOMAKE(libEMF, 0.5)
+AC_INIT(libEMF, 0.6, libemf@lignumcomputing.com)
+AM_INIT_AUTOMAKE(libEMF, 0.6)
 AM_CONFIG_HEADER([config.h])
 AC_CONFIG_SRCDIR([include/emf.h])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_LIBTOOL
+AC_PROG_INSTALL
+AM_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 
 # Checks for libraries.
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([errno.h stddef.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([errno.h stddef.h stdlib.h string.h unistd.h limits.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -28,7 +29,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_CHECK_LIB(m, ceil)
-AC_CHECK_FUNCS([ceil floor memset select])
+AC_CHECK_FUNCS([floor memset select])
 
 # Autoheader seems to complain about a lack of these (perhaps rightly)
 AH_TEMPLATE(LIBEMF_DEBUG, [Turn on any addition debugging edits])
@@ -43,8 +44,8 @@ AC_ARG_ENABLE(debug,
 if test "x$enable_debug" = xyes; then
   AC_DEFINE(LIBEMF_DEBUG, 1)
   if test "x$GCC" = xyes; then
-    CFLAGS="$CFLAGS -O0"
-    CXXFLAGS="$CXXFLAGS -O0"
+    CFLAGS="$CFLAGS -g -O0"
+    CXXFLAGS="$CXXFLAGS -g -O0"
   else
     AC_MSG_WARN([compiler unknown, please disable optimizations manually in \
 your CFLAGS])
