@@ -17,3 +17,6 @@
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
 SUBDIRS = include libemf src doc tests
+
+dist-hook:
+	rm -rf `find $(distdir)/doc -name CVS`
