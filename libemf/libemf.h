@@ -971,6 +971,12 @@ namespace EMF {
 
 #ifdef ENABLE_EDITING
   /* Miscellaneous editing routines */
+  inline void edit_rectl ( const char* tag, const RECTL& rectl )
+  {
+    printf( "\t%s\t: (%ld, %ld) - (%ld, %ld)\n", tag, rectl.left, rectl.top,
+	    rectl.right, rectl.bottom );
+  }
+
   inline void edit_pen_style ( const char* tag, DWORD style )
   {
     printf( "\t%s : ", tag );
@@ -1173,6 +1179,7 @@ namespace EMF {
     static EMF::METARECORD* new_polyline ( DATASTREAM& ds );
     static EMF::METARECORD* new_polyline16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polygon ( DATASTREAM& ds );
+    static EMF::METARECORD* new_polygon16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polypolygon ( DATASTREAM& ds );
     static EMF::METARECORD* new_polypolygon16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polybezier ( DATASTREAM& ds );
@@ -1366,14 +1373,22 @@ namespace EMF {
       printf( "*HEADER*\n" );
       printf( "\tiType             : %ld\n", iType );
       printf( "\tnSize             : %ld\n", nSize );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
+#if 0
       printf( "\trclFrame.left     : %ld\n", rclFrame.left );
       printf( "\trclFrame.top      : %ld\n", rclFrame.top );
       printf( "\trclFrame.right    : %ld\n", rclFrame.right );
       printf( "\trclFrame.bottom   : %ld\n", rclFrame.bottom );
+#else
+      edit_rectl( "rclFrame", rclFrame );
+#endif
       printf( "\tdSignature        : %.4s\n", (const char*)&dSignature );
       printf( "\tnVersion          : 0x%x\n", (unsigned int)nVersion );
       printf( "\tnBytes            : %ld\n", nBytes );
@@ -2678,10 +2693,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ARC*\n" );
+#if 0
       printf( "\trclBox.left    : %ld\n", rclBox.left );
       printf( "\trclBox.top     : %ld\n", rclBox.top );
       printf( "\trclBox.right   : %ld\n", rclBox.right );
       printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
+#else
+      edit_rectl( "rclBox", rclBox );
+#endif
       printf( "\tptlStart.x     : %ld\n", ptlStart.x );
       printf( "\tptlStart.y     : %ld\n", ptlStart.y );
       printf( "\tptlEnd.x       : %ld\n", ptlEnd.x );
@@ -2758,10 +2777,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ARCTO*\n" );
+#if 0
       printf( "\trclBox.left    : %ld\n", rclBox.left );
       printf( "\trclBox.top     : %ld\n", rclBox.top );
       printf( "\trclBox.right   : %ld\n", rclBox.right );
       printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
+#else
+      edit_rectl( "rclBox", rclBox );
+#endif
       printf( "\tptlStart.x     : %ld\n", ptlStart.x );
       printf( "\tptlStart.y     : %ld\n", ptlStart.y );
       printf( "\tptlEnd.x       : %ld\n", ptlEnd.x );
@@ -2827,10 +2850,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*RECTANGLE*\n" );
+#if 0
       printf( "\trclBox.left    : %ld\n", rclBox.left );
       printf( "\trclBox.top     : %ld\n", rclBox.top );
       printf( "\trclBox.right   : %ld\n", rclBox.right );
       printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
+#else
+      edit_rectl( "rclBox", rclBox );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2893,10 +2920,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ELLIPSE*\n" );
+#if 0
       printf( "\trclBox.left    : %ld\n", rclBox.left );
       printf( "\trclBox.top     : %ld\n", rclBox.top );
       printf( "\trclBox.right   : %ld\n", rclBox.right );
       printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
+#else
+      edit_rectl( "rclBox", rclBox );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2982,10 +3013,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINE*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3007,6 +3042,31 @@ namespace EMF {
      * \param n number of vertices in points.
      */
     EMRPOLYLINE16 ( const RECTL* bounds, const POINT16* points, INT n )
+    {
+      cpts = n;
+      apts[0].x = 0;		// Really unused
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYLINE16;
+      // The (cptl - 1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYLINE16 ) + sizeof( POINT16 ) * ( cpts - 1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Constructor with POINTs.
+     * \param bounds overall bounding box of polyline.
+     * \param points array of polyline vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYLINE16 ( const RECTL* bounds, const POINT* points, INT n )
     {
       cpts = n;
       apts[0].x = 0;		// Really unused
@@ -3075,10 +3135,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINE16*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcpts              : %ld\n", cpts );
       printf( "\tapts->\n" );
       for ( unsigned int i = 0; i < cpts; i++ )
@@ -3168,14 +3232,140 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYGON*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+    }
+#endif /* ENABLE_EDITING */
+  };
+
+  //! EMF Filled Polygon16
+  /*!
+   * Draw a filled polygon (with 16-bit points).
+   */
+  class EMRPOLYGON16 : public METARECORD, ::EMRPOLYGON16 {
+    POINT16* lpoints;
+  public:
+    /*!
+     * \param bounds overall bounding box of polygon.
+     * \param points array of polygon vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYGON16 ( const RECTL* bounds, const POINT* points, INT16 n )
+    {
+      cpts = n;
+      apts[0].x = 0;		// Really unused
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYGON16;
+      // The (cptl-1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYGON16 ) + sizeof( POINT16 ) * (cpts-1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Additional constructor which takes a POINT16 array.
+     * \param bounds overall bounding box of polygon.
+     * \param points array of polygon vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYGON16 ( const RECTL* bounds, const POINT16* points, INT16 n )
+    {
+      cpts = n;
+      apts[0].x = 0;		// Really unused
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYGON16;
+      // The (cptl-1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYGON16 ) + sizeof( POINT16 ) * (cpts-1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Construct a Polygon record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRPOLYGON16 ( DATASTREAM& ds )
+    {
+      ds >> emr >> rclBounds >> cpts;
+
+      lpoints = new POINT16[cpts];
+
+      POINT16ARRAY points( lpoints, cpts );
+
+      ds >> points;
+    }
+    /*!
+     * Destructor frees a copy of the points it buffered.
+     */
+    ~EMRPOLYGON16 ( )
+    {
+      if ( lpoints ) delete[] lpoints;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << rclBounds << cpts << POINT16ARRAY( lpoints, cpts );
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      // According to the wine windef.h header, POINT and POINTL are equivalent
+      Polygon16( dc, lpoints, cpts );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*POLYGON16*\n" );
+#if 0
+      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
+      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
+      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
+      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
+      printf( "\tcpts              : %ld\n", cpts );
+      printf( "\tapts->\n" );
+      for ( unsigned int i = 0; i < cpts; i++ )
+	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3293,10 +3483,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYPOLYGON*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tnPolys            : %ld\n", nPolys );
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taPolyCounts->\n" );
@@ -3463,10 +3657,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYPOLYGON16*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tnPolys            : %ld\n", nPolys );
       printf( "\tcpts              : %ld\n", cpts );
       printf( "\taPolyCounts->\n" );
@@ -3560,10 +3758,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIER*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3590,7 +3792,32 @@ namespace EMF {
       apts[0].x = 0;		// Really unused
       apts[0].y = 0;
 
-      emr.iType = EMR_POLYBEZIER;
+      emr.iType = EMR_POLYBEZIER16;
+      // The (cptl-1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYBEZIER16 ) + sizeof( POINT16 ) * (cpts-1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Convenience constructor with POINTs.
+     * \param bounds overall bounding box of polybezier curve.
+     * \param points array of polybezier vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYBEZIER16 ( const RECTL* bounds, const POINT* points, INT n )
+    {
+      cpts = n;
+      apts[0].x = 0;		// Really unused
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYBEZIER16;
       // The (cptl-1) below is to account for aptl, which isn't written out
       emr.nSize = sizeof( ::EMRPOLYBEZIER16 ) + sizeof( POINT16 ) * (cpts-1);
 
@@ -3653,10 +3880,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIER16*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcpts              : %ld\n", cpts );
       printf( "\tapts->\n" );
       for ( unsigned int i = 0; i < cpts; i++ )
@@ -3746,10 +3977,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIERTO*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3771,6 +4006,31 @@ namespace EMF {
      * \param n number of vertices in points.
      */
     EMRPOLYBEZIERTO16 ( const RECTL* bounds, const POINT16* points, INT n )
+    {
+      cpts = n;
+      apts[0].x = 0;		// Really unused
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYBEZIERTO16;
+      // The (cptl-1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYBEZIERTO16 ) + sizeof( POINT16 ) * (cpts-1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Convenience constructor with POINTs.
+     * \param bounds overall bounding box of polybezier curve.
+     * \param points array of polybezier vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYBEZIERTO16 ( const RECTL* bounds, const POINT* points, INT n )
     {
       cpts = n;
       apts[0].x = 0;		// Really unused
@@ -3839,10 +4099,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIERTO16*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcpts              : %ld\n", cpts );
       printf( "\tapts->\n" );
       for ( unsigned int i = 0; i < cpts; i++ )
@@ -3932,10 +4196,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINETO*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3957,6 +4225,31 @@ namespace EMF {
      * \param n number of vertices in points.
      */
     EMRPOLYLINETO16 ( const RECTL* bounds, const POINT16* points, INT n )
+    {
+      cpts = n;
+      apts[0].x = 0;
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYLINETO16;
+      // The (cptl-1) below is to account for aptl, which isn't written out
+      emr.nSize = sizeof( ::EMRPOLYLINETO16 ) + sizeof( POINT16 ) * (cpts-1);
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Convenience constructor with POINTs.
+     * \param bounds overall bounding box of polybezier curve.
+     * \param points array of polybezier vertices.
+     * \param n number of vertices in points.
+     */
+    EMRPOLYLINETO16 ( const RECTL* bounds, const POINT* points, INT n )
     {
       cpts = n;
       apts[0].x = 0;
@@ -4025,10 +4318,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINETO16*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tcpts              : %ld\n", cpts );
       printf( "\tapts->\n" );
       for ( unsigned int i = 0; i < cpts; i++ )
@@ -4180,8 +4477,12 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*EXTTEXTOUTA*\n" );
+#if 0
       printf( "\trclBounds: (%ld,%ld)-(%ld,%ld)\n", rclBounds.left, rclBounds.top,
 	      rclBounds.right, rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
       printf( "\tiGraphicsMode:" );
       switch ( iGraphicsMode ) {
       case GM_COMPATIBLE: printf( "GM_COMPATIBLE\n" ); break;
@@ -4208,8 +4509,12 @@ namespace EMF {
       if ( emrtext.fOptions & ETO_IGNORELANGUAGE )
 	printf( "ETO_IGNORELANGUAGE" );
       printf( "\n" );
+#if 0
       printf( "\trcl: (%ld,%ld)-(%ld,%ld)\n", emrtext.rcl.left, emrtext.rcl.top,
 	      emrtext.rcl.right, emrtext.rcl.bottom );
+#else
+      edit_rectl( "rcl", emrtext.rcl );
+#endif
       printf( "\toffDx: %ld\n", emrtext.offDx );
 
       printf( "\tString:\n\t\t%s\n",  string_a );
@@ -4679,10 +4984,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*FILLPATH*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4738,10 +5047,14 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*STROKEPATH*\n" );
+#if 0
       printf( "\trclBounds.left    : %ld\n", rclBounds.left );
       printf( "\trclBounds.top     : %ld\n", rclBounds.top );
       printf( "\trclBounds.right   : %ld\n", rclBounds.right );
       printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+#else
+      edit_rectl( "rclBounds", rclBounds );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };

@@ -130,6 +130,7 @@ namespace EMF {
     new_records[EMR_POLYLINE] = new_polyline;
     new_records[EMR_POLYLINE16] = new_polyline16;
     new_records[EMR_POLYGON] = new_polygon;
+    new_records[EMR_POLYGON16] = new_polygon16;
     new_records[EMR_POLYPOLYGON] = new_polypolygon;
     new_records[EMR_POLYPOLYGON16] = new_polypolygon16;
     new_records[EMR_POLYBEZIER] = new_polybezier;
@@ -371,6 +372,11 @@ namespace EMF {
   METARECORD* GLOBALOBJECTS::new_polygon ( DATASTREAM& ds )
   {
     return new EMF::EMRPOLYGON( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_polygon16 ( DATASTREAM& ds )
+  {
+    return new EMF::EMRPOLYGON16( ds );
   }
 
   METARECORD* GLOBALOBJECTS::new_polypolygon ( DATASTREAM& ds )
@@ -2462,15 +2468,39 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYBEZIER* polybezier = new EMF::EMRPOLYBEZIER( &bounds, points, n );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYBEZIER16 structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polybezier );
+    for ( DWORD i = 0; i < n; i++ ) {
+      if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	   pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	shorts_only = false;
 
-    // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
-      dc->mergePoint( points[i] );
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( *pnt_ptr++ );
+    }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYBEZIER16* polybezier16 =
+	new EMF::EMRPOLYBEZIER16( &bounds, points, n );
+
+      dc->appendRecord( polybezier16 );
+    }
+    else {
+      EMF::EMRPOLYBEZIER* polybezier = new EMF::EMRPOLYBEZIER( &bounds, points, n );
+
+      dc->appendRecord( polybezier );
+    }
 
     return TRUE;
   }
@@ -2488,10 +2518,20 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+    const POINT16* pnt_ptr = points;
 
-    EMF::EMRPOLYBEZIER16* polybezier16 = new EMF::EMRPOLYBEZIER16( &bounds,
-								   points, n );
+    for ( INT i = 0; i < n; i++, pnt_ptr++ ) {
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+    }
+
+    EMF::EMRPOLYBEZIER16* polybezier16 =
+      new EMF::EMRPOLYBEZIER16( &bounds, points, n );
 
     dc->appendRecord( polybezier16 );
 
@@ -2588,15 +2628,38 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYLINE* polyline = new EMF::EMRPOLYLINE( &bounds, points, n );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYLINE16 structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polyline );
+    for ( INT i = 0; i < n; i++ ) {
+      if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	   pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	shorts_only = false;
 
-    // Update graphics state
-    for ( INT i = 0; i < n; i++ )
-      dc->mergePoint( points[i] );
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( *pnt_ptr++ );
+    }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYLINE16* polyline16 = new EMF::EMRPOLYLINE16( &bounds, points, n );
+
+      dc->appendRecord( polyline16 );
+    }
+    else {
+      EMF::EMRPOLYLINE* polyline = new EMF::EMRPOLYLINE( &bounds, points, n );
+
+      dc->appendRecord( polyline );
+    }
 
     return TRUE;
   }    
@@ -2615,15 +2678,21 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+    const POINT16* pnt_ptr = points;
+
+    for ( INT i = 0; i < n; i++, pnt_ptr++ ) {
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+    }
 
     EMF::EMRPOLYLINE16* polyline16 = new EMF::EMRPOLYLINE16( &bounds, points, n );
 
     dc->appendRecord( polyline16 );
-
-    // Update graphics state
-    for ( INT i = 0; i < n; i++ )
-      dc->mergePoint( points[i].x, points[i].y );
 
     return TRUE;
   }    
@@ -2643,15 +2712,74 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYGON* polygon = new EMF::EMRPOLYGON( &bounds, points, n );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYGON16 structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polygon );
+    for ( INT i = 0; i < n; i++ ) {
+      if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	   pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	shorts_only = false;
 
-    // Update graphics state
-    for ( INT i = 0; i < n; i++ )
-      dc->mergePoint( points[i] );
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( *pnt_ptr++ );
+    }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYGON16* polygon16 = new EMF::EMRPOLYGON16( &bounds, points, n );
+
+      dc->appendRecord( polygon16 );
+    }
+    else {
+      EMF::EMRPOLYGON* polygon = new EMF::EMRPOLYGON( &bounds, points, n );
+
+      dc->appendRecord( polygon );
+    }
+
+    return TRUE;
+  }
+  /*!
+   * Draw a sequence of connected straight line segments where the end
+   * of the last line segment is connect to the beginning of the first
+   * line segment.
+   * \param context handle to metafile context.
+   * \param points array of points to draw.
+   * \param n number of points in the array.
+   * \return true if polygon is successfully rendered.
+   */
+  BOOL Polygon16 ( HDC context, const POINT16* points, INT16 n )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+
+    const POINT16* pnt_ptr = points;
+
+    for ( INT i = 0; i < n; i++, pnt_ptr++ ) {
+
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+    }
+
+    EMF::EMRPOLYGON16* polygon16 = new EMF::EMRPOLYGON16( &bounds, points, n );
+
+    dc->appendRecord( polygon16 );
 
     return TRUE;
   }
@@ -2735,7 +2863,7 @@ extern "C" {
     const POINT16* pnt_ptr = points;
 
     for ( UINT i = 0; i < polygons; i++ )
-      for ( INT j = 0; j < counts[i]; j++ ) {
+      for ( INT j = 0; j < counts[i]; j++, pnt_ptr++ ) {
 
 	if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
 	if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
@@ -2743,8 +2871,6 @@ extern "C" {
 	if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
 
 	dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
-
-	pnt_ptr++;
       }
 
     EMF::EMRPOLYPOLYGON16* polypolygon16 =
@@ -2856,16 +2982,40 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYBEZIERTO* polybezierto =
-      new EMF::EMRPOLYBEZIERTO( &bounds, points, n );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYBEZIERTO16 structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polybezierto );
+    for ( DWORD i = 0; i < n; i++ ) {
+      if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	   pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	shorts_only = false;
 
-    // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
-      dc->mergePoint( points[i] );
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( *pnt_ptr++ );
+    }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYBEZIERTO16* polybezierto16 =
+	new EMF::EMRPOLYBEZIERTO16( &bounds, points, n );
+
+      dc->appendRecord( polybezierto16 );
+    }
+    else {
+      EMF::EMRPOLYBEZIERTO* polybezierto =
+	new EMF::EMRPOLYBEZIERTO( &bounds, points, n );
+
+      dc->appendRecord( polybezierto );
+    }
 
     return TRUE;
   }
@@ -2884,7 +3034,17 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+    const POINT16* pnt_ptr = points;
+
+    for ( INT i = 0; i < n; i++, pnt_ptr++ ) {
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+    }
 
     EMF::EMRPOLYBEZIERTO16* polybezierto16 =
       new EMF::EMRPOLYBEZIERTO16( &bounds, points, n );
@@ -2912,15 +3072,39 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYLINETO* polylineto = new EMF::EMRPOLYLINETO( &bounds, points, n );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYLINETO16 structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polylineto );
+    for ( DWORD i = 0; i < n; i++ ) {
+      if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	   pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	shorts_only = false;
 
-    // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
-      dc->mergePoint( points[i] );
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( *pnt_ptr++ );
+    }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYLINETO16* polylineto16 =
+	new EMF::EMRPOLYLINETO16( &bounds, points, n );
+
+      dc->appendRecord( polylineto16 );
+    }
+    else {
+      EMF::EMRPOLYLINETO* polylineto = new EMF::EMRPOLYLINETO( &bounds, points, n );
+
+      dc->appendRecord( polylineto );
+    }
 
     return TRUE;
   }
@@ -2939,16 +3123,22 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+    const POINT16* pnt_ptr = points;
 
-    EMF::EMRPOLYLINETO16* polylineto16 = new EMF::EMRPOLYLINETO16( &bounds,
-								   points, n );
+    for ( INT i = 0; i < n; i++, pnt_ptr++ ) {
+      if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+      if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+      if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+      if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+      dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+    }
+
+    EMF::EMRPOLYLINETO16* polylineto16 =
+      new EMF::EMRPOLYLINETO16( &bounds, points, n );
 
     dc->appendRecord( polylineto16 );
-
-    // Update graphics state
-    for ( INT16 i = 0; i < n; i++ )
-      dc->mergePoint( points[i].x, points[i].y );
 
     return TRUE;
   }
