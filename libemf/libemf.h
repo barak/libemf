@@ -1003,17 +1003,30 @@ namespace EMF {
     printf( "\t%s\t: (%ld, %ld)\n", tag, point.x, point.y );
   }
 
+  inline void edit_pointlarray ( const char* tag, const DWORD cptl,
+				  const POINTL* points )
+  {
+    printf( "\tcptl%s\t: %ld\n", tag, cptl );
+    printf( "\taptl%s\t: ", tag );
+    if ( cptl > 0 )
+      printf( "%ld, %ld\n", points[0].x, points[0].y );
+    else
+      puts( "" );
+    for ( DWORD i = 1; i < cptl; i++ )
+      printf( "\t\t%s  %ld, %ld\n", tag, points[i].x, points[i].y );
+  }
+
   inline void edit_point16array ( const char* tag, const unsigned int cpts,
 				  const POINT16* points )
   {
     printf( "\tcpts%s\t: %d\n", tag, cpts );
-    printf( "\tapts%s\t:\t", tag );
+    printf( "\tapts%s\t: ", tag );
     if ( cpts > 0 )
       printf( "%d, %d\n", points[0].x, points[0].y );
     else
       puts( "" );
     for ( unsigned int i = 1; i < cpts; i++ )
-      printf( "\t\t\t%s%d, %d\n", tag, points[i].x, points[i].y );
+      printf( "\t\t%s  %d, %d\n", tag, points[i].x, points[i].y );
   }
 
   inline void edit_pen_style ( const char* tag, DWORD style )
@@ -2986,10 +2999,14 @@ namespace EMF {
     {
       printf( "*POLYLINE*\n" );
       edit_rectl( "rclBounds", rclBounds );
+#if 0
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+#else
+      edit_pointlarray( "\t", cptl, lpoints );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3188,10 +3205,14 @@ namespace EMF {
     {
       printf( "*POLYGON*\n" );
       edit_rectl( "rclBounds", rclBounds );
+#if 0
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+#else
+      edit_pointlarray( "\t", cptl, lpoints );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3422,14 +3443,22 @@ namespace EMF {
     {
       printf( "*POLYPOLYGON*\n" );
       edit_rectl( "rclBounds", rclBounds );
-      printf( "\tnPolys            : %ld\n", nPolys );
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taPolyCounts->\n" );
-      for ( unsigned int i = 0; i < nPolys; i++ )
-	printf( "\t\t%ld\n", lcounts[i] );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+      printf( "\tnPolys\t\t: %ld\n", nPolys );
+      printf( "\tcptl\t\t: %ld\n", cptl );
+      printf( "\taPolyCounts\t: " );
+      if ( nPolys > 0 )
+	printf( "%ld\n", lcounts[0] );
+      else
+	puts( "" );
+      for ( unsigned int i = 1; i < nPolys; i++ )
+	printf( "\t\t\t  %ld\n", lcounts[i] );
+      printf( "\tapts\t\t: " );
+      if ( cptl > 0 )
+	printf( "%ld, %ld\n", lpoints[0].x, lpoints[0].y );
+      else
+	puts( "" );
+      for ( unsigned int i = 1; i < cptl; i++ )
+	printf( "\t\t\t  %ld, %ld\n", lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3591,20 +3620,20 @@ namespace EMF {
       edit_rectl( "rclBounds", rclBounds );
       printf( "\tnPolys\t\t: %ld\n", nPolys );
       printf( "\tcpts\t\t: %ld\n", cpts );
-      printf( "\taPolyCounts\t:\t" );
+      printf( "\taPolyCounts\t: " );
       if ( nPolys > 0 )
 	printf( "%ld\n", lcounts[0] );
       else
 	puts( "" );
       for ( unsigned int i = 1; i < nPolys; i++ )
-	printf( "\t\t\t\t%ld\n", lcounts[i] );
-      printf( "\tapts\t\t:\t" );
+	printf( "\t\t\t  %ld\n", lcounts[i] );
+      printf( "\tapts\t\t: " );
       if ( cpts > 0 )
 	printf( "%d, %d\n", lpoints[0].x, lpoints[0].y );
       else
 	puts( "" );
       for ( unsigned int i = 1; i < cpts; i++ )
-	printf( "\t\t\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+	printf( "\t\t\t  %d, %d\n", lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3691,10 +3720,14 @@ namespace EMF {
     {
       printf( "*POLYBEZIER*\n" );
       edit_rectl( "rclBounds", rclBounds );
+#if 0
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+#else
+      edit_pointlarray( "\t", cptl, lpoints );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3893,10 +3926,14 @@ namespace EMF {
     {
       printf( "*POLYBEZIERTO*\n" );
       edit_rectl( "rclBounds", rclBounds );
+#if 0
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+#else
+      edit_pointlarray( "\t", cptl, lpoints );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4095,10 +4132,14 @@ namespace EMF {
     {
       printf( "*POLYLINETO*\n" );
       edit_rectl( "rclBounds", rclBounds );
+#if 0
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+#else
+      edit_pointlarray( "\t", cptl, lpoints );
+#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4372,18 +4413,40 @@ namespace EMF {
       printf( "\tnChars\t\t: %ld\n", emrtext.nChars );
       printf( "\toffString\t: %ld\n", emrtext.offString );
       printf( "\tfOptions\t: " );
-      if ( emrtext.fOptions & ETO_GRAYED )
-	printf( "ETO_GRAYED | " );
-      if ( emrtext.fOptions & ETO_OPAQUE )
-	printf( "ETO_OPAQUE | " );
-      if ( emrtext.fOptions & ETO_CLIPPED )
-	printf( "ETO_CLIPPED | " );
-      if ( emrtext.fOptions & ETO_GLYPH_INDEX )
-	printf( "ETO_GLYPH_INDEX | " );
-      if ( emrtext.fOptions & ETO_RTLREADING )
-	printf( "ETO_RTLREADING | " );
-      if ( emrtext.fOptions & ETO_IGNORELANGUAGE )
-	printf( "ETO_IGNORELANGUAGE" );
+      if ( emrtext.fOptions == 0 )
+	printf( "None" );
+      else {
+	if ( emrtext.fOptions & ETO_GRAYED ) {
+	  printf( "ETO_GRAYED" );
+	  if ( emrtext.fOptions & ~ETO_GRAYED )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_OPAQUE ) {
+	  printf( "ETO_OPAQUE" );
+	  if ( emrtext.fOptions & ~(ETO_GRAYED | ETO_OPAQUE) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_CLIPPED ) {
+	  printf( "ETO_CLIPPED" );
+	  if ( emrtext.fOptions & ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED ) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_GLYPH_INDEX ) {
+	  printf( "ETO_GLYPH_INDEX" );
+	  if ( emrtext.fOptions &
+	       ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED | ETO_GLYPH_INDEX) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_RTLREADING ) {
+	  printf( "ETO_RTLREADING" );
+	  if ( emrtext.fOptions &
+	       ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED | ETO_GLYPH_INDEX |
+		 ETO_RTLREADING) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_IGNORELANGUAGE )
+	  printf( "ETO_IGNORELANGUAGE" );
+      }
       printf( "\n" );
       edit_rectl( "rcl\t", emrtext.rcl );
       printf( "\toffDx\t\t: %ld\n", emrtext.offDx );
@@ -4617,7 +4680,7 @@ namespace EMF {
     {
       printf( "*CREATEBRUSHINDIRECT*\n" );
       printf( "\tihBrush\t\t: 0x%lx\n", ihBrush );
-      edit_brush_style( "b.lbStyle\t", lb.lbStyle );
+      edit_brush_style( "lb.lbStyle", lb.lbStyle );
       edit_color( "lb.lbColor", lb.lbColor );
       edit_brush_hatch( "lb.lbHatch", lb.lbHatch );
     }
