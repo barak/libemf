@@ -977,9 +977,48 @@ namespace EMF {
 	    rectl.right, rectl.bottom );
   }
 
+  inline void edit_xform ( const char* tag, const XFORM& xform )
+  {
+    printf( "\t%s.eM11\t: %f\n", tag, xform.eM11 );
+    printf( "\t%s.eM12\t: %f\n", tag, xform.eM12 );
+    printf( "\t%s.eM21\t: %f\n", tag, xform.eM21 );
+    printf( "\t%s.eM22\t: %f\n", tag, xform.eM22 );
+    printf( "\t%s.eDx\t: %f\n", tag, xform.eDx );
+    printf( "\t%s.eDy\t: %f\n", tag, xform.eDy );
+  }
+
+  inline void edit_color ( const char* tag, const COLORREF& color )
+  {
+    printf( "\t%s\t: R(0x%02lx) G(0x%02lx) B(0x%02lx)\n", tag,
+	    GetRValue( color ), GetGValue( color ), GetBValue( color ) );
+  }
+
+  inline void edit_sizel ( const char* tag, const SIZEL& size )
+  {
+    printf( "\t%s\t: (%ld, %ld)\n", tag, size.cx, size.cy );
+  }
+
+  inline void edit_pointl ( const char* tag, const POINTL& point )
+  {
+    printf( "\t%s\t: (%ld, %ld)\n", tag, point.x, point.y );
+  }
+
+  inline void edit_point16array ( const char* tag, const unsigned int cpts,
+				  const POINT16* points )
+  {
+    printf( "\tcpts%s\t: %d\n", tag, cpts );
+    printf( "\tapts%s\t:\t", tag );
+    if ( cpts > 0 )
+      printf( "%d, %d\n", points[0].x, points[0].y );
+    else
+      puts( "" );
+    for ( unsigned int i = 1; i < cpts; i++ )
+      printf( "\t\t\t%s%d, %d\n", tag, points[i].x, points[i].y );
+  }
+
   inline void edit_pen_style ( const char* tag, DWORD style )
   {
-    printf( "\t%s : ", tag );
+    printf( "\t%s\t: ", tag );
     switch ( style & PS_STYLE_MASK ) {
     case PS_SOLID: printf( "PS_SOLID" ); break;
     case PS_DASH: printf( "PS_DASH" ); break;
@@ -1010,7 +1049,7 @@ namespace EMF {
 
   inline void edit_brush_style ( const char* tag, DWORD style )
   {
-    printf( "\t%s : ", tag );
+    printf( "\t%s\t: ", tag );
     switch ( style ) {
     case BS_SOLID: printf( "BS_SOLID" ); break;
     case BS_NULL: printf( "BS_NULL" ); break;
@@ -1029,7 +1068,7 @@ namespace EMF {
 
   inline void edit_brush_hatch ( const char* tag, DWORD hatch )
   {
-    printf( "\t%s : ", tag );
+    printf( "\t%s\t: ", tag );
     switch ( hatch ) {
     case HS_HORIZONTAL: printf( "HS_HORIZONTAL" ); break;
     case HS_VERTICAL: printf( "HS_VERTICAL" ); break;
@@ -1254,10 +1293,9 @@ namespace EMF {
       offPixelFormat = 0;
       bOpenGL = FALSE;
       //
-#if 0
       szlMicrometers.cx = 1000 * szlMillimeters.cx;
       szlMicrometers.cy = 1000 * szlMillimeters.cy;
-#endif
+
       if ( description ) {
 	// Count the number of characters in the description
 	int description_count = 0, nulls = 0;
@@ -1306,9 +1344,7 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
-#if 0
 	 << szlMicrometers
-#endif
 	 << WCHARSTR( description_w, description_size );
       return true;
     }
@@ -1328,18 +1364,14 @@ namespace EMF {
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
 
-#if 0
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#else
-      if ( sizeof( ::ENHMETAHEADER ) <= offDescription )
-	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#endif
+
 #undef OffsetOf
-#if 0
+
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
-#endif
+
       // Should now probably check that the offset is correct...
 
       description_size = ( nSize - offDescription ) / sizeof(WCHAR);
@@ -1371,51 +1403,33 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*HEADER*\n" );
-      printf( "\tiType             : %ld\n", iType );
-      printf( "\tnSize             : %ld\n", nSize );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
-      edit_rectl( "rclBounds", rclBounds );
-#endif
-#if 0
-      printf( "\trclFrame.left     : %ld\n", rclFrame.left );
-      printf( "\trclFrame.top      : %ld\n", rclFrame.top );
-      printf( "\trclFrame.right    : %ld\n", rclFrame.right );
-      printf( "\trclFrame.bottom   : %ld\n", rclFrame.bottom );
-#else
-      edit_rectl( "rclFrame", rclFrame );
-#endif
-      printf( "\tdSignature        : %.4s\n", (const char*)&dSignature );
-      printf( "\tnVersion          : 0x%x\n", (unsigned int)nVersion );
-      printf( "\tnBytes            : %ld\n", nBytes );
-      printf( "\tnRecords          : %ld\n", nRecords );
-      printf( "\tnHandles          : %d\n", nHandles );
-      printf( "\tnDescription      : %ld\n", nDescription );
-      printf( "\toffDescription    : %ld\n", offDescription );
-      printf( "\tnPalEntries       : %ld\n", nPalEntries );
-      printf( "\tszlDevice.cx      : %ld\n", szlDevice.cx );
-      printf( "\tszlDevice.cy      : %ld\n", szlDevice.cy );
-      printf( "\tszlMillimeters.cx : %ld\n", szlMillimeters.cx );
-      printf( "\tszlMillimeters.cy : %ld\n", szlMillimeters.cy );
+      printf( "\tiType\t\t\t: %ld\n", iType );
+      printf( "\tnSize\t\t\t: %ld\n", nSize );
+      edit_rectl( "rclBounds\t", rclBounds );
+      edit_rectl( "rclFrame\t", rclFrame );
+      printf( "\tdSignature\t\t: %.4s\n", (const char*)&dSignature );
+      printf( "\tnVersion\t\t: 0x%x\n", (unsigned int)nVersion );
+      printf( "\tnBytes\t\t\t: %ld\n", nBytes );
+      printf( "\tnRecords\t\t: %ld\n", nRecords );
+      printf( "\tnHandles\t\t: %d\n", nHandles );
+      printf( "\tnDescription\t\t: %ld\n", nDescription );
+      printf( "\toffDescription\t\t: %ld\n", offDescription );
+      printf( "\tnPalEntries\t\t: %ld\n", nPalEntries );
+      edit_sizel( "szlDevice\t", szlDevice );
+      edit_sizel( "szlMillimeters\t", szlMillimeters );
 
       /* Make a crude guess as to the age of this file */
 #define OffsetOf( a, b ) ((unsigned int)(((const char*)&(((const ::ENHMETAHEADER*)a)->b)) - \
 (const char*)((const ::ENHMETAHEADER*)a)))
 
       if ( OffsetOf( this, cbPixelFormat ) <= offDescription ) {
-	printf( "\tcbPixelFormat     : %ld\n", cbPixelFormat );
-	printf( "\toffPixelFormat    : %ld\n", offPixelFormat );
-	printf( "\tbOpenGL           : %ld\n", bOpenGL );
-#if 0
+	printf( "\tcbPixelFormat\t\t: %ld\n", cbPixelFormat );
+	printf( "\toffPixelFormat\t\t: %ld\n", offPixelFormat );
+	printf( "\tbOpenGL\t\t\t: %ld\n", bOpenGL );
+
 	if ( sizeof(::ENHMETAHEADER) <= offDescription ) {
-	  printf( "\tszlMicrometers.cx : %ld\n", szlMicrometers.cx );
-	  printf( "\tszlMicrometers.cy : %ld\n", szlMicrometers.cy );
+	  edit_sizel( "szlMicrometers\t", szlMicrometers );
 	}
-#endif
       }
 
 #undef OffsetOf
@@ -1561,7 +1575,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETVIEWPORTORGEX*\n" );
-      printf( "\tptlOrigin: %ld, %ld\n", ptlOrigin.x, ptlOrigin.y );
+      edit_pointl( "ptlOrigin", ptlOrigin );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1623,7 +1637,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETWINDOWORGEX*\n" );
-      printf( "\tptlOrigin: %ld, %ld\n", ptlOrigin.x, ptlOrigin.y );
+      edit_pointl( "ptlOrigin", ptlOrigin );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1683,7 +1697,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETVIEWPORTEXTEX*\n" );
-      printf( "\tszlExtent: %ld, %ld\n", szlExtent.cx, szlExtent.cy );
+      edit_sizel( "szlExtent", szlExtent );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1747,10 +1761,10 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SCALEVIEWPORTEXTEX*\n" );
-      printf( "\txNum: %ld\n", xNum );
-      printf( "\txDenom: %ld\n", xDenom );
-      printf( "\tyNum: %ld\n", yNum );
-      printf( "\tyDenom: %ld\n", yDenom );
+      printf( "\txNum\t: %ld\n", xNum );
+      printf( "\txDenom\t: %ld\n", xDenom );
+      printf( "\tyNum\t: %ld\n", yNum );
+      printf( "\tyDenom\t: %ld\n", yDenom );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1810,7 +1824,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETWINDOWEXTEX*\n" );
-      printf( "\tszlExtent: %ld, %ld\n", szlExtent.cx, szlExtent.cy );
+      edit_sizel( "szlExtent", szlExtent );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1874,10 +1888,10 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SCALEWINDOWEXTEX*\n" );
-      printf( "\txNum: %ld\n", xNum );
-      printf( "\txDenom: %ld\n", xDenom );
-      printf( "\tyNum: %ld\n", yNum );
-      printf( "\tyDenom: %ld\n", yDenom );
+      printf( "\txNum\t: %ld\n", xNum );
+      printf( "\txDenom\t: %ld\n", xDenom );
+      printf( "\tyNum\t: %ld\n", yNum );
+      printf( "\tyDenom\t: %ld\n", yDenom );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1939,13 +1953,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*MODIFYWORLDTRANSFORM*\n" );
-      printf( "\txform.eM11  : %f\n", xform.eM11 );
-      printf( "\txform.eM12  : %f\n", xform.eM12 );
-      printf( "\txform.eM21  : %f\n", xform.eM21 );
-      printf( "\txform.eM22  : %f\n", xform.eM22 );
-      printf( "\txform.eDx   : %f\n", xform.eDx );
-      printf( "\txform.eDy   : %f\n", xform.eDy );
-      printf( "\tiMode: " );
+      edit_xform( "xform", xform );
+      printf( "\tiMode\t\t: " );
       switch ( iMode ) {
       case MWT_IDENTITY: printf( "MWT_IDENTITY\n" ); break;
       case MWT_LEFTMULTIPLY: printf( "MWT_LEFTMULTIPLY\n" ); break;
@@ -2010,12 +2019,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETWORLDTRANSFORM*\n" );
-      printf( "\txform.eM11  : %f\n", xform.eM11 );
-      printf( "\txform.eM12  : %f\n", xform.eM12 );
-      printf( "\txform.eM21  : %f\n", xform.eM21 );
-      printf( "\txform.eM22  : %f\n", xform.eM22 );
-      printf( "\txform.eDx   : %f\n", xform.eDx );
-      printf( "\txform.eDy   : %f\n", xform.eDy );
+      edit_xform( "xform", xform );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2074,7 +2078,7 @@ namespace EMF {
       unsigned int unknown_bits = ~known_bits;
 
       printf( "*SETTEXTALIGN*\n" );
-      printf( "\tiMode: " );
+      printf( "\tiMode\t: " );
       if ( iMode & TA_UPDATECP )
 	printf( "TA_UPDATECP" );
       else
@@ -2151,7 +2155,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETTEXTCOLOR*\n" );
-      printf( "\tcrColor: 0x%lx\n", crColor );
+      edit_color( "crColor", crColor );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2207,7 +2211,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETBKCOLOR*\n" );
-      printf( "\tcrColor: 0x%lx\n", crColor );
+      edit_color( "crColor", crColor );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2264,7 +2268,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETBKMODE*\n" );
-      printf( "\tiMode: " );
+      printf( "\tiMode\t: " );
       switch ( iMode ) {
       case TRANSPARENT: printf( "TRANSPARENT\n" ); break;
       case OPAQUE: printf( "OPAQUE\n" ); break;
@@ -2387,7 +2391,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETMAPMODE*\n" );
-      printf( "\tiMode: " );
+      printf( "\tiMode\t: " );
       switch ( iMode ) {
       case MM_TEXT: printf( "MM_TEXT\n" ); break;
       case MM_LOMETRIC: printf( "MM_LOMETRIC\n" ); break;
@@ -2451,7 +2455,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SELECTOBJECT*\n" );
-      printf( "\tihObject: 0x%lx\n", ihObject );
+      printf( "\tihObject\t: 0x%lx\n", ihObject );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2504,7 +2508,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*DELETEOBJECT*\n" );
-      printf( "\tihObject: 0x%lx\n", ihObject );
+      printf( "\tihObject\t: 0x%lx\n", ihObject );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2562,7 +2566,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*MOVETOEX*\n" );
-      printf( "\tptl: %ld, %ld\n", ptl.x, ptl.y );
+      edit_pointl( "ptl", ptl );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2620,7 +2624,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*LINETO*\n" );
-      printf( "\tptl: %ld, %ld\n", ptl.x, ptl.y );
+      edit_pointl( "ptl", ptl );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2693,18 +2697,9 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ARC*\n" );
-#if 0
-      printf( "\trclBox.left    : %ld\n", rclBox.left );
-      printf( "\trclBox.top     : %ld\n", rclBox.top );
-      printf( "\trclBox.right   : %ld\n", rclBox.right );
-      printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
-#else
-      edit_rectl( "rclBox", rclBox );
-#endif
-      printf( "\tptlStart.x     : %ld\n", ptlStart.x );
-      printf( "\tptlStart.y     : %ld\n", ptlStart.y );
-      printf( "\tptlEnd.x       : %ld\n", ptlEnd.x );
-      printf( "\tptlEnd.y       : %ld\n", ptlEnd.y );
+      edit_rectl( "rclBox\t", rclBox );
+      edit_pointl( "ptlStart", ptlStart );
+      edit_pointl( "ptlEnd\t", ptlEnd );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2777,18 +2772,9 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ARCTO*\n" );
-#if 0
-      printf( "\trclBox.left    : %ld\n", rclBox.left );
-      printf( "\trclBox.top     : %ld\n", rclBox.top );
-      printf( "\trclBox.right   : %ld\n", rclBox.right );
-      printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
-#else
-      edit_rectl( "rclBox", rclBox );
-#endif
-      printf( "\tptlStart.x     : %ld\n", ptlStart.x );
-      printf( "\tptlStart.y     : %ld\n", ptlStart.y );
-      printf( "\tptlEnd.x       : %ld\n", ptlEnd.x );
-      printf( "\tptlEnd.y       : %ld\n", ptlEnd.y );
+      edit_rectl( "rclBox\t", rclBox );
+      edit_pointl( "ptlStart", ptlStart );
+      edit_pointl( "ptlEnd\t", ptlEnd );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2850,14 +2836,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*RECTANGLE*\n" );
-#if 0
-      printf( "\trclBox.left    : %ld\n", rclBox.left );
-      printf( "\trclBox.top     : %ld\n", rclBox.top );
-      printf( "\trclBox.right   : %ld\n", rclBox.right );
-      printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
-#else
       edit_rectl( "rclBox", rclBox );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2920,14 +2899,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*ELLIPSE*\n" );
-#if 0
-      printf( "\trclBox.left    : %ld\n", rclBox.left );
-      printf( "\trclBox.top     : %ld\n", rclBox.top );
-      printf( "\trclBox.right   : %ld\n", rclBox.right );
-      printf( "\trclBox.bottom  : %ld\n", rclBox.bottom );
-#else
       edit_rectl( "rclBox", rclBox );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3013,14 +2985,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINE*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3135,18 +3100,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINE16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\tapts->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      edit_point16array( "\t", cpts, lpoints );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3232,14 +3187,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYGON*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3354,18 +3302,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYGON16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\tapts->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      edit_point16array( "\t", cpts, lpoints );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3483,14 +3421,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYPOLYGON*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tnPolys            : %ld\n", nPolys );
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taPolyCounts->\n" );
@@ -3657,22 +3588,23 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYPOLYGON16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tnPolys            : %ld\n", nPolys );
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\taPolyCounts->\n" );
-      for ( unsigned int i = 0; i < nPolys; i++ )
-	printf( "\t\t%ld\n", lcounts[i] );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      printf( "\tnPolys\t\t: %ld\n", nPolys );
+      printf( "\tcpts\t\t: %ld\n", cpts );
+      printf( "\taPolyCounts\t:\t" );
+      if ( nPolys > 0 )
+	printf( "%ld\n", lcounts[0] );
+      else
+	puts( "" );
+      for ( unsigned int i = 1; i < nPolys; i++ )
+	printf( "\t\t\t\t%ld\n", lcounts[i] );
+      printf( "\tapts\t\t:\t" );
+      if ( cpts > 0 )
+	printf( "%d, %d\n", lpoints[0].x, lpoints[0].y );
+      else
+	puts( "" );
+      for ( unsigned int i = 1; i < cpts; i++ )
+	printf( "\t\t\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3758,14 +3690,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIER*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -3880,18 +3805,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIER16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\tapts->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      edit_point16array( "\t", cpts, lpoints );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3977,14 +3892,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIERTO*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -4099,18 +4007,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYBEZIERTO16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\tapts->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      edit_point16array( "\t", cpts, lpoints );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4196,14 +4094,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINETO*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
       printf( "\tcptl              : %ld\n", cptl );
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
@@ -4318,18 +4209,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*POLYLINETO16*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tcpts              : %ld\n", cpts );
-      printf( "\tapts->\n" );
-      for ( unsigned int i = 0; i < cpts; i++ )
-	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
+      edit_point16array( "\t", cpts, lpoints );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4477,25 +4358,20 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*EXTTEXTOUTA*\n" );
-#if 0
-      printf( "\trclBounds: (%ld,%ld)-(%ld,%ld)\n", rclBounds.left, rclBounds.top,
-	      rclBounds.right, rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
-      printf( "\tiGraphicsMode:" );
+      printf( "\tiGraphicsMode\t: " );
       switch ( iGraphicsMode ) {
       case GM_COMPATIBLE: printf( "GM_COMPATIBLE\n" ); break;
       case GM_ADVANCED: printf( "GM_ADVANCED\n" ); break;
       default: printf( "unknown(%ld)\n", iGraphicsMode );
       }
-      printf( "\texScale: %f\n", exScale );
-      printf( "\teyScale: %f\n", eyScale );
-      printf( "\tptlReference: (%ld,%ld)\n", emrtext.ptlReference.x,
+      printf( "\texScale\t\t: %f\n", exScale );
+      printf( "\teyScale\t\t: %f\n", eyScale );
+      printf( "\tptlReference\t: (%ld,%ld)\n", emrtext.ptlReference.x,
 	      emrtext.ptlReference.y );
-      printf( "\tnChars: %ld\n", emrtext.nChars );
-      printf( "\toffString: %ld\n", emrtext.offString );
-      printf( "\tfOptions: " );
+      printf( "\tnChars\t\t: %ld\n", emrtext.nChars );
+      printf( "\toffString\t: %ld\n", emrtext.offString );
+      printf( "\tfOptions\t: " );
       if ( emrtext.fOptions & ETO_GRAYED )
 	printf( "ETO_GRAYED | " );
       if ( emrtext.fOptions & ETO_OPAQUE )
@@ -4509,14 +4385,8 @@ namespace EMF {
       if ( emrtext.fOptions & ETO_IGNORELANGUAGE )
 	printf( "ETO_IGNORELANGUAGE" );
       printf( "\n" );
-#if 0
-      printf( "\trcl: (%ld,%ld)-(%ld,%ld)\n", emrtext.rcl.left, emrtext.rcl.top,
-	      emrtext.rcl.right, emrtext.rcl.bottom );
-#else
-      edit_rectl( "rcl", emrtext.rcl );
-#endif
-      printf( "\toffDx: %ld\n", emrtext.offDx );
-
+      edit_rectl( "rcl\t", emrtext.rcl );
+      printf( "\toffDx\t\t: %ld\n", emrtext.offDx );
       printf( "\tString:\n\t\t%s\n",  string_a );
 
       if ( emrtext.offDx != 0 ) {
@@ -4584,8 +4454,8 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*SETPIXELV*\n" );
-      printf( "\tptlPixel: %ld, %ld\n", ptlPixel.x, ptlPixel.y );
-      printf( "\tcrColor: 0x%lx\n", crColor );
+      edit_pointl( "ptlPixel", ptlPixel );
+      edit_color( "crColor\t", crColor );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4638,25 +4508,10 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*CREATEPEN*\n" );
-      printf( "\tihPen: 0x%lx\n", ihPen );
-#if 0
-      printf( "\tlopn.lopnStyle : " );
-      switch ( lopn.lopnStyle & PS_STYLE_MASK ) {
-      case PS_SOLID: printf( "PS_SOLID" ); break;
-      case PS_DASH: printf( "PS_DASH" ); break;
-      case PS_DOT: printf( "PS_DOT" ); break;
-      case PS_DASHDOT: printf( "PS_DASHDOT" ); break;
-      case PS_DASHDOTDOT: printf( "PS_DASHDOTDOT" ); break;
-      case PS_NULL: printf( "PS_NULL" ); break;
-      case PS_INSIDEFRAME: printf( "PS_INSIDEFRAME" ); break;
-      case PS_USERSTYLE: printf( "PS_USERSTYLE" ); break;
-      case PS_ALTERNATE: printf( "PS_ALTERNATE" ); break;
-      }
-#else
+      printf( "\tihPen\t\t: 0x%lx\n", ihPen );
       edit_pen_style( "lopn.lopnStyle", lopn.lopnStyle );
-#endif
-      printf( "\tlopn.lopnWidth : %ld, %ld\n", lopn.lopnWidth.x, lopn.lopnWidth.y );
-      printf( "\tlopn.lopnColor : 0x%lx\n", lopn.lopnColor );
+      printf( "\tlopn.lopnWidth\t: %ld, %ld\n", lopn.lopnWidth.x, lopn.lopnWidth.y );
+      edit_color( "lopn.lopnColor", lopn.lopnColor );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4704,17 +4559,17 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*EXTCREATEPEN*\n" );
-      printf( "\tihPen   : 0x%lx\n", ihPen );
-      printf( "\toffBmi  : %ld\n",  offBmi );
-      printf( "\tcbBmi   : %ld\n", cbBmi );
-      printf( "\toffBits : %ld\n", offBits );
-      printf( "\tcbBits  : %ld\n", cbBits );
-      edit_pen_style( "elp.elpPenStyle", elp.elpPenStyle );
-      printf( "\telp.elpWidth : %ld\n", elp.elpWidth );
+      printf( "\tihPen\t\t\t: 0x%lx\n", ihPen );
+      printf( "\toffBmi\t\t\t: %ld\n",  offBmi );
+      printf( "\tcbBmi\t\t\t: %ld\n", cbBmi );
+      printf( "\toffBits\t\t\t: %ld\n", offBits );
+      printf( "\tcbBits\t\t\t: %ld\n", cbBits );
+      edit_pen_style( "elp.elpPenStyle\t", elp.elpPenStyle );
+      printf( "\telp.elpWidth\t\t: %ld\n", elp.elpWidth );
       edit_brush_style( "elp.elpBrushStyle", elp.elpBrushStyle );
-      printf( "\telp.elpColor : 0x%lx\n", elp.elpColor );
-      edit_brush_hatch( "elp.elpHatch", elp.elpHatch );
-      printf( "\telp.elpNumEntries : %ld\n", elp.elpNumEntries );
+      edit_color( "elp.elpColor\t", elp.elpColor );
+      edit_brush_hatch( "elp.elpHatch\t", elp.elpHatch );
+      printf( "\telp.elpNumEntries\t: %ld\n", elp.elpNumEntries );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4761,9 +4616,9 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*CREATEBRUSHINDIRECT*\n" );
-      printf( "\tihBrush: 0x%lx\n", ihBrush );
-      edit_brush_style( "lb.lbStyle", lb.lbStyle );
-      printf( "\tlb.lbColor : 0x%lx\n", lb.lbColor );
+      printf( "\tihBrush\t\t: 0x%lx\n", ihBrush );
+      edit_brush_style( "b.lbStyle\t", lb.lbStyle );
+      edit_color( "lb.lbColor", lb.lbColor );
       edit_brush_hatch( "lb.lbHatch", lb.lbHatch );
     }
 #endif /* ENABLE_EDITING */
@@ -4816,12 +4671,12 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*EXTCREATEFONTINDIRECTW*\n" );
-      printf( "\tihFont: %ld\n", ihFont );
-      printf( "\tlfHeight: %ld\n", elfw.elfLogFont.lfHeight );
-      printf( "\tlfWidth: %ld\n", elfw.elfLogFont.lfWidth );
-      printf( "\tlfEscapement: %ld\n", elfw.elfLogFont.lfEscapement );
-      printf( "\tlfOrientation: %ld\n", elfw.elfLogFont.lfOrientation );
-      printf( "\tlfWeight: " );
+      printf( "\tihFont\t\t\t: %ld\n", ihFont );
+      printf( "\tlfHeight\t\t: %ld\n", elfw.elfLogFont.lfHeight );
+      printf( "\tlfWidth\t\t\t: %ld\n", elfw.elfLogFont.lfWidth );
+      printf( "\tlfEscapement\t\t: %ld\n", elfw.elfLogFont.lfEscapement );
+      printf( "\tlfOrientation\t\t: %ld\n", elfw.elfLogFont.lfOrientation );
+      printf( "\tlfWeight\t\t: " );
       switch ( elfw.elfLogFont.lfWeight ) {
       case FW_DONTCARE: printf( "FW_DONTCARE\n" ); break;
       case FW_THIN: printf( "FW_THIN\n" ); break;
@@ -4834,16 +4689,16 @@ namespace EMF {
       case FW_EXTRABOLD: printf( "FW_EXTRABOLD\n" ); break;
       case FW_BLACK: printf( "FW_BLACK\n" ); break;
       }
-      printf( "\tlfItalic: %d\n", elfw.elfLogFont.lfItalic );
-      printf( "\tlfUnderline: %d\n", elfw.elfLogFont.lfUnderline );
-      printf( "\tlfStrikeOut: %d\n", elfw.elfLogFont.lfStrikeOut );
-      printf( "\tlfCharSet: %d\n", elfw.elfLogFont.lfCharSet );
-      printf( "\tlfOutPrecision: %d\n", elfw.elfLogFont.lfOutPrecision );
-      printf( "\tlfClipPrecision: %d\n", elfw.elfLogFont.lfClipPrecision );
-      printf( "\tlfQuality: %d\n", elfw.elfLogFont.lfQuality );
-      printf( "\tlfPitchAndFamily: %d\n", elfw.elfLogFont.lfPitchAndFamily );
+      printf( "\tlfItalic\t\t: %d\n", elfw.elfLogFont.lfItalic );
+      printf( "\tlfUnderline\t\t: %d\n", elfw.elfLogFont.lfUnderline );
+      printf( "\tlfStrikeOut\t\t: %d\n", elfw.elfLogFont.lfStrikeOut );
+      printf( "\tlfCharSet\t\t: %d\n", elfw.elfLogFont.lfCharSet );
+      printf( "\tlfOutPrecision\t\t: %d\n", elfw.elfLogFont.lfOutPrecision );
+      printf( "\tlfClipPrecision\t\t: %d\n", elfw.elfLogFont.lfClipPrecision );
+      printf( "\tlfQuality\t\t: %d\n", elfw.elfLogFont.lfQuality );
+      printf( "\tlfPitchAndFamily\t: %d\n", elfw.elfLogFont.lfPitchAndFamily );
       int i = 0;
-      printf( "\tlfFaceName: '" );
+      printf( "\tlfFaceName\t\t: '" );
       while ( elfw.elfLogFont.lfFaceName[i] != 0 && i < LF_FACESIZE ) {
 	putchar( elfw.elfLogFont.lfFaceName[i] );
 	i++;
@@ -4851,7 +4706,7 @@ namespace EMF {
       puts( "'" );
 
       i = 0;
-      printf( "\telfFullName: '" );
+      printf( "\telfFullName\t\t: '" );
       while ( elfw.elfFullName[i] != 0 && i < LF_FULLFACESIZE ) {
 	putchar( elfw.elfFullName[i] );
 	i++;
@@ -4859,29 +4714,29 @@ namespace EMF {
       puts( "'" );
 
       i = 0;
-      printf( "\telfStyle: '" );
+      printf( "\telfStyle\t\t: '" );
       while ( elfw.elfStyle[i] != 0 && i < LF_FACESIZE ) {
 	putchar( elfw.elfStyle[i] );
 	i++;
       }
       puts( "'" );
 
-      printf( "\telfVersion: %ld\n", elfw.elfVersion );
-      printf( "\telfStyleSize: %ld\n", elfw.elfStyleSize );
-      printf( "\telfMatch: %ld\n", elfw.elfMatch );
-      printf( "\telfVendorId: '%s'\n", elfw.elfVendorId );
-      printf( "\telfCulture: %ld\n", elfw.elfCulture );
-      printf( "\telfPanose:\n" );
-      printf( "\t\tbFamilyType: %d\n", elfw.elfPanose.bFamilyType );
-      printf( "\t\tbSerifStyle: %d\n", elfw.elfPanose.bSerifStyle );
-      printf( "\t\tbWeight: %d\n", elfw.elfPanose.bWeight );
-      printf( "\t\tbProportion: %d\n", elfw.elfPanose.bProportion );
-      printf( "\t\tbContrast: %d\n", elfw.elfPanose.bContrast );
-      printf( "\t\tbStrokeVariation: %d\n", elfw.elfPanose.bStrokeVariation );
-      printf( "\t\tbArmStyle: %d\n", elfw.elfPanose.bArmStyle );
-      printf( "\t\tbLetterform: %d\n", elfw.elfPanose.bLetterform );
-      printf( "\t\tbMidline: %d\n", elfw.elfPanose.bMidline );
-      printf( "\t\tbXHeight: %d\n", elfw.elfPanose.bXHeight );
+      printf( "\telfVersion\t\t: %ld\n", elfw.elfVersion );
+      printf( "\telfStyleSize\t\t: %ld\n", elfw.elfStyleSize );
+      printf( "\telfMatch\t\t: %ld\n", elfw.elfMatch );
+      printf( "\telfVendorId\t\t: '%s'\n", elfw.elfVendorId );
+      printf( "\telfCulture\t\t: %ld\n", elfw.elfCulture );
+      printf( "\telfPanose\t\t:\n" );
+      printf( "\t\tbFamilyType\t\t: %d\n", elfw.elfPanose.bFamilyType );
+      printf( "\t\tbSerifStyle\t\t: %d\n", elfw.elfPanose.bSerifStyle );
+      printf( "\t\tbWeight\t\t\t: %d\n", elfw.elfPanose.bWeight );
+      printf( "\t\tbProportion\t\t: %d\n", elfw.elfPanose.bProportion );
+      printf( "\t\tbContrast\t\t: %d\n", elfw.elfPanose.bContrast );
+      printf( "\t\tbStrokeVariation\t: %d\n", elfw.elfPanose.bStrokeVariation );
+      printf( "\t\tbArmStyle\t\t: %d\n", elfw.elfPanose.bArmStyle );
+      printf( "\t\tbLetterform\t\t: %d\n", elfw.elfPanose.bLetterform );
+      printf( "\t\tbMidline\t\t: %d\n", elfw.elfPanose.bMidline );
+      printf( "\t\tbXHeight\t\t: %d\n", elfw.elfPanose.bXHeight );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4984,14 +4839,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*FILLPATH*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -5047,14 +4895,7 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*STROKEPATH*\n" );
-#if 0
-      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
-      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
-      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
-      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
-#else
       edit_rectl( "rclBounds", rclBounds );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -5748,16 +5589,10 @@ namespace EMF {
 	}
       }
       handles.push_back( true );
-#if 0
-      // So, the number of handles is equal to largest ever handle value
-      header->nHandles = handles.size()-1;
-      return header->nHandles;
-#else
       // Well, it appears that even StockObject handles count for something.
       // Not sure what the right value here is, then.
       header->nHandles = handles.size();
       return handles.size()-1;
-#endif
     }
     /*!
      * Clear the usage of this handle
