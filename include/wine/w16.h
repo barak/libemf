@@ -37,11 +37,21 @@ typedef struct {
   EMRPOLYBEZIERTO16, *PEMRPOLYBEZIERTO16,
   EMRPOLYLINETO16,   *PEMRPOLYLINETO16;
 
+typedef struct {
+    EMR    emr;
+    RECTL  rclBounds;
+    DWORD  nPolys;
+    DWORD  cpts;
+    DWORD  aPolyCounts[1];
+    POINT16 apts[1];
+} EMRPOLYPOLYLINE16,     *PEMRPOLYPOLYLINE16,
+  EMRPOLYPOLYGON16,      *PEMRPOLYPOLYGON16;
+
 BOOL      WINAPI PolyBezier16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI PolyBezierTo16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI Polyline16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI PolylineTo16(HDC16,const POINT16*,INT16);
-
+BOOL      WINAPI PolyPolygon16(HDC16,const POINT16*,const INT*,UINT16);
 #ifdef __cplusplus
 }
 #endif
