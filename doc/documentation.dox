@@ -8,6 +8,7 @@ Table of Contents
 - \ref compilation
 - \ref documentation
 - \ref example
+- \ref acknowledgements
 
 \section intro Introduction
 
@@ -168,6 +169,11 @@ drawing as a PNG file (after using The GIMP to crop the transparent
 boundary).
 
 \image html example.png
+
+\section acknowledgements Acknowledgements
+
+Special thanks to Wolfgang Glunz (wglunz@pstoedit.net) for suggestions
+and help testing.
 
 <hr>
 Copyright &copy; 2002 lignum Computing, Inc., <A
