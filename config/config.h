@@ -2,7 +2,7 @@
 /* config/config.h.in.  Generated automatically from configure.ac by autoheader.  */
 
 /* Enable the EditEnhMetaFile() function */
-/* #undef ENABLE_EDITING */
+#define ENABLE_EDITING 1
 
 /* Define if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -62,7 +62,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Turn on any addition debugging edits */
-/* #undef LIBEMF_DEBUG */
+#define LIBEMF_DEBUG 1
 
 /* Name of package */
 #define PACKAGE "libEMF"

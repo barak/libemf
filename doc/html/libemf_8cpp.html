@@ -24,7 +24,7 @@
 <tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a10">DeleteMetaFile</a> (HMETAFILE metafile)</td></tr>
 <tr><td nowrap align=right valign=top>HENHMETAFILE&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a11">GetEnhMetaFileA</a> (LPCSTR filename)</td></tr>
 <tr><td nowrap align=right valign=top>HENHMETAFILE&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a12">GetEnhMetaFileW</a> (LPCWSTR filename)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a13">PlayEnhMetaFile</a> (HDC context, HENHMETAFILE metafile, const RECT *frame)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a13">PlayEnhMetaFile</a> (HDC context, HENHMETAFILE metafile, const RECT *)</td></tr>
 <tr><td nowrap align=right valign=top>void&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a14">EditEnhMetaFile</a> (HENHMETAFILE metafile)</td></tr>
 <tr><td nowrap align=right valign=top>DWORD&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a15">GetLastError</a> ()</td></tr>
 <tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a16">MoveToEx</a> (HDC context, INT x, INT y, LPPOINT point)</td></tr>
@@ -73,34 +73,38 @@
 <tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a59">Polyline16</a> (HDC context, const POINT16 *points, INT16 n)</td></tr>
 <tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a60">Polygon</a> (HDC context, const POINT *points, INT n)</td></tr>
 <tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a61">PolyPolygon</a> (HDC context, const POINT *points, const INT *counts, UINT polygons)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a62">GetTextFaceA</a> (HDC, INT, LPSTR)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a63">SetTextJustification</a> (HDC, INT, INT)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a64">SetPolyFillMode</a> (HDC context, INT mode)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a65">FillPath</a> (HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a66">StrokePath</a> (HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a67">PolyBezierTo</a> (HDC context, const POINT *points, DWORD n)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a68">PolyBezierTo16</a> (HDC context, const POINT16 *points, INT16 n)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a69">PolylineTo</a> (HDC context, const POINT *points, DWORD n)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a70">PolylineTo16</a> (HDC context, const POINT16 *points, INT16 n)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a71">GetTextMetricsA</a> (HDC, LPTEXTMETRICA)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a72">GetTextExtentPoint32A</a> (HDC, LPCSTR, INT, LPSIZE)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a73">BeginPath</a> (HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a74">EndPath</a> (HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a75">CloseFigure</a> (HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a76">SetTextCharacterExtra</a> (HDC, INT)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a77">GetTextCharacterExtra</a> (HDC)</td></tr>
-<tr><td nowrap align=right valign=top>COLORREF&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a78">SetPixel</a> (HDC context, INT x, INT y, COLORREF color)</td></tr>
-<tr><td nowrap align=right valign=top>HWND&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a79">GetDesktopWindow</a> (void)</td></tr>
-<tr><td nowrap align=right valign=top>HDC&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a80">GetDC</a> (HWND window)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a81">ReleaseDC</a> (HWND window, HDC context)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a82">EnumFontFamiliesA</a> (HDC, LPCSTR, FONTENUMPROCA, LPARAM)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a83">EnumFontFamiliesW</a> (HDC, LPCWSTR, FONTENUMPROCW, LPARAM)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a84">EnumFontFamiliesExA</a> (HDC, LPLOGFONTA, FONTENUMPROCEXA, LPARAM, DWORD)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a85">EnumFontFamiliesExW</a> (HDC, LPLOGFONTW, FONTENUMPROCEXW, LPARAM, DWORD)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a86">EnumFontsA</a> (HDC, LPCSTR, FONTENUMPROCA, LPARAM)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a87">EnumFontsW</a> (HDC, LPCWSTR, FONTENUMPROCW, LPARAM)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a88">StretchDIBits</a> (HDC, INT, INT, INT, INT, INT, INT, INT, INT, const void *,const BITMAPINFO *,UINT, DWORD)</td></tr>
-<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a89">SetDIBitsToDevice</a> (HDC, INT, INT, DWORD, DWORD, INT, INT, UINT, UINT, LPCVOID, const BITMAPINFO *,UINT)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a62">PolyPolygon16</a> (HDC context, const POINT16 *points, const INT *counts, UINT16 polygons)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a63">GetTextFaceA</a> (HDC, INT, LPSTR)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a64">SetTextJustification</a> (HDC, INT, INT)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a65">SetPolyFillMode</a> (HDC context, INT mode)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a66">FillPath</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a67">StrokePath</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a68">PolyBezierTo</a> (HDC context, const POINT *points, DWORD n)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a69">PolyBezierTo16</a> (HDC context, const POINT16 *points, INT16 n)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a70">PolylineTo</a> (HDC context, const POINT *points, DWORD n)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a71">PolylineTo16</a> (HDC context, const POINT16 *points, INT16 n)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a72">GetTextMetricsA</a> (HDC, LPTEXTMETRICA)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a73">GetTextExtentPoint32A</a> (HDC, LPCSTR, INT, LPSIZE)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a74">BeginPath</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a75">EndPath</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>BOOL&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a76">CloseFigure</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a77">SaveDC</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a78">RestoreDC</a> (HDC context, INT n)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a79">SetMetaRgn</a> (HDC context)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a80">SetTextCharacterExtra</a> (HDC, INT)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a81">GetTextCharacterExtra</a> (HDC)</td></tr>
+<tr><td nowrap align=right valign=top>COLORREF&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a82">SetPixel</a> (HDC context, INT x, INT y, COLORREF color)</td></tr>
+<tr><td nowrap align=right valign=top>HWND&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a83">GetDesktopWindow</a> (void)</td></tr>
+<tr><td nowrap align=right valign=top>HDC&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a84">GetDC</a> (HWND)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a85">ReleaseDC</a> (HWND, HDC)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a86">EnumFontFamiliesA</a> (HDC, LPCSTR, FONTENUMPROCA, LPARAM)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a87">EnumFontFamiliesW</a> (HDC, LPCWSTR, FONTENUMPROCW, LPARAM)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a88">EnumFontFamiliesExA</a> (HDC, LPLOGFONTA, FONTENUMPROCEXA, LPARAM, DWORD)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a89">EnumFontFamiliesExW</a> (HDC, LPLOGFONTW, FONTENUMPROCEXW, LPARAM, DWORD)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a90">EnumFontsA</a> (HDC, LPCSTR, FONTENUMPROCA, LPARAM)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a91">EnumFontsW</a> (HDC, LPCWSTR, FONTENUMPROCW, LPARAM)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a92">StretchDIBits</a> (HDC, INT, INT, INT, INT, INT, INT, INT, INT, const void *,const BITMAPINFO *,UINT, DWORD)</td></tr>
+<tr><td nowrap align=right valign=top>INT&nbsp;</td><td valign=bottom><a class="el" href="libemf_8cpp.html#a93">SetDIBitsToDevice</a> (HDC, INT, INT, DWORD, DWORD, INT, INT, UINT, UINT, LPCVOID, const BITMAPINFO *,UINT)</td></tr>
 </table>
 <hr><h2>Function Documentation</h2>
 <a name="a50" doxytag="libemf.cpp::Arc"></a><p>
@@ -317,7 +321,7 @@ y position of arc end. </td></tr>
 true if arc was successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a73" doxytag="libemf.cpp::BeginPath"></a><p>
+<a name="a74" doxytag="libemf.cpp::BeginPath"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -431,7 +435,7 @@ handle of metafile context </td></tr>
 handle to a metafile. I don't think there's anything you can do with it, though. </dl>    </td>
   </tr>
 </table>
-<a name="a75" doxytag="libemf.cpp::CloseFigure"></a><p>
+<a name="a76" doxytag="libemf.cpp::CloseFigure"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1649,7 +1653,7 @@ y position of bottom extrema of ellipse. </td></tr>
 true if the ellipse was successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a74" doxytag="libemf.cpp::EndPath"></a><p>
+<a name="a75" doxytag="libemf.cpp::EndPath"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1687,7 +1691,7 @@ handle to metafile context. </td></tr>
 true if successful. </dl>    </td>
   </tr>
 </table>
-<a name="a82" doxytag="libemf.cpp::EnumFontFamiliesA"></a><p>
+<a name="a86" doxytag="libemf.cpp::EnumFontFamiliesA"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1734,7 +1738,7 @@ LPARAM&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a84" doxytag="libemf.cpp::EnumFontFamiliesExA"></a><p>
+<a name="a88" doxytag="libemf.cpp::EnumFontFamiliesExA"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1787,7 +1791,7 @@ DWORD&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a85" doxytag="libemf.cpp::EnumFontFamiliesExW"></a><p>
+<a name="a89" doxytag="libemf.cpp::EnumFontFamiliesExW"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1840,7 +1844,7 @@ DWORD&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a83" doxytag="libemf.cpp::EnumFontFamiliesW"></a><p>
+<a name="a87" doxytag="libemf.cpp::EnumFontFamiliesW"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1887,7 +1891,7 @@ LPARAM&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a86" doxytag="libemf.cpp::EnumFontsA"></a><p>
+<a name="a90" doxytag="libemf.cpp::EnumFontsA"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -1934,7 +1938,7 @@ LPARAM&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a87" doxytag="libemf.cpp::EnumFontsW"></a><p>
+<a name="a91" doxytag="libemf.cpp::EnumFontsW"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2158,7 +2162,7 @@ returns a list of where each glyph was drawn(?) </td></tr>
 true if text was successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a65" doxytag="libemf.cpp::FillPath"></a><p>
+<a name="a66" doxytag="libemf.cpp::FillPath"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2189,7 +2193,7 @@ Fill the defined path. <dl compact><dt>
 true if successful. </dl>    </td>
   </tr>
 </table>
-<a name="a80" doxytag="libemf.cpp::GetDC"></a><p>
+<a name="a84" doxytag="libemf.cpp::GetDC"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2199,7 +2203,7 @@ true if successful. </dl>    </td>
 HDC GetDC (
           </b></td>
           <td valign="bottom"><b>
-HWND <em>window</em>&nbsp;)
+HWND&nbsp;)
           </b></td>
         </tr>
 
@@ -2227,7 +2231,7 @@ handle to a window. </td></tr>
 device context of window. </dl>    </td>
   </tr>
 </table>
-<a name="a79" doxytag="libemf.cpp::GetDesktopWindow"></a><p>
+<a name="a83" doxytag="libemf.cpp::GetDesktopWindow"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2566,7 +2570,7 @@ number of stock object. </td></tr>
 handle of stock graphics object. </dl>    </td>
   </tr>
 </table>
-<a name="a77" doxytag="libemf.cpp::GetTextCharacterExtra"></a><p>
+<a name="a81" doxytag="libemf.cpp::GetTextCharacterExtra"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2604,7 +2608,7 @@ handle to metafile context. </td></tr>
 the current setting. </dl>    </td>
   </tr>
 </table>
-<a name="a72" doxytag="libemf.cpp::GetTextExtentPoint32A"></a><p>
+<a name="a73" doxytag="libemf.cpp::GetTextExtentPoint32A"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2669,7 +2673,7 @@ size of text extents. </td></tr>
 true if successful. </dl>    </td>
   </tr>
 </table>
-<a name="a62" doxytag="libemf.cpp::GetTextFaceA"></a><p>
+<a name="a63" doxytag="libemf.cpp::GetTextFaceA"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -2725,7 +2729,7 @@ buffer to store returned name </td></tr>
 real number of bytes in name </dl>    </td>
   </tr>
 </table>
-<a name="a71" doxytag="libemf.cpp::GetTextMetricsA"></a><p>
+<a name="a72" doxytag="libemf.cpp::GetTextMetricsA"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3159,7 +3163,7 @@ HENHMETAFILE <em>metafile</em>,
         <tr>
           <td></td>
           <td><b>
-const RECT * <em>frame</em>&nbsp;)
+const RECT *&nbsp;)
           </b></td>
         </tr>
 
@@ -3306,7 +3310,7 @@ number of points in the array. </td></tr>
 true if Bezier curve is successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a67" doxytag="libemf.cpp::PolyBezierTo"></a><p>
+<a name="a68" doxytag="libemf.cpp::PolyBezierTo"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3362,7 +3366,7 @@ number of points in the array. </td></tr>
 true if Bezier curve is successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a68" doxytag="libemf.cpp::PolyBezierTo16"></a><p>
+<a name="a69" doxytag="libemf.cpp::PolyBezierTo16"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3463,6 +3467,71 @@ UINT <em>polygons</em>&nbsp;)
 
 <p>
 Draw a series of sequences of connected straight line segments where the end of the last line segment is connect to the beginning of the first line segment. <dl compact><dt>
+<b>Parameters: </b><dd>
+<table border=0 cellspacing=2 cellpadding=0>
+<tr><td valign=top><em>context</em>
+&nbsp;</td><td>
+handle to metafile context. </td></tr>
+<tr><td valign=top><em>points</em>
+&nbsp;</td><td>
+array of points to draw. </td></tr>
+<tr><td valign=top><em>counts</em>
+&nbsp;</td><td>
+array of number of points in each polygon. </td></tr>
+<tr><td valign=top><em>polygons</em>
+&nbsp;</td><td>
+number of polygons (i.e. number of values in counts array). </td></tr>
+</table>
+</dl><dl compact><dt>
+<b>Returns: </b><dd>
+true if the polygons are successfully rendered. </dl>    </td>
+  </tr>
+</table>
+<a name="a62" doxytag="libemf.cpp::PolyPolygon16"></a><p>
+<table width="100%" cellpadding="2" cellspacing="0" border="0">
+  <tr>
+    <td class="md">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td nowrap valign="top"><b> 
+BOOL PolyPolygon16 (
+          </b></td>
+          <td valign="bottom"><b>
+HDC <em>context</em>, 
+          </b></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>
+const POINT16 * <em>points</em>, 
+          </b></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>
+const INT * <em>counts</em>, 
+          </b></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>
+UINT16 <em>polygons</em>&nbsp;)
+          </b></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing=5 cellpadding=0 border=0>
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Draw a series of sequences of connected straight line segments where the end of the last line segment is connect to the beginning of the first line segment. Uses the 16-bit interface (not directly callable from a user-program, though). <dl compact><dt>
 <b>Parameters: </b><dd>
 <table border=0 cellspacing=2 cellpadding=0>
 <tr><td valign=top><em>context</em>
@@ -3651,7 +3720,7 @@ number of points in the array. </td></tr>
 true if polyline is successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a69" doxytag="libemf.cpp::PolylineTo"></a><p>
+<a name="a70" doxytag="libemf.cpp::PolylineTo"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3707,7 +3776,7 @@ number of points in the array. </td></tr>
 true if Polyline is successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a70" doxytag="libemf.cpp::PolylineTo16"></a><p>
+<a name="a71" doxytag="libemf.cpp::PolylineTo16"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3837,7 +3906,7 @@ y position of bottom edge of rectangle. </td></tr>
 true if rectangle was successfully rendered. </dl>    </td>
   </tr>
 </table>
-<a name="a81" doxytag="libemf.cpp::ReleaseDC"></a><p>
+<a name="a85" doxytag="libemf.cpp::ReleaseDC"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -3847,13 +3916,13 @@ true if rectangle was successfully rendered. </dl>    </td>
 INT ReleaseDC (
           </b></td>
           <td valign="bottom"><b>
-HWND <em>window</em>, 
+HWND, 
           </b></td>
         </tr>
         <tr>
           <td></td>
           <td><b>
-HDC <em>context</em>&nbsp;)
+HDC&nbsp;)
           </b></td>
         </tr>
 
@@ -3882,6 +3951,91 @@ device context associated with window. </td></tr>
 </dl><dl compact><dt>
 <b>Returns: </b><dd>
 1 (determined from wine source code) </dl>    </td>
+  </tr>
+</table>
+<a name="a78" doxytag="libemf.cpp::RestoreDC"></a><p>
+<table width="100%" cellpadding="2" cellspacing="0" border="0">
+  <tr>
+    <td class="md">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td nowrap valign="top"><b> 
+INT RestoreDC (
+          </b></td>
+          <td valign="bottom"><b>
+HDC <em>context</em>, 
+          </b></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>
+INT <em>n</em>&nbsp;)
+          </b></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing=5 cellpadding=0 border=0>
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Get the (contents of?) given Device Context off a stack (?). <dl compact><dt>
+<b>Parameters: </b><dd>
+<table border=0 cellspacing=2 cellpadding=0>
+<tr><td valign=top><em>dc</em>
+&nbsp;</td><td>
+device context to restore into </td></tr>
+<tr><td valign=top><em>n</em>
+&nbsp;</td><td>
+pushed context to restore </td></tr>
+</table>
+</dl><dl compact><dt>
+<b>Returns: </b><dd>
+number of save'd contexts? </dl>    </td>
+  </tr>
+</table>
+<a name="a77" doxytag="libemf.cpp::SaveDC"></a><p>
+<table width="100%" cellpadding="2" cellspacing="0" border="0">
+  <tr>
+    <td class="md">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td nowrap valign="top"><b> 
+INT SaveDC (
+          </b></td>
+          <td valign="bottom"><b>
+HDC <em>context</em>&nbsp;)
+          </b></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing=5 cellpadding=0 border=0>
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Push the (contents of?) given Device Context on to a stack (?). <dl compact><dt>
+<b>Parameters: </b><dd>
+<table border=0 cellspacing=2 cellpadding=0>
+<tr><td valign=top><em>dc</em>
+&nbsp;</td><td>
+device context to save </td></tr>
+</table>
+</dl><dl compact><dt>
+<b>Returns: </b><dd>
+number of save'd contexts? </dl>    </td>
   </tr>
 </table>
 <a name="a27" doxytag="libemf.cpp::ScaleViewportExtEx"></a><p>
@@ -4187,7 +4341,7 @@ background mode. </td></tr>
 previous background mode. </dl>    </td>
   </tr>
 </table>
-<a name="a89" doxytag="libemf.cpp::SetDIBitsToDevice"></a><p>
+<a name="a93" doxytag="libemf.cpp::SetDIBitsToDevice"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -4331,7 +4485,45 @@ window mapping mode. </td></tr>
 previous window mapping mode. </dl>    </td>
   </tr>
 </table>
-<a name="a78" doxytag="libemf.cpp::SetPixel"></a><p>
+<a name="a79" doxytag="libemf.cpp::SetMetaRgn"></a><p>
+<table width="100%" cellpadding="2" cellspacing="0" border="0">
+  <tr>
+    <td class="md">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td nowrap valign="top"><b> 
+INT SetMetaRgn (
+          </b></td>
+          <td valign="bottom"><b>
+HDC <em>context</em>&nbsp;)
+          </b></td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing=5 cellpadding=0 border=0>
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Uhm? <dl compact><dt>
+<b>Parameters: </b><dd>
+<table border=0 cellspacing=2 cellpadding=0>
+<tr><td valign=top><em>dc</em>
+&nbsp;</td><td>
+device context </td></tr>
+</table>
+</dl><dl compact><dt>
+<b>Returns: </b><dd>
+number of somethings? </dl>    </td>
+  </tr>
+</table>
+<a name="a82" doxytag="libemf.cpp::SetPixel"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -4396,7 +4588,7 @@ the color to color the pixel with. </td></tr>
 the previous color of the pixel? (not really implemented, though). </dl>    </td>
   </tr>
 </table>
-<a name="a64" doxytag="libemf.cpp::SetPolyFillMode"></a><p>
+<a name="a65" doxytag="libemf.cpp::SetPolyFillMode"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -4491,7 +4683,7 @@ new text alignment. </td></tr>
 previous text alignment value. </dl>    </td>
   </tr>
 </table>
-<a name="a76" doxytag="libemf.cpp::SetTextCharacterExtra"></a><p>
+<a name="a80" doxytag="libemf.cpp::SetTextCharacterExtra"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -4585,7 +4777,7 @@ text foreground color. </td></tr>
 previous text foreground color. </dl>    </td>
   </tr>
 </table>
-<a name="a63" doxytag="libemf.cpp::SetTextJustification"></a><p>
+<a name="a64" doxytag="libemf.cpp::SetTextJustification"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -4948,7 +5140,7 @@ new global transformation. </td></tr>
 true if global transformation was successfully replaced. </dl>    </td>
   </tr>
 </table>
-<a name="a88" doxytag="libemf.cpp::StretchDIBits"></a><p>
+<a name="a92" doxytag="libemf.cpp::StretchDIBits"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -5049,7 +5241,7 @@ DWORD&nbsp;)
     </td>
   </tr>
 </table>
-<a name="a66" doxytag="libemf.cpp::StrokePath"></a><p>
+<a name="a67" doxytag="libemf.cpp::StrokePath"></a><p>
 <table width="100%" cellpadding="2" cellspacing="0" border="0">
   <tr>
     <td class="md">
@@ -5154,7 +5346,7 @@ number of characters in string to draw. </td></tr>
 true of string successfully drawn. </dl>    </td>
   </tr>
 </table>
-<hr><address><small>Generated at Mon Jan 7 14:35:12 2002 for EMF by
+<hr><address><small>Generated at Sun Jan 27 15:26:59 2002 for EMF by
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.gif" alt="doxygen" align="middle" border=0 
 width=110 height=53></a>1.2.8.1 written by <a href="mailto:dimitri@stack.nl">Dimitri van Heesch</a>,
