@@ -86,7 +86,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 
 INCLUDES = -I$(top_srcdir)/include
-check_PROGRAMS = check1 check2 check3
+check_PROGRAMS = check1 check2 check3 example1 example2
 LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++
 
 TESTS = docheck1 docheck2 docheck3
@@ -96,7 +96,8 @@ subdir = tests
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-check_PROGRAMS = check1$(EXEEXT) check2$(EXEEXT) check3$(EXEEXT)
+check_PROGRAMS = check1$(EXEEXT) check2$(EXEEXT) check3$(EXEEXT) \
+	example1$(EXEEXT) example2$(EXEEXT)
 check1_SOURCES = check1.c
 check1_OBJECTS = check1.$(OBJEXT)
 check1_LDADD = $(LDADD)
@@ -112,6 +113,16 @@ check3_OBJECTS = check3.$(OBJEXT)
 check3_LDADD = $(LDADD)
 check3_DEPENDENCIES = $(top_builddir)/libemf/libEMF.la
 check3_LDFLAGS =
+example1_SOURCES = example1.c
+example1_OBJECTS = example1.$(OBJEXT)
+example1_LDADD = $(LDADD)
+example1_DEPENDENCIES = $(top_builddir)/libemf/libEMF.la
+example1_LDFLAGS =
+example2_SOURCES = example2.c
+example2_OBJECTS = example2.$(OBJEXT)
+example2_LDADD = $(LDADD)
+example2_DEPENDENCIES = $(top_builddir)/libemf/libEMF.la
+example2_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -120,7 +131,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/check1.Po $(DEPDIR)/check2.Po \
-@AMDEP_TRUE@	$(DEPDIR)/check3.Po
+@AMDEP_TRUE@	$(DEPDIR)/check3.Po $(DEPDIR)/example1.Po \
+@AMDEP_TRUE@	$(DEPDIR)/example2.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -129,9 +141,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
-DIST_SOURCES = check1.c check2.c check3.c
+DIST_SOURCES = check1.c check2.c check3.c example1.c example2.c
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = check1.c check2.c check3.c
+SOURCES = check1.c check2.c check3.c example1.c example2.c
 
 all: all-am
 
@@ -163,6 +175,12 @@ check2$(EXEEXT): $(check2_OBJECTS) $(check2_DEPENDENCIES)
 check3$(EXEEXT): $(check3_OBJECTS) $(check3_DEPENDENCIES) 
 	@rm -f check3$(EXEEXT)
 	$(LINK) $(check3_LDFLAGS) $(check3_OBJECTS) $(check3_LDADD) $(LIBS)
+example1$(EXEEXT): $(example1_OBJECTS) $(example1_DEPENDENCIES) 
+	@rm -f example1$(EXEEXT)
+	$(LINK) $(example1_LDFLAGS) $(example1_OBJECTS) $(example1_LDADD) $(LIBS)
+example2$(EXEEXT): $(example2_OBJECTS) $(example2_DEPENDENCIES) 
+	@rm -f example2$(EXEEXT)
+	$(LINK) $(example2_LDFLAGS) $(example2_OBJECTS) $(example2_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -173,6 +191,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/check1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/check2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/check3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/example1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/example2.Po@am__quote@
 
 distclean-depend:
 	-rm -rf $(DEPDIR)
