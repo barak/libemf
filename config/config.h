@@ -62,7 +62,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Turn on any addition debugging edits */
-#define LIBEMF_DEBUG 1
+/* #undef LIBEMF_DEBUG */
 
 /* Name of package */
 #define PACKAGE "libEMF"
@@ -71,7 +71,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.6"
+#define VERSION "1.0"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
