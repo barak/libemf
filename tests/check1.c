@@ -24,13 +24,25 @@
 static XFORM xform = { 2., 0., 0., 2., -3., -4. };
 
 static POINT plarray[4] = { { -4, -3 }, { -2, -1 }, { 0, 1 }, { 2, 3 } };
+static POINT plarrayl[4] = { { -400000, -300000 }, { -200000, -100000 },
+			     { 0, 100000 }, { 200000, 300000 } };
 static POINT pltoarray[4] = { { -10, -20 }, { -30, -40 }, { 50, 61 }, { 72, 83 } };
+static POINT pltoarrayl[4] = { { -1000000, -2000000 }, { -3000000, -4000000 },
+			       { 5000000, 6100000 }, { 7200000, 8300000 } };
 static POINT pgarray[4] = {
   { -400, -300 }, { -200, -100 }, { 0, 100 }, { 200, 300 }
+};
+static POINT pgarrayl[4] = {
+  { -40000000, -30000000 }, { -20000000, -10000000 },
+  { 0, 10000000 }, { 20000000, 30000000 }
 };
 static INT advances[7] = { 11, 22, 33, 44, 55, 66, 77 };
 static POINT plplarray[7] = { { -101, -201 }, { -301, -401 }, { -501, -601 },
 			      { 101, 201 }, { 301, 401 }, { 501, 601 }, { 701, 801 } };
+static POINT plplarrayl[7] = { { -10100000, -20100000 }, { -30100000, -40100000 },
+			       { -50100000, -60100000 },
+			       { 10100000, 20100000 }, { 30100000, 40100000 },
+			       { 50100000, 60100000 }, { 70100000, 80100000 } };
 static INT plplsizes[2] = { 3, 4 };
 static LOGPEN lpen = { PS_SOLID, {20,20}, RGB(0,0xff,0xff) };
 static LOGBRUSH lbrush = { BS_HATCHED, RGB(0x0,0x0,0xff), HS_DIAGCROSS };
@@ -81,14 +93,20 @@ int main ( int argc, char* argv[] )
   Ellipse( metaDC, 32, 54, 76, 98 );
 
   Polyline( metaDC, plarray, 4 );
+  Polyline( metaDC, plarrayl, 4 );
   PolylineTo( metaDC, pltoarray, 4 );
+  PolylineTo( metaDC, pltoarrayl, 4 );
   PolyBezier( metaDC, plarray, 4 );
+  PolyBezier( metaDC, plarrayl, 4 );
   PolyBezierTo( metaDC, pltoarray, 4 );
+  PolyBezierTo( metaDC, pltoarrayl, 4 );
   Polygon( metaDC, pgarray, 4 );
+  Polygon( metaDC, pgarrayl, 4 );
   PolyPolygon( metaDC, plplarray, plplsizes, 2 );
+  PolyPolygon( metaDC, plplarrayl, plplsizes, 2 );
 
   TextOut( metaDC, 50, 75, "A larger font, e?", 17 );
-  ExtTextOut( metaDC, 100, 200, ETO_GRAYED, 0, "And now", 7, advances );
+  ExtTextOut( metaDC, 100, 200, ETO_GRAYED|ETO_CLIPPED, 0, "And now", 7, advances );
 
   pen = CreatePenIndirect( &lpen );
   SelectObject( metaDC, pen );
