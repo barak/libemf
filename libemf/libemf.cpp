@@ -2730,13 +2730,22 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
+
     const POINT16* pnt_ptr = points;
 
     for ( UINT i = 0; i < polygons; i++ )
-      for ( INT j = 0; j < counts[i]; j++ )
+      for ( INT j = 0; j < counts[i]; j++ ) {
+
+	if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+	if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+	if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+	if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
 	dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
 
-    RECTL bounds = { 0, 0, -1, -1 };
+	pnt_ptr++;
+      }
 
     EMF::EMRPOLYPOLYGON16* polypolygon16 =
       new EMF::EMRPOLYPOLYGON16( &bounds, points, counts, polygons );
