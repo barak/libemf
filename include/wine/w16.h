@@ -51,6 +51,7 @@ BOOL      WINAPI PolyBezier16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI PolyBezierTo16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI Polyline16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI PolylineTo16(HDC16,const POINT16*,INT16);
+BOOL      WINAPI Polygon16(HDC16,const POINT16*,INT16);
 BOOL      WINAPI PolyPolygon16(HDC16,const POINT16*,const INT*,UINT16);
 #ifdef __cplusplus
 }
