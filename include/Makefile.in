@@ -91,8 +91,8 @@ wine/winnt.h wine/basetsd.h wine/pshpack2.h wine/poppack.h wine/pshpack4.h \
 wine/guiddef.h wine/w16.h
 
 subdir = include
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/config.h
+mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
+CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
 DIST_SOURCES =
 HEADERS = $(nobase_pkginclude_HEADERS)

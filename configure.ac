@@ -3,8 +3,9 @@
 # $Id$
 
 AC_INIT(libEMF, 0.6, libemf@lignumcomputing.com)
+AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(libEMF, 0.6)
-AM_CONFIG_HEADER([config.h])
+AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_SRCDIR([include/emf.h])
 
 # Checks for programs.

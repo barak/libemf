@@ -93,8 +93,8 @@ TESTS = docheck1 docheck2 docheck3
 
 EXTRA_DIST = docheck1 docheck2 docheck3 emfs/check1.emf emfs/check3.emf
 subdir = tests
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/config.h
+mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
+CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
 check_PROGRAMS = check1$(EXEEXT) check2$(EXEEXT) check3$(EXEEXT) \
 	example1$(EXEEXT) example2$(EXEEXT)
@@ -125,11 +125,11 @@ example2_DEPENDENCIES = $(top_builddir)/libemf/libEMF.la
 example2_LDFLAGS =
 
 DEFS = @DEFS@
-DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/check1.Po $(DEPDIR)/check2.Po \
 @AMDEP_TRUE@	$(DEPDIR)/check3.Po $(DEPDIR)/example1.Po \
 @AMDEP_TRUE@	$(DEPDIR)/example2.Po

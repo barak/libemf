@@ -89,8 +89,8 @@ INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = printemf
 LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++ -lm
 subdir = src
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/config.h
+mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
+CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
 bin_PROGRAMS = printemf$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -102,11 +102,11 @@ printemf_DEPENDENCIES = $(top_builddir)/libemf/libEMF.la
 printemf_LDFLAGS =
 
 DEFS = @DEFS@
-DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/config
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/printemf.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
