@@ -699,36 +699,6 @@ namespace EMF {
       return *this;
     }
   };
-  /*!
-   * Very simple routine to determine endian-ness of the machine. Note:
-   * this calls abort() if the results of the test are nonsensical, e.g. if
-   * the byte swapping is not consistent between short's and int's.
-   * \return true if big-endian.
-   */
-  bool DATASTREAM::bigEndian ( void )
-  {
-    bool be16, be32;
-    short ns = 0x1234;
-    int nl = 0x12345678;
-
-    unsigned char* p = (unsigned char*)&ns;
-    be16 = *p == 0x12;
-
-    p = (unsigned char*)&nl;
-    if ( p[0] == 0x12 && p[1] == 0x34 && p[2] == 0x56 && p[3] == 0x78 )
-      be32 = true;
-    else if ( p[0] == 0x78 && p[1] == 0x56 && p[2] == 0x34 && p[3] == 0x12 )
-      be32 = false;
-    else
-      be32 = !be16;
-
-    if ( be32 != be16 ) {
-      //      cerr << "endian-ness not consistent between short's and int's!" << endl;
-      ::abort();
-    }
-
-    return be32;
-  }
 
   class METAFILEDEVICECONTEXT;
 
@@ -979,6 +949,7 @@ namespace EMF {
     static EMF::METARECORD* new_polyline16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polygon ( DATASTREAM& ds );
     static EMF::METARECORD* new_polypolygon ( DATASTREAM& ds );
+    static EMF::METARECORD* new_polypolygon16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polybezier ( DATASTREAM& ds );
     static EMF::METARECORD* new_polybezier16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_polybezierto ( DATASTREAM& ds );
@@ -996,6 +967,9 @@ namespace EMF {
     static EMF::METARECORD* new_beginpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_endpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_closefigure ( DATASTREAM& ds );
+    static EMF::METARECORD* new_savedc ( DATASTREAM& ds );
+    static EMF::METARECORD* new_restoredc ( DATASTREAM& ds );
+    static EMF::METARECORD* new_setmetargn ( DATASTREAM& ds );
   };
 
   extern GLOBALOBJECTS globalObjects;
@@ -1048,9 +1022,10 @@ namespace EMF {
       offPixelFormat = 0;
       bOpenGL = FALSE;
       //
+#if 0
       szlMicrometers.cx = 1000 * szlMillimeters.cx;
       szlMicrometers.cy = 1000 * szlMillimeters.cy;
-
+#endif
       if ( description ) {
 	// Count the number of characters in the description
 	int description_count = 0, nulls = 0;
@@ -1099,7 +1074,9 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
+#if 0
 	 << szlMicrometers
+#endif
 	 << WCHARSTR( description_w, description_size );
       return true;
     }
@@ -1119,14 +1096,18 @@ namespace EMF {
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
 
+#if 0
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-
+#else
+      if ( sizeof( ::ENHMETAHEADER ) <= offDescription )
+	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
+#endif
 #undef OffsetOf
-
+#if 0
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
-
+#endif
       // Should now probably check that the offset is correct...
 
       description_size = ( nSize - offDescription ) / sizeof(WCHAR);
@@ -1147,7 +1128,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC /*dc*/ ) const
     {
       // Actually handled by the destination device context.
     }
@@ -1189,11 +1170,12 @@ namespace EMF {
 	printf( "\tcbPixelFormat     : %ld\n", cbPixelFormat );
 	printf( "\toffPixelFormat    : %ld\n", offPixelFormat );
 	printf( "\tbOpenGL           : %ld\n", bOpenGL );
-
+#if 0
 	if ( sizeof(::ENHMETAHEADER) <= offDescription ) {
 	  printf( "\tszlMicrometers.cx : %ld\n", szlMicrometers.cx );
 	  printf( "\tszlMicrometers.cy : %ld\n", szlMicrometers.cy );
 	}
+#endif
       }
 
 #undef OffsetOf
@@ -1269,7 +1251,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC /*dc*/ ) const
     {
       // Actually handled by the destination device context.
     }
@@ -1328,7 +1310,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetViewportOrgEx( dc, ptlOrigin.x, ptlOrigin.y, 0 );
     }
@@ -1390,7 +1372,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetWindowOrgEx( dc, ptlOrigin.x, ptlOrigin.y, 0 );
     }
@@ -1450,7 +1432,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetViewportExtEx( dc, szlExtent.cx, szlExtent.cy, 0 );
     }
@@ -1514,7 +1496,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       ScaleViewportExtEx( dc, xNum, xDenom, yNum, yDenom, 0 );
     }
@@ -1577,7 +1559,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetWindowExtEx( dc, szlExtent.cx, szlExtent.cy, 0 );
     }
@@ -1641,7 +1623,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       ScaleWindowExtEx( dc, xNum, xDenom, yNum, yDenom, 0 );
     }
@@ -1706,7 +1688,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       ModifyWorldTransform( dc, &xform, iMode );
     }
@@ -1777,7 +1759,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetWorldTransform( dc, &xform );
     }
@@ -1838,7 +1820,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetTextAlign( dc, iMode );
     }
@@ -1918,7 +1900,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetTextColor( dc, crColor );
     }
@@ -1974,7 +1956,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetBkColor( dc, crColor );
     }
@@ -2031,7 +2013,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetBkMode( dc, iMode );
     }
@@ -2092,7 +2074,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetPolyFillMode( dc, iMode );
     }
@@ -2154,7 +2136,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetMapMode( dc, iMode );
     }
@@ -2329,7 +2311,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       MoveToEx( dc,  ptl.x, ptl.y, 0 );
     }
@@ -2387,7 +2369,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       LineTo( dc,  ptl.x, ptl.y );
     }
@@ -2459,7 +2441,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       Arc( dc, rclBox.left, rclBox.top, rclBox.right, rclBox.bottom,
 	   ptlStart.x, ptlStart.y, ptlEnd.x, ptlEnd.y );
@@ -2539,7 +2521,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       ArcTo( dc, rclBox.left, rclBox.top, rclBox.right, rclBox.bottom,
 	     ptlStart.x, ptlStart.y, ptlEnd.x, ptlEnd.y );
@@ -2609,7 +2591,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       Rectangle( dc, rclBox.left, rclBox.top, rclBox.right, rclBox.bottom );
     }
@@ -2675,7 +2657,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       Ellipse( dc, rclBox.left, rclBox.top, rclBox.right, rclBox.bottom );
     }
@@ -2763,7 +2745,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       Polyline( dc, (POINT*)lpoints, cptl );
@@ -2856,7 +2838,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       Polyline16( dc, lpoints, cpts );
@@ -2949,7 +2931,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       Polygon( dc, (POINT*)lpoints, cptl );
@@ -3067,7 +3049,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       // (but DWORD and INT are not)
@@ -3098,6 +3080,176 @@ namespace EMF {
       printf( "\taptl->\n" );
       for ( unsigned int i = 0; i < cptl; i++ )
 	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
+    }
+#endif /* ENABLE_EDITING */
+  };
+
+  //! EMF Poly Polygon16
+  /*!
+   * Draw several filled polygons (with 16-bit points).
+   */
+  class EMRPOLYPOLYGON16 : public METARECORD, ::EMRPOLYPOLYGON16 {
+    DWORD* lcounts;
+    POINT16* lpoints;
+  public:
+    /*!
+     * \param bounds overall bounding box of polygon.
+     * \param points array of polygon vertices.
+     * \param counts array of number of vertices in each polygon.
+     * \param polygons number of polygons.
+     */
+    EMRPOLYPOLYGON16 ( const RECTL* bounds, const POINT* points,
+		       const INT* counts, UINT polygons )
+    {
+      nPolys = polygons;
+      // Count the number of points in points
+      int n = 0;
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	n += counts[i];
+
+      cpts = n;
+      aPolyCounts[0] = 0;	// Really unused
+      apts[0].x = 0;
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYPOLYGON16;
+      // The (#-1)'s below are to account for aPolyCounts[0] and aptl[0], which
+      // aren't directly written out
+      emr.nSize = sizeof( ::EMRPOLYPOLYGON16 ) + sizeof( POINT16 ) * (cpts-1)
+	+ sizeof( DWORD ) * (nPolys-1);
+
+      lcounts = new DWORD[nPolys];
+
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	lcounts[i] = counts[i];
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Additional constructor which takes a POINT16 structure.
+     * \param bounds overall bounding box of polygon.
+     * \param points array of polygon vertices.
+     * \param counts array of number of vertices in each polygon.
+     * \param polygons number of polygons.
+     */
+    EMRPOLYPOLYGON16 ( const RECTL* bounds, const POINT16* points,
+		       const INT* counts, UINT16 polygons )
+    {
+      nPolys = polygons;
+      // Count the number of points in points
+      int n = 0;
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	n += counts[i];
+
+      cpts = n;
+      aPolyCounts[0] = 0;	// Really unused
+      apts[0].x = 0;
+      apts[0].y = 0;
+
+      emr.iType = EMR_POLYPOLYGON16;
+      // The (#-1)'s below are to account for aPolyCounts[0] and aptl[0], which
+      // aren't directly written out
+      emr.nSize = sizeof( ::EMRPOLYPOLYGON16 ) + sizeof( POINT16 ) * (cpts-1)
+	+ sizeof( DWORD ) * (nPolys-1);
+
+      lcounts = new DWORD[nPolys];
+
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	lcounts[i] = counts[i];
+
+      lpoints = new POINT16[cpts];
+
+      for (int i=0; i<n; i++) {
+	lpoints[i].x = points[i].x;
+	lpoints[i].y = points[i].y;
+      }
+
+      rclBounds = *bounds;
+    }
+    /*!
+     * Destructor frees a copy of the counts and points it buffered.
+     */
+    ~EMRPOLYPOLYGON16 ( )
+    {
+      if ( lcounts ) delete[] lcounts;
+      if ( lpoints ) delete[] lpoints;
+    }
+    /*!
+     * Construct a Polygon record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRPOLYPOLYGON16 ( DATASTREAM& ds )
+    {
+      ds >> emr >> rclBounds >> nPolys >> cpts;
+
+      lcounts = new DWORD[nPolys];
+
+      DWORDARRAY counts( lcounts, nPolys );
+
+      ds >> counts;
+
+      lpoints = new POINT16[cpts];
+
+      POINT16ARRAY points( lpoints, cpts );
+
+      ds >> points;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << rclBounds << nPolys << cpts << DWORDARRAY( lcounts, nPolys )
+	 << POINT16ARRAY( lpoints, cpts );
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      // According to the wine windef.h header, POINT and POINTL are equivalent
+      // (but DWORD and INT are not)
+      INT* counts = new INT[nPolys];
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	counts[i] = lcounts[i];
+
+      PolyPolygon16( dc, lpoints, counts, nPolys );
+
+      delete[] counts;
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*POLYPOLYGON16*\n" );
+      printf( "\trclBounds.left    : %ld\n", rclBounds.left );
+      printf( "\trclBounds.top     : %ld\n", rclBounds.top );
+      printf( "\trclBounds.right   : %ld\n", rclBounds.right );
+      printf( "\trclBounds.bottom  : %ld\n", rclBounds.bottom );
+      printf( "\tnPolys            : %ld\n", nPolys );
+      printf( "\tcpts              : %ld\n", cpts );
+      printf( "\taPolyCounts->\n" );
+      for ( unsigned int i = 0; i < nPolys; i++ )
+	printf( "\t\t%ld\n", lcounts[i] );
+      printf( "\taptl->\n" );
+      for ( unsigned int i = 0; i < cpts; i++ )
+	printf( "\t\t%d, %d\n", lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3171,7 +3323,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolyBezier( dc, (POINT*)lpoints, cptl );
@@ -3264,7 +3416,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolyBezier16( dc, lpoints, cpts );
@@ -3357,7 +3509,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolyBezierTo( dc, (POINT*)lpoints, cptl );
@@ -3450,7 +3602,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolyBezierTo16( dc, lpoints, cpts );
@@ -3543,7 +3695,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolylineTo( dc, (POINT*)lpoints, cptl );
@@ -3636,7 +3788,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       // According to the wine windef.h header, POINT and POINTL are equivalent
       PolylineTo16( dc, lpoints, cpts );
@@ -3784,7 +3936,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       RECT rect;
       rect.left = emrtext.rcl.left;
@@ -3891,7 +4043,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       SetPixel( dc, ptlPixel.x, ptlPixel.y, crColor );
     }
@@ -4291,7 +4443,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       FillPath( dc );
     }
@@ -4350,7 +4502,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       StrokePath( dc );
     }
@@ -4406,7 +4558,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       BeginPath( dc );
     }
@@ -4458,7 +4610,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       EndPath( dc );
     }
@@ -4510,7 +4662,7 @@ namespace EMF {
      * \param source the device context from which this record is taken.
      * \param dc device context for execute.
      */
-    void execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
     {
       CloseFigure( dc );
     }
@@ -4521,6 +4673,165 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*CLOSEFIGURE*\n" );
+    }
+#endif /* ENABLE_EDITING */
+  };
+  //! EMF Save DC
+  /*!
+   * Save the device context (i.e., push contents on a stack of
+   * some variety?)
+   */
+  class EMRSAVEDC : public METARECORD, ::EMRSAVEDC {
+  public:
+    /*!
+     */
+    EMRSAVEDC ( void )
+    {
+      emr.iType = EMR_SAVEDC;
+      emr.nSize = sizeof( ::EMRSAVEDC );
+    }
+    /*!
+     * Construct an Savedc record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRSAVEDC ( DATASTREAM& ds )
+    {
+      ds >> emr;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr;
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      SaveDC( dc );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*SAVEDC*\n" );
+    }
+#endif /* ENABLE_EDITING */
+  };
+  //! EMF Restore DC
+  /*!
+   * Use the stored device context in this context(?)
+   */
+  class EMRRESTOREDC : public METARECORD, ::EMRRESTOREDC {
+  public:
+    /*!
+     */
+    EMRRESTOREDC ( INT n )
+    {
+      emr.iType = EMR_RESTOREDC;
+      emr.nSize = sizeof( ::EMRRESTOREDC );
+      iRelative = n;
+    }
+    /*!
+     * Construct an Restoredc record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRRESTOREDC ( DATASTREAM& ds )
+    {
+      ds >> emr >> iRelative;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << iRelative;
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      RestoreDC( dc, iRelative );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*RESTOREDC*\n" );
+      printf( "\tiRelative: %ld\n", iRelative );
+    }
+#endif /* ENABLE_EDITING */
+  };
+  //! EMF Set Meta Region
+  /*!
+   * I really have no idea.
+   */
+  class EMRSETMETARGN : public METARECORD, ::EMRSETMETARGN {
+  public:
+    /*!
+     */
+    EMRSETMETARGN ( void )
+    {
+      emr.iType = EMR_SETMETARGN;
+      emr.nSize = sizeof( ::EMRSETMETARGN );
+    }
+    /*!
+     * Construct an Setmetargn record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRSETMETARGN ( DATASTREAM& ds )
+    {
+      ds >> emr;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr;
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      SetMetaRgn( dc );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*SETMETARGN*\n" );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4893,9 +5204,16 @@ namespace EMF {
 	}
       }
       handles.push_back( true );
+#if 0
       // So, the number of handles is equal to largest ever handle value
       header->nHandles = handles.size()-1;
       return header->nHandles;
+#else
+      // Well, it appears that even StockObject handles count for something.
+      // Not sure what the right value here is, then.
+      header->nHandles = handles.size();
+      return handles.size()-1;
+#endif
     }
     /*!
      * Clear the usage of this handle

@@ -25,6 +25,40 @@ namespace EMF {
   const char PADDING::padding_[4] = { 0, 0, 0, 0 };
 
   /*!
+   * Very simple routine to determine endian-ness of the machine. Note:
+   * this calls abort() if the results of the test are nonsensical, e.g. if
+   * the byte swapping is not consistent between short's and int's.
+   * \return true if big-endian.
+   */
+  bool DATASTREAM::bigEndian ( void )
+  {
+    bool be16, be32;
+    short ns = 0x1234;
+    int nl = 0x12345678;
+
+    unsigned char* p = (unsigned char*)&ns;
+    be16 = *p == 0x12;
+
+    p = (unsigned char*)&nl;
+    if ( p[0] == 0x12 && p[1] == 0x34 && p[2] == 0x56 && p[3] == 0x78 )
+      be32 = true;
+    else if ( p[0] == 0x78 && p[1] == 0x56 && p[2] == 0x34 && p[3] == 0x12 )
+      be32 = false;
+    else
+      be32 = !be16;
+
+    if ( be32 != be16 ) {
+      cerr << "endian-ness not consistent between short's and int's!" << endl;
+      ::abort();
+    }
+
+    // Should also check that the sizes of all the other data structures
+    // are as expected as well...
+
+    return be32;
+  }
+
+  /*!
    * The single instance of the GlobalObjects database. Must be
    * constructed when the library is loaded.
    */
@@ -97,6 +131,7 @@ namespace EMF {
     new_records[EMR_POLYLINE16] = new_polyline16;
     new_records[EMR_POLYGON] = new_polygon;
     new_records[EMR_POLYPOLYGON] = new_polypolygon;
+    new_records[EMR_POLYPOLYGON16] = new_polypolygon16;
     new_records[EMR_POLYBEZIER] = new_polybezier;
     new_records[EMR_POLYBEZIER16] = new_polybezier16;
     new_records[EMR_POLYBEZIERTO] = new_polybezierto;
@@ -114,6 +149,9 @@ namespace EMF {
     new_records[EMR_BEGINPATH] = new_beginpath;
     new_records[EMR_ENDPATH] = new_endpath;
     new_records[EMR_CLOSEFIGURE] = new_closefigure;
+    new_records[EMR_SAVEDC] = new_savedc;
+    new_records[EMR_RESTOREDC] = new_restoredc;
+    new_records[EMR_SETMETARGN] = new_setmetargn;
   }
 
   GLOBALOBJECTS::~GLOBALOBJECTS ( void )
@@ -340,6 +378,11 @@ namespace EMF {
     return new EMF::EMRPOLYPOLYGON( ds );
   }
 
+  METARECORD* GLOBALOBJECTS::new_polypolygon16 ( DATASTREAM& ds )
+  {
+    return new EMF::EMRPOLYPOLYGON16( ds );
+  }
+
   METARECORD* GLOBALOBJECTS::new_polybezier ( DATASTREAM& ds )
   {
     return new EMF::EMRPOLYBEZIER( ds );
@@ -425,6 +468,21 @@ namespace EMF {
     return new EMF::EMRCLOSEFIGURE( ds );
   }
 
+  METARECORD* GLOBALOBJECTS::new_savedc ( DATASTREAM& ds )
+  {
+    return new EMF::EMRSAVEDC( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_restoredc ( DATASTREAM& ds )
+  {
+    return new EMF::EMRRESTOREDC( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_setmetargn ( DATASTREAM& ds )
+  {
+    return new EMF::EMRSETMETARGN( ds );
+  }
+
   EMRCREATEPEN::EMRCREATEPEN ( PEN* pen, HGDIOBJ handle )
   {
     emr.iType = EMR_CREATEPEN;
@@ -448,7 +506,8 @@ namespace EMF {
       SelectObject( dc, ihObject );
   }
 
-  void EMRDELETEOBJECT::execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+  void EMRDELETEOBJECT::execute ( METAFILEDEVICECONTEXT* source, HDC /*dc*/ )
+    const
   {
     // The primary subtlety here is that the handle of an object
     // in the metafile is not the same as the global handle in memory.
@@ -466,7 +525,7 @@ namespace EMF {
     ds >> emr >> ihPen >> lopn;
   }
 
-  void EMRCREATEPEN::execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+  void EMRCREATEPEN::execute ( METAFILEDEVICECONTEXT* source, HDC /*dc*/ ) const
   {
     HPEN pen = CreatePenIndirect( &lopn );
     // The primary subtlety here is that the handle of an object
@@ -491,7 +550,8 @@ namespace EMF {
     elp = *ext_pen;
   }
 
-  void EMREXTCREATEPEN::execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+  void EMREXTCREATEPEN::execute ( METAFILEDEVICECONTEXT* source, HDC /*dc*/ )
+    const
   {
     LOGBRUSH brush;
 
@@ -524,7 +584,7 @@ namespace EMF {
   }
 
   void EMRCREATEBRUSHINDIRECT::execute ( METAFILEDEVICECONTEXT* source,
-					 HDC dc ) const
+					 HDC /*dc*/ ) const
   {
     HBRUSH brush = CreateBrushIndirect( &lb );
     // The primary subtlety here is that the handle of an object
@@ -557,7 +617,7 @@ namespace EMF {
   }
 
   void EMREXTCREATEFONTINDIRECTW::execute ( METAFILEDEVICECONTEXT* source,
-					    HDC dc ) const
+					    HDC /*dc*/ ) const
   {
     HFONT font = CreateFontIndirectW( &elfw.elfLogFont );
     // The primary subtlety here is that the handle of an object
@@ -578,7 +638,8 @@ namespace EMF {
     lgpl = *palette;
   }
 
-  void EMRCREATEPALETTE::execute ( METAFILEDEVICECONTEXT* source, HDC dc ) const
+  void EMRCREATEPALETTE::execute ( METAFILEDEVICECONTEXT* /*source*/,
+				   HDC /*dc*/ ) const
   {
     // Does nothing for now...
   }
@@ -952,6 +1013,8 @@ extern "C" {
     dc->header->nBytes = dc->header->nSize;
     dc->header->nRecords = 1;
 
+    fseek( fp, emr.nSize, SEEK_SET );
+
     while ( true ) {
       long position = ftell( fp );
 
@@ -960,6 +1023,12 @@ extern "C" {
       dc->ds >> emr;
 
       if ( feof( fp ) ) break;
+
+      if ( emr.nSize == 0 ) {
+	cerr << "GetEnhMetaFileW error: record size == 0. cannot continue" << endl;
+	fclose( fp );
+	return 0;
+      }
 
       long next_position = position + emr.nSize;
 
@@ -995,7 +1064,8 @@ extern "C" {
    * \param frame A bounding rectangle in context for the metafile.
    * \param true if successfully copied.
    */
-  BOOL PlayEnhMetaFile ( HDC context, HENHMETAFILE metafile, const RECT* frame )
+  BOOL PlayEnhMetaFile ( HDC context, HENHMETAFILE metafile,
+			 const RECT* /*frame*/ )
   {
     EMF::METAFILEDEVICECONTEXT* source =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find(metafile));
@@ -2426,7 +2496,7 @@ extern "C" {
     dc->appendRecord( polybezier16 );
 
     // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
+    for ( INT16 i = 0; i < n; i++ )
       dc->mergePoint( points[i].x, points[i].y );
 
     return TRUE;
@@ -2603,17 +2673,75 @@ extern "C" {
 
     if ( dc == 0 ) return FALSE;
 
-    RECTL bounds = { 0, 0, -1, -1 };
+    RECTL bounds = { INT_MAX, INT_MAX, INT_MIN, INT_MIN };
 
-    EMF::EMRPOLYPOLYGON* polypolygon = new EMF::EMRPOLYPOLYGON( &bounds, points,
-								counts, polygons );
+    // An optimization: if all the values in points are representable in
+    // 16-bits, then we can use the smaller 16-bit POLYPOLYGON structure.
+    // So, as we update graphics state, try to determine if we've only
+    // got short ints.
+    const POINT* pnt_ptr = points;
+    bool shorts_only = true;
 
-    dc->appendRecord( polypolygon );
+    for ( UINT i = 0; i < polygons; i++ )
+      for ( INT j = 0; j < counts[i]; j++ ) {
+	if ( pnt_ptr->x > SHRT_MAX || pnt_ptr->x < SHRT_MIN ||
+	     pnt_ptr->y > SHRT_MAX || pnt_ptr->y < SHRT_MIN )
+	  shorts_only = false;
 
-    // Update graphics state
+	if ( pnt_ptr->x < bounds.left ) bounds.left = pnt_ptr->x;
+	if ( pnt_ptr->x > bounds.right ) bounds.right = pnt_ptr->x;
+	if ( pnt_ptr->y < bounds.top ) bounds.top = pnt_ptr->y;
+	if ( pnt_ptr->y > bounds.bottom ) bounds.bottom = pnt_ptr->y;
+
+	dc->mergePoint( *pnt_ptr++ );
+      }
+
+    if ( shorts_only ) {
+      EMF::EMRPOLYPOLYGON16* polypolygon16 =
+	new EMF::EMRPOLYPOLYGON16( &bounds, points, counts, polygons );
+
+      dc->appendRecord( polypolygon16 );
+    }
+    else {
+      EMF::EMRPOLYPOLYGON* polypolygon =
+	new EMF::EMRPOLYPOLYGON( &bounds, points, counts, polygons );
+
+      dc->appendRecord( polypolygon );
+    }
+
+    return TRUE;
+  }
+  /*!
+   * Draw a series of sequences of connected straight line segments where
+   * the end of the last line segment is connect to the beginning of the
+   * first line segment. Uses the 16-bit interface (not directly callable
+   * from a user-program, though).
+   * \param context handle to metafile context.
+   * \param points array of points to draw.
+   * \param counts array of number of points in each polygon.
+   * \param polygons number of polygons (i.e. number of values in counts array).
+   * \return true if the polygons are successfully rendered.
+   */
+  BOOL PolyPolygon16 ( HDC context, const POINT16* points, const INT* counts,
+		       UINT16 polygons )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    const POINT16* pnt_ptr = points;
+
     for ( UINT i = 0; i < polygons; i++ )
       for ( INT j = 0; j < counts[i]; j++ )
-	dc->mergePoint( *points++ );
+	dc->mergePoint( pnt_ptr->x, pnt_ptr->y );
+
+    RECTL bounds = { 0, 0, -1, -1 };
+
+    EMF::EMRPOLYPOLYGON16* polypolygon16 =
+      new EMF::EMRPOLYPOLYGON16( &bounds, points, counts, polygons );
+
+    dc->appendRecord( polypolygon16 );
 
     return TRUE;
   }
@@ -2755,7 +2883,7 @@ extern "C" {
     dc->appendRecord( polybezierto16 );
 
     // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
+    for ( INT16 i = 0; i < n; i++ )
       dc->mergePoint( points[i].x, points[i].y );
 
     return TRUE;
@@ -2810,7 +2938,7 @@ extern "C" {
     dc->appendRecord( polylineto16 );
 
     // Update graphics state
-    for ( DWORD i = 0; i < n; i++ )
+    for ( INT16 i = 0; i < n; i++ )
       dc->mergePoint( points[i].x, points[i].y );
 
     return TRUE;
@@ -2899,6 +3027,63 @@ extern "C" {
   }
 
   /*!
+   * Push the (contents of?) given Device Context on to a stack (?).
+   * \param dc device context to save
+   * \return number of save'd contexts?
+   */
+  INT SaveDC (HDC context )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    EMF::EMRSAVEDC* savedc = new EMF::EMRSAVEDC();
+
+    dc->appendRecord( savedc );
+
+    return 0; // Not really implemented.
+  }
+
+  /*!
+   * Get the (contents of?) given Device Context off a stack (?).
+   * \param dc device context to restore into
+   * \param n pushed context to restore
+   * \return number of save'd contexts?
+   */
+  INT RestoreDC (HDC context, INT n )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    EMF::EMRRESTOREDC* restoredc = new EMF::EMRRESTOREDC( n );
+
+    dc->appendRecord( restoredc );
+
+    return 0; // Not really implemented.
+  }
+
+  /*!
+   * Uhm?
+   * \param dc device context
+   * \return number of somethings?
+   */
+  INT SetMetaRgn (HDC context )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    EMF::EMRSETMETARGN* setmetargn = new EMF::EMRSETMETARGN();
+
+    dc->appendRecord( setmetargn );
+
+    return 0; // Not really implemented.
+  }
+  /*!
    * Adds extra space between each character drawn.
    * \param context handle to metafile context.
    * \param extra extra space to add.
@@ -2959,7 +3144,7 @@ extern "C" {
    * \param window handle to a window.
    * \return device context of window.
    */
-  HDC GetDC ( HWND window )
+  HDC GetDC ( HWND /*window*/ )
   {
     return 0;
   }
@@ -2971,7 +3156,7 @@ extern "C" {
    * \param context device context associated with window.
    * \return 1 (determined from wine source code)
    */
-  INT ReleaseDC ( HWND window, HDC context )
+  INT ReleaseDC ( HWND /*window*/, HDC /*context*/ )
   {
     return 1;
   }
