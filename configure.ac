@@ -45,8 +45,8 @@ AC_ARG_ENABLE(debug,
 if test "x$enable_debug" = xyes; then
   AC_DEFINE(LIBEMF_DEBUG, 1)
   if test "x$GCC" = xyes; then
-    CFLAGS="$CFLAGS -g -O0"
-    CXXFLAGS="$CXXFLAGS -g -O0"
+    CFLAGS="$CFLAGS -g -O0 -Wall -W"
+    CXXFLAGS="$CXXFLAGS -g -O0 -Wall -W"
   else
     AC_MSG_WARN([compiler unknown, please disable optimizations manually in \
 your CFLAGS])
