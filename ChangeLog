@@ -1,0 +1,72 @@
+2002-01-28  Allen Barnett  <allen@localhost.localdomain>
+
+	* README: Updated to version 1.0!
+
+	* tests/emfs/check1.emf, tests/emfs/check3.emf:
+	Updated to latest versions of the checkout programs.
+
+	* doc/Makefile, doc/Makefile.in: New file.
+
+	* doc/Makefile.am: Added Doxygen output to distribution file.
+
+	* configure.ac: Added documentation to distribution file.
+
+	* Makefile.am: Added doc subdirectory.
+
+	* libemf/libemf.h: Further editing formats cleanup.
+
+	* tests/check1.c: Added tests for both 16- and 32- poly* records.
+
+	* include/wine/wingdi.h:
+	Reenabled Micrometer member of ENHMETAHEADER structure.
+
+	* libemf/libemf.h: Format of editing improved.
+
+	* tests/emfs/check1.emf: Updated to the latest output format.
+
+	* NEWS: Update to 1.0 release!
+
+	* AUTHORS: Changed WG's e-mail address.
+
+2002-01-27  Allen Barnett  <allen@localhost.localdomain>
+
+	* doc/documentation.dox, doc/Doxyfile, configure.ac:
+	Update to 1.0 release!
+
+	* libemf/libemf.h, libemf/libemf.cpp:
+	Added 16-bit record output for Polyline, PolylineTo, PolyBezier,
+	PolyBezierTo, Polygon, and PolygonTo.
+
+	* configure.ac: Added warning flags to compilation.
+
+	* include/wine/w16.h: Added prototype for Polygon16.
+
+	* libemf/libemf.h: Doxygen comments updates
+
+2002-01-22  Allen Barnett  <allen@localhost.localdomain>
+
+	* tests/emfs/check1.emf, tests/emfs/check3.emf:
+	Updated to be the latest output from the library.
+
+	* tests/Makefile.am, tests/Makefile.in:
+	Added example1 and example2 as testing codes.
+
+	* libemf/libemf.cpp:
+	When PolyPolygon16 is called directly, compute the bounding box.
+
+	* aclocal.m4, config.guess, config.h.in, config.sub, configure, ltmain.sh:
+	Updated as a result of new versions of the autotools.
+
+	* include/wine/w16.h: * Added the PolyPolygon16 structure and function
+
+	* libemf/libemf.h, libemf/libemf.cpp:
+	Added 16-bit metarecord for PolyPolygon when the coordinates are
+	small enough.
+
+	The nHandles value in the header is now one larger than the maximum
+	handle created by the user. Evidently, w32 expects the StockObjects to
+	count as one handle.
+
+	* configure.ac:
+	Updated for version 0.6 (using Autoconf 2.52, Automake 1.5c, and
+	Libtool 1.4)
