@@ -4,17 +4,18 @@
 \mainpage libEMF: Enhanced Metafile Library
 
 Table of Contents
-- \ref intro 
+- \ref intro
+- \ref compilation
 - \ref documentation
 - \ref example
 
 \section intro Introduction
 
-libEMF is a C/C++ library which provides a drawing toolkit based on
-the <A href=http://www.ecma.ch/ecma1/STAND/ECMA-234.HTM> ECMA-234
-standard</A>. The general purpose of this library is to create vector
-graphics files on POSIX systems which can be imported into <A
-href=http://www.sun.com/staroffice/>StarOffice</A> / <A
+libEMF is a C/C++ library which provides a drawing toolkit based on <A
+href=http://www.ecma.ch/ecma1/STAND/ECMA-234.HTM> ECMA-234</A>. The
+general purpose of this library is to create vector graphics files on
+POSIX systems which can be imported into <A
+href=http://www.sun.com/staroffice/>StarOffice</A>/<A
 href=http://www.openoffice.org>OpenOffice</A>.  The Enhanced MetaFile
 (EMF) is one of the two color vector graphics format which is
 "vectorially" understood by SO/OO. (SO/OO can import Encapsulated
@@ -28,21 +29,37 @@ SO/OO graphics object.
 
 My general interest in this library is for making scientific plots
 with <A href=http://www.gnuplot.org/>gnuplot</A> and <A
-href=http://plasma-gate.weizmann.ac.il/Grace/> Grace</A>(forthcoming).
+href=http://plasma-gate.weizmann.ac.il/Grace/>Grace</A>(forthcoming).
 Therefore, this software includes patches to those programs to add the
-EMF as an output option. Therefore, this library is mostly limited to
-the graphics commands required for gnuplot and Grace output drivers,
+EMF as an output option. This library is mostly limited to the
+graphics commands required for gnuplot and Grace output drivers,
 though it's trivial to add new ones.
 
 It is also possible now to generate EMF files from <A
 href=http://www.pstoedit.net/pstoedit/>PSTOEDIT</A> on POSIX
 systems. Therefore, if your graphics code only outputs PostScript,
-you now easily convert it to EMF.
+you can now easily convert it to EMF.
 
 <A href=http://sourceforge.net/projects/libemf>libEMF is hosted on
 SourceForge.</A> If you have questions or comments, try out the <A
 href=mailto:libemf-devel@lists.sourceforge.net>libEMF mailing
 list.</A>
+
+\section compilation Compilation
+
+libEMF uses a standard autoconf-generated configure script to prepare
+it for compilation. If you want to activate printing of EMF records,
+run the configure script with:
+\code
+./configure --enable-editing
+\endcode
+
+A single program is provided which can print the complete contents of
+a metafie (as far as the library understands them, anyway),
+
+\code
+printemf metafile.emf
+\endcode
 
 \section documentation Documentation
 
@@ -72,16 +89,16 @@ GetDesktopWindow() and GetDC(), but they are just dummy functions. The
 metafile device context has its own internal definitions.
 
 The metafile creation subroutine takes four arguments (the first of
-which is ignored). The second argument is the path name of the
-metafile; you can use whatever name is valid on the system, but SO/OO
-prefers the file to end with the .emf extension. The third argument
-gives the size and position of the metafile; since SO/OO ignores the
-position, the first two values should be zero; the second pair of
-values should give the desired physical width and height of the
-drawing in units of 1/1000-th centimeters. The last argument to the
-creation routine is the description of the metafile; by convention,
-this consists of two null-terminated strings with an extra '\0' at the
-end.
+which, the reference device context as obtained above, is
+ignored). The second argument is the path name of the metafile; you
+can use whatever name is valid on the system, but SO/OO prefers the
+file to end with the .emf extension. The third argument gives the size
+and position of the metafile; since SO/OO ignores the position, the
+first two values should be zero; the second pair of values should give
+the desired physical width and height of the drawing in units of
+1/1000-th centimeters. The last argument to the creation routine is
+the description of the metafile; by convention, this consists of two
+null-terminated strings with an extra '\0' at the end.
 
 \code
    HWND desktop = GetDesktopWindow();
