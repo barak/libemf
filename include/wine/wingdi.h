@@ -1930,11 +1930,9 @@ typedef struct {
     DWORD cbPixelFormat;
     DWORD offPixelFormat;
     DWORD bOpenGL;
-#if 0
+
     /* Fields for winver >= win98 */ 
     SIZEL szlMicrometers;
-#endif
-
 } ENHMETAHEADER, *PENHMETAHEADER, *LPENHMETAHEADER; 
 
 typedef struct {
