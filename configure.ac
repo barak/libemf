@@ -2,9 +2,9 @@
 # Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
 # $Id$
 
-AC_INIT(libEMF, 0.6, libemf@lignumcomputing.com)
+AC_INIT(libEMF, 1.0, libemf@lignumcomputing.com)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(libEMF, 0.6)
+AM_INIT_AUTOMAKE(libEMF, 1.0)
 AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_SRCDIR([include/emf.h])
 
