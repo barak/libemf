@@ -1,4 +1,4 @@
-libEMF Version 0.5
+libEMF Version 1.0
 
 libEMF is a library for generating Enhanced Metafiles on systems which
 don't natively support the ECMA-234 Graphics Device Interface
@@ -10,6 +10,8 @@ The only additional configuration option beyond the usual GNU
 autotools options is --enable-editing, which activates the function
 EditEnhMetaFile(). This will print the contents of a metafile in
 memory to stdout.
+
+The documentation starts at doc/html/index.html.
 
 The software is available from SourceForge. See http://libemf.sf.net.
 
