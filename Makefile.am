@@ -16,4 +16,4 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-SUBDIRS = include libemf src tests
+SUBDIRS = include libemf src doc tests
