@@ -1,0 +1,167 @@
+/* Doxygen formatted file */
+/* $Id$ */
+/*!
+\mainpage libEMF: Enhanced Metafile Library
+
+Table of Contents
+- \ref intro 
+- \ref documentation
+- \ref example
+
+\section intro Introduction
+
+libEMF is a C/C++ library which provides a drawing toolkit based on
+the <A href=http://www.ecma.ch/ecma1/STAND/ECMA-234.HTM> ECMA-234
+standard</A>. The general purpose of this library is to create vector
+graphics files on POSIX systems which can be imported into <A
+href=http://www.sun.com/staroffice/>StarOffice</A> / <A
+href=http://www.openoffice.org>OpenOffice</A>.  The Enhanced MetaFile
+(EMF) is one of the two color vector graphics format which is
+"vectorially" understood by SO/OO. (SO/OO can import Encapsulated
+PostScript files, but will only display it if it has a bitmap preview
+image. SO/OO can also import a DXF file, but as near as I can tell,
+this is only monochrome. OpenOffice now has an XML based file format;
+in the future, use of this format will probably supplant this
+library.) The EMF format also has the additional advantage that it can
+be "broken" into its constituent components and edited like any other
+SO/OO graphics object.
+
+My general interest in this library is for making scientific plots
+with <A href=http://www.gnuplot.org/>gnuplot</A> and <A
+href=http://plasma-gate.weizmann.ac.il/Grace/> Grace</A>(forthcoming).
+Therefore, this software includes patches to those programs to add the
+EMF as an output option. Therefore, this library is mostly limited to
+the graphics commands required for gnuplot and Grace output drivers,
+though it's trivial to add new ones.
+
+It is also possible now to generate EMF files from <A
+href=http://www.pstoedit.net/pstoedit/>PSTOEDIT</A> on POSIX
+systems. Therefore, if your graphics code only outputs PostScript,
+you now easily convert it to EMF.
+
+<A href=http://sourceforge.net/projects/libemf>libEMF is hosted on
+SourceForge.</A> If you have questions or comments, try out the <A
+href=mailto:libemf-devel@lists.sourceforge.net>libEMF mailing
+list.</A>
+
+\section documentation Documentation
+
+The documentation of this project is generated with Doxygen and is
+largely for the internals of the library. However, the graphics
+commands which are available from C are <A href=libemf_8cpp.html>
+given here</A>. 
+
+\section example Example
+
+You will probably only use libEMF in the context of an output driver
+for another graphics program, but should you want to do some custom
+graphics generation, here is an annotated example.
+
+\code
+#include <emf.h> // Will depend on your installation of libEMF
+
+int main ( int argc, char* argv[] )
+{
+\endcode
+
+The first step is to create a device context for the metafile. The
+usual way this is accomplished is by acquiring a copy of the
+"desktop" device context and using it as a starting point for the
+metafile device context. libEMF supports the commands
+GetDesktopWindow() and GetDC(), but they are just dummy functions. The
+metafile device context has its own internal definitions.
+
+The metafile creation subroutine takes four arguments (the first of
+which is ignored). The second argument is the path name of the
+metafile; you can use whatever name is valid on the system, but SO/OO
+prefers the file to end with the .emf extension. The third argument
+gives the size and position of the metafile; since SO/OO ignores the
+position, the first two values should be zero; the second pair of
+values should give the desired physical width and height of the
+drawing in units of 1/1000-th centimeters. The last argument to the
+creation routine is the description of the metafile; by convention,
+this consists of two null-terminated strings with an extra '\0' at the
+end.
+
+\code
+   HWND desktop = GetDesktopWindow();
+   HDC dc = GetDC( desktop );
+
+   RECT size = { 0, 0, 10000, 10000 }; // 10cm x 10cm
+   PCSTR filename = "example.emf";
+   PCSTR description = "Example metafile created\0with libEMF\0";
+
+   HDC metaDC = CreateEnhMetaFile( 0, filename, &size, description );
+\endcode
+
+Next, we want to set the drawing properties of the pen, brush and font
+to something other than the default, say a wide, cyan pen and a solid,
+blue brush, and a bold Helvetica font.
+
+\code
+   LOGPEN lpen = { PS_SOLID, {2000,2000}, RGB(0,0xff,0xff) };
+   LOGBRUSH lbrush = { BS_SOLID, RGB(0x0,0x0,0xff), HS_HORIZONTAL };
+   HPEN pen = CreatePenIndirect( &lpen );
+   HBRUSH brush = CreateBrushIndirect( &lbrush );
+   HFONT font = CreateFont( -1100, 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET,
+		      OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		      DEFAULT_PITCH | FF_DONTCARE, "Helvetica" );
+
+   // Make these the active objects for their respective types
+
+   SelectObject( metaDC, pen );
+   SelectObject( metaDC, brush );
+   SelectObject( metaDC, font );
+\endcode
+
+Set the window size to the natural coordinates of the drawing. Here,
+we want to draw on a 100x100 grid.
+
+\code
+   SetWindowExtEx( metaDC, 100, 100, 0 );
+\endcode
+
+Now, we can draw as we like. For example, we'll make a solid
+background with some text centered in the window.
+
+\code
+   Rectangle( metaDC, 0, 0, 100, 100 );
+
+   SetTextColor( metaDC, RGB(0,0xff,0) );
+   SetTextAlign( metaDC, TA_CENTER+TA_BASELINE );
+   SetBkMode( metaDC, TRANSPARENT );
+   TextOutA( metaDC, 50, 50, "Welcome to libEMF", 17 );
+\endcode
+
+Finally, the metafile is written to disk when the metafile is closed.
+Delete the metafile and its assocated device context to free all the
+memory they have consumed.
+
+\code
+   metafile = CloseEnhMetaFile( metaDC );
+   DeleteEnhMetaFile( metafile );
+   DeleteDC( metaDC );
+
+   return 0;
+}
+\endcode
+
+This is result of importing example.emf into OO and exporting the
+drawing as a PNG file (after using The GIMP to crop the transparent
+boundary).
+
+\image html example.png
+
+<hr>
+Copyright &copy; 2002 lignum Computing, Inc., <A
+href="mailto:libemf@lignumcomputing.com>libemf@lignumcomputing.com</A>
+
+<hr>
+Hosted by <A href="http://sourceforge.net">
+<IMG src="http://sourceforge.net/sflogo.php?group_id=30708" width="88" height="31" align="middle" border="0" alt="SourceForge Logo"></A>
+*/
+/*
+;;; local variables: ***
+;;; mode: text ***
+;;; end: ***
+*/

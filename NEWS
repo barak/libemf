@@ -1,0 +1,11 @@
+New in libEMF version 0.5
+
+	Support for reading an existing EMF file.
+	Support for PlayEnhMetaFile, to replay a collected metafile.
+
+New in libEMF version 0.3
+
+	Support for writing EMF files on big-endian machines
+	Support of passing NULL as the initial EMF size. libEMF now
+	maintains more graphics state information.
+	Alpha Autoconf support
