@@ -71,9 +71,13 @@ namespace EMF {
    * all the components of metafiles.
    */
   struct WCHARSTR {
-    WCHAR *const string_;
-    const int length_;
-
+    WCHAR *const string_;	//!< String of WCHARs.
+    const int length_;		//!< Number of WCHARs in string.
+    /*!
+     * Simple constructor.
+     * \param string pointer to string of WCHARS.
+     * \param n number of WCHARS in string.
+     */
     WCHARSTR ( WCHAR *const string, const int length )
       : string_( string ), length_( length ) {}
   };
@@ -85,9 +89,13 @@ namespace EMF {
    * all the components of metafiles.
    */
   struct CHARSTR {
-    CHAR *const string_;
-    const int length_;
-
+    CHAR *const string_;	//!< Array of single byte characters.
+    const int length_;		//!< Number of single byte characers in array.
+    /*!
+     * Simple constructor.
+     * \param array pointer to array of single byte characters.
+     * \param n number of bytes in array.
+     */
     CHARSTR ( CHAR *const string, const int length )
       : string_( string ), length_( length ) {}
   };
@@ -98,9 +106,13 @@ namespace EMF {
    * implied.
    */
   struct BYTEARRAY {
-    BYTE *const array_;
-    const int n_;
-
+    BYTE *const array_;		//!< Array of unsigned bytes.
+    const int n_;		//!< Number of bytes in array.
+    /*!
+     * Simple constructor.
+     * \param array pointer to array of bytes
+     * \param n number of bytes in array
+     */
     BYTEARRAY ( BYTE *const array, const int n )
       : array_( array ), n_( n ) {}
   };
@@ -110,9 +122,13 @@ namespace EMF {
    * Allow an array of POINTL's to be written out at once.
    */
   struct POINTLARRAY {
-    POINTL *const points_;
-    const DWORD n_;
-
+    POINTL *const points_;	//!< Array of POINTLs.
+    const DWORD n_;		//!< Number of POINTLs in array.
+    /*!
+     * Simple constructor.
+     * \param array pointer to array of POINTLs.
+     * \param n number POINTLs in array.
+     */
     POINTLARRAY ( POINTL *const points, const DWORD n )
       : points_( points ), n_( n ) {}
   };
@@ -122,9 +138,13 @@ namespace EMF {
    * Allow an array of POINT16's to be written out at once.
    */
   struct POINT16ARRAY {
-    POINT16 *const points_;
-    const DWORD n_;
-
+    POINT16 *const points_;	//!< Array of POINT16s.
+    const DWORD n_;		//!< Number of POINT16s in array.
+    /*!
+     * Simple constructor.
+     * \param array pointer to array of POINT16s.
+     * \param n number POINT16s in array.
+     */
     POINT16ARRAY ( POINT16 *const points, const DWORD n )
       : points_( points ), n_( n ) {}
   };
@@ -134,9 +154,13 @@ namespace EMF {
    * Allow an array of INT's to be written out at once.
    */
   struct INTARRAY {
-    INT *const ints_;
-    const DWORD n_;
-
+    INT *const ints_;		//!< Array of ints.
+    const DWORD n_;		//!< Number of ints in array.
+    /*!
+     * simple constructor.
+     * \param array pointer to ints.
+     * \param n number ints in array.
+     */
     INTARRAY ( INT *const ints, const DWORD n )
       : ints_( ints ), n_( n ) {}
   };
@@ -146,9 +170,13 @@ namespace EMF {
    * Allow an array of DWORD's to be written out at once.
    */
   struct DWORDARRAY {
-    DWORD *const dwords_;
-    const DWORD n_;
-
+    DWORD *const dwords_;	//!< Array of double words.
+    const DWORD n_;		//!< Number of double words in array.
+    /*!
+     * simple constructor.
+     * \param array pointer to double words.
+     * \param n number double words in array.
+     */
     DWORDARRAY ( DWORD *const dwords, const DWORD n )
       : dwords_( dwords ), n_( n ) {}
   };
@@ -158,8 +186,12 @@ namespace EMF {
    * Write out a few bytes of padding if necessary.
    */
   struct PADDING {
-    static const char padding_[4];
-    const int size_;
+    static const char padding_[4]; //!< Pad with '\0's.
+    const int size_;		//!< Number of bytes of padding.
+    /*!
+     * simple constructor.
+     * \param size number of bytes of padding to use.
+     */
     PADDING ( const int size ) : size_( size ) {}
   };
   
@@ -177,22 +209,39 @@ namespace EMF {
 
     static bool bigEndian ( void );
   public:
+    /*!
+     * Constructor for DATASTREAM.
+     * \param fp optional file pointer (but must be assigned before
+     * any output occurs.)
+     */
     DATASTREAM ( ::FILE* fp = 0 ) : swap_( bigEndian() ), fp_( fp ) {}
-
+    /*!
+     * Use the given FILE stream as the input/output destination.
+     * \param fp file point for i/o.
+     */
     void setStream ( ::FILE* fp ) { fp_ = fp; }
-
+    /*!
+     * Output a byte to the stream (not swabbed or anything).
+     * \param byte byte to output.
+     */
     DATASTREAM& operator<< ( const BYTE& byte )
     {
       fwrite( &byte, sizeof(BYTE), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a byte from the stream (not swabbed or anything).
+     * \param byte destination for input byte.
+     */
     DATASTREAM& operator>> ( BYTE& byte )
     {
       fread( &byte, sizeof(BYTE), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a (short) word to the stream (swabbed).
+     * \param word (short) word to output.
+     */
     DATASTREAM& operator<< ( const WORD& word )
     {
       if ( swap_ ) {
@@ -204,7 +253,10 @@ namespace EMF {
 	fwrite( &word, sizeof(WORD), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a (short) word from the stream (swabbed).
+     * \param word destination for (short) word.
+     */
     DATASTREAM& operator>> ( WORD& word )
     {
       if ( swap_ ) {
@@ -216,7 +268,10 @@ namespace EMF {
 	fread( &word, sizeof(WORD), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a (short, 16-bit) word to the stream (swabbed).
+     * \param word (short, 16-bit) word to output.
+     */
     DATASTREAM& operator<< ( const INT16& word )
     {
       if ( swap_ ) {
@@ -228,7 +283,10 @@ namespace EMF {
 	fwrite( &word, sizeof(INT16), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a (short, 16-bit) word from the stream (swabbed).
+     * \param word destination for (short, 16-bit) word.
+     */
     DATASTREAM& operator>> ( INT16& word )
     {
       if ( swap_ ) {
@@ -240,7 +298,10 @@ namespace EMF {
 	fread( &word, sizeof(INT16), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a double word (long) to the stream (swabbed).
+     * \param word word (long) to output.
+     */
     DATASTREAM& operator<< ( const DWORD& dword )
     {
       if ( swap_ ) {
@@ -254,7 +315,10 @@ namespace EMF {
 	fwrite( &dword, sizeof(DWORD), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a double word (long) from the stream (swabbed).
+     * \param word destination for double word (long).
+     */
     DATASTREAM& operator>> ( DWORD& dword )
     {
       if ( swap_ ) {
@@ -268,7 +332,10 @@ namespace EMF {
 	fread( &dword, sizeof(DWORD), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a long int to the stream (swabbed).
+     * \param long long int to output.
+     */
     DATASTREAM& operator<< ( const LONG& long_ )
     {
       if ( swap_ ) {
@@ -282,7 +349,10 @@ namespace EMF {
 	fwrite( &long_, sizeof(LONG), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a long int from the stream (swabbed).
+     * \param word destination for long int.
+     */
     DATASTREAM& operator>> ( LONG& long_ )
     {
       if ( swap_ ) {
@@ -296,7 +366,10 @@ namespace EMF {
 	fread( &long_, sizeof(LONG), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a (long) int to the stream (swabbed).
+     * \param int_ (long) int to output.
+     */
     DATASTREAM& operator<< ( const INT& int_ )
     {
       if ( swap_ ) {
@@ -310,7 +383,10 @@ namespace EMF {
 	fwrite( &int_, sizeof(INT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a (long) int from the stream (swabbed).
+     * \param int_ destination for (long) int.
+     */
     DATASTREAM& operator>> ( INT& int_ )
     {
       if ( swap_ ) {
@@ -324,7 +400,10 @@ namespace EMF {
 	fread( &int_, sizeof(INT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a (long) unsigned int to the stream (swabbed).
+     * \param uint (long) unsigned int to output.
+     */
     DATASTREAM& operator<< ( const UINT& uint )
     {
       if ( swap_ ) {
@@ -338,7 +417,10 @@ namespace EMF {
 	fwrite( &uint, sizeof(UINT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a (long) unsigned int from the stream (swabbed).
+     * \param uint destination for (long) unsigned int.
+     */
     DATASTREAM& operator>> ( UINT& uint )
     {
       if ( swap_ ) {
@@ -352,7 +434,10 @@ namespace EMF {
 	fread( &uint, sizeof(UINT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a single precision float to the stream (swabbed).
+     * \param float_ single precision float to output.
+     */
     DATASTREAM& operator<< ( const FLOAT& float_ )
     {
       if ( swap_ ) {
@@ -366,7 +451,10 @@ namespace EMF {
 	fwrite( &float_, sizeof(FLOAT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a single precision float from the stream (swabbed).
+     * \param uint destination for single precision float.
+     */
     DATASTREAM& operator>> ( FLOAT& float_ )
     {
       if ( swap_ ) {
@@ -380,220 +468,322 @@ namespace EMF {
 	fread( &float_, sizeof(FLOAT), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a series of '\0's to pad out a record.
+     * \param padding simple padding structure (length and number of nulls).
+     */
     DATASTREAM& operator<< ( const PADDING& padding )
     {
       if ( padding.size_ != 0 )
 	fwrite( &padding.padding_, sizeof(CHAR), padding.size_, fp_ );
       return *this;
     }
-
+    /*!
+     * Output a RECTL structure.
+     * \param rectl structure to output.
+     */
     DATASTREAM& operator<< ( const RECTL& rectl )
     {
       *this << rectl.left << rectl.top << rectl.right << rectl.bottom;
       return *this;
     }
-
+    /*!
+     * Input a RECTL structure.
+     * \param rectl destination of input RECTL.
+     */
     DATASTREAM& operator>> ( RECTL& rectl )
     {
       *this >> rectl.left >> rectl.top >> rectl.right >> rectl.bottom;
       return *this;
     }
-
+    /*!
+     * Output a SIZEL structure.
+     * \param sizel structure to output.
+     */
     DATASTREAM& operator<< ( const SIZEL& sizel )
     {
       *this << sizel.cx << sizel.cy;
       return *this;
     }
-
+    /*!
+     * Input a SIZEL structure.
+     * \param sizel destination of input SIZEL.
+     */
     DATASTREAM& operator>> ( SIZEL& sizel )
     {
       *this >> sizel.cx >> sizel.cy;
       return *this;
     }
-
+    /*!
+     * Output a WCHAR string (note: the individual characters are swabbed).
+     * \param wcharstr structure to output.
+     */
     DATASTREAM& operator<< ( const WCHARSTR& wcharstr )
     {
       for ( int i = 0; i < wcharstr.length_; i++ )
 	*this << wcharstr.string_[i];
       return *this;
     }
-
+    /*!
+     * Input a WCHAR string (note: the individual characters are swabbed.)
+     * \param wcharstr destination of input WCHAR string.
+     */
     DATASTREAM& operator>> ( WCHARSTR& wcharstr )
     {
       for ( int i = 0; i < wcharstr.length_; i++ )
 	*this >> wcharstr.string_[i];
       return *this;
     }
-
+    /*!
+     * Output a single byte character string.
+     * \param charstr structure to output.
+     */
     DATASTREAM& operator<< ( const CHARSTR& charstr )
     {
       fwrite( charstr.string_, sizeof(CHAR), charstr.length_, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a single byte character string.
+     * \param charstr destination of input CHAR string.
+     */
     DATASTREAM& operator>> ( CHARSTR& charstr )
     {
       fread( charstr.string_, sizeof(CHAR), charstr.length_, fp_ );
       return *this;
     }
-
+    /*!
+     * Output an Enhanced Metafile Record header.
+     * \param emr Enhanced Metafile Record header to output.
+     */
     DATASTREAM& operator<< ( const ::EMR& emr )
     {
       *this << emr.iType << emr.nSize;
       return *this;
     }
-
+    /*!
+     * Input an Enhanced Metafile Record header.
+     * \param emr destination of Enhanced Metafile Record header.
+     */
     DATASTREAM& operator>> ( ::EMR& emr )
     {
       *this >> emr.iType >> emr.nSize;
       return *this;
     }
-
+    /*!
+     * Output a POINT structure.
+     * \param point POINT to output.
+     */
     DATASTREAM& operator<< ( const POINT& point )
     {
       *this << point.x << point.y;
       return *this;
     }
-
+    /*!
+     * Input a POINT structure.
+     * \param point destination of input POINT.
+     */
     DATASTREAM& operator>> ( POINT& point )
     {
       *this >> point.x >> point.y;
       return *this;
     }
-
+    /*!
+     * Output a POINTL structure.
+     * \param pointl POINTL to output.
+     */
     DATASTREAM& operator<< ( const POINTL& pointl )
     {
       *this << pointl.x << pointl.y;
       return *this;
     }
-
+    /*!
+     * Input a POINTL structure.
+     * \param pointl destination of input POINTL.
+     */
     DATASTREAM& operator>> ( POINTL& pointl )
     {
       *this >> pointl.x >> pointl.y;
       return *this;
     }
-
+    /*!
+     * Output a POINT16 structure.
+     * \param point POINT16 to output.
+     */
     DATASTREAM& operator<< ( const POINT16& point )
     {
       *this << point.x << point.y;
       return *this;
     }
-
+    /*!
+     * Input a POINT16 structure.
+     * \param point destination of input POINT16.
+     */
     DATASTREAM& operator>> ( POINT16& point )
     {
       *this >> point.x >> point.y;
       return *this;
     }
-
+    /*!
+     * Output an XFORM structure.
+     * \param xform XFORM to output.
+     */
     DATASTREAM& operator<< ( const XFORM& xform )
     {
       *this << xform.eM11 << xform.eM12 << xform.eM21 << xform.eM22
 	    << xform.eDx << xform.eDy;
       return *this;
     }
-
+    /*!
+     * Input an XFORM structure.
+     * \param xfrom destination of input XFORM.
+     */
     DATASTREAM& operator>> ( XFORM& xform )
     {
       *this >> xform.eM11 >> xform.eM12 >> xform.eM21 >> xform.eM22
 	    >> xform.eDx >> xform.eDy;
       return *this;
     }
-
+    /*!
+     * Output an array of BYTEs.
+     * \param array array of BYTEs to output.
+     */
     DATASTREAM& operator<< ( const BYTEARRAY& array )
     {
       fwrite( array.array_, sizeof(BYTE), array.n_, fp_ );
       return *this;
     }
-
+    /*!
+     * Input an array of BYTEs.
+     * \param array destination of array of input BYTEs.
+     */
     DATASTREAM& operator>> ( BYTEARRAY& array )
     {
       fread( array.array_, sizeof(BYTE), array.n_, fp_ );
       return *this;
     }
-
+    /*!
+     * Output an array of POINTLs.
+     * \param array array of POINTLs to output.
+     */
     DATASTREAM& operator<< ( const POINTLARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this << array.points_[i];
       return *this;
     }
-
+    /*!
+     * Input an array of POINTLs.
+     * \param array destination of array of input POINTLs.
+     */
     DATASTREAM& operator>> ( POINTLARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this >> array.points_[i];
       return *this;
     }
-
+    /*!
+     * Output an array of POINT16s.
+     * \param array array of POINT16s to output.
+     */
     DATASTREAM& operator<< ( const POINT16ARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this << array.points_[i];
       return *this;
     }
-
+    /*!
+     * Input an array of POINT16s.
+     * \param array destination of array of input POINT16s.
+     */
     DATASTREAM& operator>> ( POINT16ARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this >> array.points_[i];
       return *this;
     }
-
+    /*!
+     * Output an array of (long) ints.
+     * \param array array of (long) ints to output.
+     */
     DATASTREAM& operator<< ( const INTARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this << array.ints_[i];
       return *this;
     }
-
+    /*!
+     * Input an array of (long) ints.
+     * \param array destination of array of input (long) ints.
+     */
     DATASTREAM& operator>> ( INTARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this >> array.ints_[i];
       return *this;
     }
-
+    /*!
+     * Output an array of double words (longs).
+     * \param array array of double words (longs) to output.
+     */
     DATASTREAM& operator<< ( const DWORDARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this << array.dwords_[i];
       return *this;
     }
-
+    /*!
+     * Input an array of double words (longs).
+     * \param array destination of array of input double words (longs).
+     */
     DATASTREAM& operator>> ( DWORDARRAY& array )
     {
       for ( unsigned int i = 0; i < array.n_; i++ )
 	*this >> array.dwords_[i];
       return *this;
     }
-
+    /*!
+     * Output an Enhanced Metafile Text Record.
+     * \param text Enhanced Metafile Text Record to output.
+     */
     DATASTREAM& operator<< ( const ::EMRTEXT& text )
     {
       *this << text.ptlReference << text.nChars << text.offString << text.fOptions
 	 << text.rcl << text.offDx;
       return *this;
     }
-
+    /*!
+     * Input an Enhanced Metafile Text Record.
+     * \param text destination of Enhanced Metafile Text Record.
+     */
     DATASTREAM& operator>> ( ::EMRTEXT& text )
     {
       *this >> text.ptlReference >> text.nChars >> text.offString >> text.fOptions
 	    >> text.rcl >> text.offDx;
       return *this;
     }
-
+    /*!
+     * Output a Logical Pen definition.
+     * \param pen Logical Pen definition to output.
+     */
     DATASTREAM& operator<< ( const LOGPEN& pen )
     {
       *this << pen.lopnStyle << pen.lopnWidth << pen.lopnColor;
       return *this;
     }
-
+    /*!
+     * Input a Logical Pen definition.
+     * \param pen destination of Logical Pen definition.
+     */
     DATASTREAM& operator>> ( LOGPEN& pen )
     {
       *this >> pen.lopnStyle >> pen.lopnWidth >> pen.lopnColor;
       return *this;
     }
-
+    /*!
+     * Output an Extended Logical Pen definition.
+     * \param pen Extended Logical Pen definition to output.
+     */
     DATASTREAM& operator<< ( const EXTLOGPEN& pen )
     {
       // *** How big is this structure if there are no style entries? ***
@@ -601,7 +791,10 @@ namespace EMF {
 	    << pen.elpHatch << pen.elpNumEntries;
       return *this;
     }
-
+    /*!
+     * Input an Extended Logical Pen definition.
+     * \param pen destination of Extended Logical Pen definition.
+     */
     DATASTREAM& operator>> ( EXTLOGPEN& pen )
     {
       // *** How big is this structure if there are no style entries? ***
@@ -609,19 +802,28 @@ namespace EMF {
 	    >> pen.elpHatch >> pen.elpNumEntries;
       return *this;
     }
-
+    /*!
+     * Output a Logical Brush definition.
+     * \param brush Logical Brush definition to output.
+     */
     DATASTREAM& operator<< ( const LOGBRUSH& brush )
     {
       *this << brush.lbStyle << brush.lbColor << brush.lbHatch;
       return *this;
     }
-
+    /*!
+     * Input a Logical Brush definition.
+     * \param brush destination of Logical Brush definition.
+     */
     DATASTREAM& operator>> ( LOGBRUSH& brush )
     {
       *this >> brush.lbStyle >> brush.lbColor >> brush.lbHatch;
       return *this;
     }
-
+    /*!
+     * Output a Logical Font definition (using WCHAR strings).
+     * \param font Logical Font definition to output.
+     */
     DATASTREAM& operator<< ( const LOGFONTW& font )
     {
       *this << font.lfHeight << font.lfWidth << font.lfEscapement
@@ -632,7 +834,10 @@ namespace EMF {
 	    << WCHARSTR( const_cast<WCHAR*const>(font.lfFaceName), LF_FACESIZE );
       return *this;
     }
-
+    /*!
+     * Input a Logical Font definition (using WCHAR strings).
+     * \param font destination of Logical Font definition.
+     */
     DATASTREAM& operator>> ( LOGFONTW& font )
     {
       WCHARSTR wFaceName( font.lfFaceName, LF_FACESIZE );
@@ -645,19 +850,28 @@ namespace EMF {
 	    >> wFaceName;
       return *this;
     }
-
+    /*!
+     * Output a Panose structure.
+     * \param panose Panose structure to output.
+     */
     DATASTREAM& operator<< ( const PANOSE& panose )
     {
       fwrite( &panose, sizeof(PANOSE), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Input a Panose structure.
+     * \param panose destinatino of input Panose structure.
+     */
     DATASTREAM& operator>> ( PANOSE& panose )
     {
       fread( &panose, sizeof(PANOSE), 1, fp_ );
       return *this;
     }
-
+    /*!
+     * Output an Extended Logical Font definition (using WCHAR strings).
+     * \param font Extended Logical Font definition to output.
+     */
     DATASTREAM& operator<< ( const EXTLOGFONTW& font )
     {
       *this << font.elfLogFont
@@ -671,7 +885,10 @@ namespace EMF {
 	    << font.elfCulture << font.elfPanose;
       return *this;
     }
-
+    /*!
+     * Input an Extended Logical Font definition (using WCHAR strings).
+     * \param font destination of Extended Logical Font definition.
+     */
     DATASTREAM& operator>> ( EXTLOGFONTW& font )
     {
       WCHARSTR wFullName( font.elfFullName, LF_FULLFACESIZE );
@@ -684,14 +901,20 @@ namespace EMF {
 	    >> font.elfCulture >> font.elfPanose;
       return *this;
     }
-
+    /*!
+     * Output a Logical Palette.
+     * \param palette Logical Palette to output.
+     */
     DATASTREAM& operator<< ( const LOGPALETTE& palette )
     {
       // *** How big is this structure if the palette is empty? ***
       *this << palette.palVersion << palette.palNumEntries;
       return *this;
     }
-
+    /*!
+     * Input a Logical Palette.
+     * \param palette destination of input Logical Palette.
+     */
     DATASTREAM& operator>> ( LOGPALETTE& palette )
     {
       // *** How big is this structure if the palette is empty? ***
@@ -858,6 +1081,7 @@ namespace EMF {
   class OBJECT {
   public:
     HGDIOBJ handle;		//!< The handle of a GDI object.
+    //! OBJECTs have a virtual destructor.
     virtual ~OBJECT () {}
     /*!
      * Create a new object. It's up to a subclass to create a real
@@ -878,6 +1102,7 @@ namespace EMF {
    */
   class GRAPHICSOBJECT : public OBJECT {
   public:
+    //! GRAPHICSOBJECTs has a virtual destructor.
     virtual ~GRAPHICSOBJECT () {}
     /*!
      * A set of all the contexts into which this object has been selected and
@@ -4527,6 +4752,7 @@ namespace EMF {
   class EMRBEGINPATH : public METARECORD, ::EMRBEGINPATH {
   public:
     /*!
+     * Create a Begin Path record.
      */
     EMRBEGINPATH ( void )
     {
@@ -4579,6 +4805,7 @@ namespace EMF {
   class EMRENDPATH : public METARECORD, ::EMRENDPATH {
   public:
     /*!
+     * Create an End Path record.
      */
     EMRENDPATH ( void )
     {
@@ -4631,6 +4858,7 @@ namespace EMF {
   class EMRCLOSEFIGURE : public METARECORD, ::EMRCLOSEFIGURE {
   public:
     /*!
+     * Create a Close Figure record.
      */
     EMRCLOSEFIGURE ( void )
     {
@@ -4684,6 +4912,7 @@ namespace EMF {
   class EMRSAVEDC : public METARECORD, ::EMRSAVEDC {
   public:
     /*!
+     * Create a Save DC record.
      */
     EMRSAVEDC ( void )
     {
@@ -4736,6 +4965,7 @@ namespace EMF {
   class EMRRESTOREDC : public METARECORD, ::EMRRESTOREDC {
   public:
     /*!
+     * Create a Restore DC record.
      */
     EMRRESTOREDC ( INT n )
     {
@@ -4790,6 +5020,7 @@ namespace EMF {
   class EMRSETMETARGN : public METARECORD, ::EMRSETMETARGN {
   public:
     /*!
+     * Create a Set Meta Rgn record.
      */
     EMRSETMETARGN ( void )
     {
