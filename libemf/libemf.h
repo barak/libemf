@@ -37,12 +37,20 @@ namespace EMF {
    * The maximum number of pixels in the X direction. Effectively
    * the horizontal resolution of the metafile.
    */
+#if 0
   const int XMAX_PIXELS = 1024; /*(INT_MAX)*/
+#else
+  const int XMAX_PIXELS = 1280; /*(INT_MAX)*/
+#endif
   /*!
    * The maximum number of pixels in the Y direction. Effectively
    * the vertical resolution of the metafile.
    */
+#if 0
   const int YMAX_PIXELS = 768; /*(INT_MAX)*/
+#else
+  const int YMAX_PIXELS = 1024; /*(INT_MAX)*/
+#endif
   /*!
    * The number of millimeters to which the XMAX_PIXELS corresponds.
    * The default horizontal size of the metafile (can be changed by
@@ -1248,6 +1256,7 @@ namespace EMF {
     static EMF::METARECORD* new_extcreatefontindirectw ( DATASTREAM& ds );
     static EMF::METARECORD* new_fillpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_strokepath ( DATASTREAM& ds );
+    static EMF::METARECORD* new_strokeandfillpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_beginpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_endpath ( DATASTREAM& ds );
     static EMF::METARECORD* new_closefigure ( DATASTREAM& ds );
@@ -1306,9 +1315,10 @@ namespace EMF {
       offPixelFormat = 0;
       bOpenGL = FALSE;
       //
+#if 0
       szlMicrometers.cx = 1000 * szlMillimeters.cx;
       szlMicrometers.cy = 1000 * szlMillimeters.cy;
-
+#endif
       if ( description ) {
 	// Count the number of characters in the description
 	int description_count = 0, nulls = 0;
@@ -1357,7 +1367,9 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
+#if 0
 	 << szlMicrometers
+#endif
 	 << WCHARSTR( description_w, description_size );
       return true;
     }
@@ -1376,15 +1388,18 @@ namespace EMF {
 
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
-
+#if 0
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-
+#else
+      if ( sizeof(::ENHMETAHEADER) <= offDescription )
+	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
+#endif
 #undef OffsetOf
-
+#if 0
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
-
+#endif
       // Should now probably check that the offset is correct...
 
       description_size = ( nSize - offDescription ) / sizeof(WCHAR);
@@ -1439,10 +1454,11 @@ namespace EMF {
 	printf( "\tcbPixelFormat\t\t: %ld\n", cbPixelFormat );
 	printf( "\toffPixelFormat\t\t: %ld\n", offPixelFormat );
 	printf( "\tbOpenGL\t\t\t: %ld\n", bOpenGL );
-
+#if 0
 	if ( sizeof(::ENHMETAHEADER) <= offDescription ) {
 	  edit_sizel( "szlMicrometers\t", szlMicrometers );
 	}
+#endif
       }
 
 #undef OffsetOf
@@ -4958,6 +4974,62 @@ namespace EMF {
     void edit ( void ) const
     {
       printf( "*STROKEPATH*\n" );
+      edit_rectl( "rclBounds", rclBounds );
+    }
+#endif /* ENABLE_EDITING */
+  };
+  //! EMF Stroke and Fill path
+  /*!
+   * Stroke and Fill the path.
+   */
+  class EMRSTROKEANDFILLPATH : public METARECORD, ::EMRSTROKEANDFILLPATH {
+  public:
+    /*!
+     * \param bounds overall bounding box of polygon.
+     * \param n number of vertices in points.
+     */
+    EMRSTROKEANDFILLPATH ( const RECTL* bounds )
+    {
+      emr.iType = EMR_STROKEANDFILLPATH;
+      emr.nSize = sizeof( ::EMRSTROKEANDFILLPATH );
+      rclBounds = *bounds;
+    }
+    /*!
+     * Create a StrokeandfillPath record from input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRSTROKEANDFILLPATH ( DATASTREAM& ds )
+    {
+      ds >> emr >> rclBounds;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << rclBounds;
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      StrokeAndFillPath( dc );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*STROKEANDFILLPATH*\n" );
       edit_rectl( "rclBounds", rclBounds );
     }
 #endif /* ENABLE_EDITING */

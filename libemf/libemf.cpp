@@ -147,6 +147,7 @@ namespace EMF {
     new_records[EMR_EXTCREATEFONTINDIRECTW] = new_extcreatefontindirectw;
     new_records[EMR_FILLPATH] = new_fillpath;
     new_records[EMR_STROKEPATH] = new_strokepath;
+    new_records[EMR_STROKEANDFILLPATH] = new_strokeandfillpath;
     new_records[EMR_BEGINPATH] = new_beginpath;
     new_records[EMR_ENDPATH] = new_endpath;
     new_records[EMR_CLOSEFIGURE] = new_closefigure;
@@ -457,6 +458,11 @@ namespace EMF {
   METARECORD* GLOBALOBJECTS::new_strokepath ( DATASTREAM& ds )
   {
     return new EMF::EMRSTROKEPATH( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_strokeandfillpath ( DATASTREAM& ds )
+  {
+    return new EMF::EMRSTROKEANDFILLPATH( ds );
   }
 
   METARECORD* GLOBALOBJECTS::new_beginpath ( DATASTREAM& ds )
@@ -2964,6 +2970,26 @@ extern "C" {
     EMF::EMRSTROKEPATH* strokepath = new EMF::EMRSTROKEPATH( &bounds );
 
     dc->appendRecord( strokepath );
+
+    return TRUE;
+  }
+  /*!
+   * Outline and Fill the defined path.
+   * \return true if successful.
+   */
+  BOOL StrokeAndFillPath ( HDC context )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    RECTL bounds = { 0, 0, -1, -1 };
+
+    EMF::EMRSTROKEANDFILLPATH* strokeandfillpath =
+      new EMF::EMRSTROKEANDFILLPATH( &bounds );
+
+    dc->appendRecord( strokeandfillpath );
 
     return TRUE;
   }
