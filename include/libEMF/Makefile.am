@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ## Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
-## $Id: Makefile.am,v 1.1 2002/01/28 18:38:18 allen Exp $
+## $Id$
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,4 +16,7 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-SUBDIRS = libEMF
+nobase_pkginclude_HEADERS = emf.h \
+wine/winbase.h wine/windef.h wine/winerror.h wine/wingdi.h wine/winuser.h \
+wine/winnt.h wine/basetsd.h wine/pshpack2.h wine/poppack.h wine/pshpack4.h \
+wine/guiddef.h wine/w16.h
