@@ -66,12 +66,20 @@
 #ifndef __WINE__
 #define pascal      __stdcall
 #define _pascal     __stdcall
+#ifndef _stdcall
 #define _stdcall    __stdcall
+#endif
+#ifndef _fastcall
 #define _fastcall   __stdcall
+#endif
+#ifndef __fastcall
 #define __fastcall  __stdcall
+#endif
 #define __export    __stdcall
 #define cdecl       __cdecl
+#ifndef _cdecl
 #define _cdecl      __cdecl
+#endif
 
 #define near
 #define far
@@ -116,14 +124,21 @@
 # define NONAMELESSSTRUCT
 # define NONAMELESSUNION
 #else
+#if !defined(__cplusplus)
+/* for c we can keep the anonymous version (to avoid compiler warnings) */
+#define NONAMELESSSTRUCT
+#define NONAMELESSUNION
+#else
 /* Anonymous struct support starts with gcc/g++ 2.96 */
-# if !defined(NONAMELESSSTRUCT) && defined(__GNUC__) && ((__GNUC__ < 2) || ((__GNUC__ == 2) && (__GNUC_MINOR__ < 96)))
+# if !defined(NONAMELESSSTRUCT) && defined(__GNUC__) && ((__GNUC__ < 2) || ((__GNUC__ == 2) && (__GNUC_MINOR__ < 96))) 
+/* && !defined(__cplusplus) */
 #  define NONAMELESSSTRUCT
 # endif
 /* Anonymous unions support starts with gcc 2.96/g++ 2.95 */
 # if !defined(NONAMELESSUNION) && defined(__GNUC__) && ((__GNUC__ < 2) || ((__GNUC__ == 2) && ((__GNUC_MINOR__ < 95) || ((__GNUC_MINOR__ == 95) && !defined(__cplusplus)))))
 #  define NONAMELESSUNION
 # endif
+#endif
 #endif
 
 #ifndef NONAMELESSSTRUCT
@@ -3134,8 +3149,8 @@ typedef struct _IMAGE_RESOURCE_DIRECTORY {
 #define	IMAGE_RESOURCE_DATA_IS_DIRECTORY	0x80000000
 
 typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
-	union {
-		struct {
+	union u1 {
+		struct fleegle {
 #ifdef BITFIELDS_BIGENDIAN
 			unsigned NameIsString:1;
 			unsigned NameOffset:31;
@@ -3145,7 +3160,7 @@ typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
 #endif
 		} DUMMYSTRUCTNAME1;
 		DWORD   Name;
-                struct {
+                struct sneegle {
 #ifdef WORDS_BIGENDIAN
 			WORD    __pad;
 			WORD    Id;
@@ -3155,9 +3170,9 @@ typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
 #endif
 		} DUMMYSTRUCTNAME2;
 	} DUMMYUNIONNAME1;
-	union {
+	union u2 {
 		DWORD   OffsetToData;
-		struct {
+		struct drooper {
 #ifdef BITFIELDS_BIGENDIAN
 			unsigned DataIsDirectory:1;
 			unsigned OffsetToDirectory:31;
@@ -3567,7 +3582,7 @@ typedef struct _TOKEN_GROUPS  {
  */
 
 typedef union _LARGE_INTEGER {
-    struct {
+    struct dorp {
         DWORD    LowPart;
         LONG     HighPart;
     } DUMMYSTRUCTNAME;
@@ -3575,7 +3590,7 @@ typedef union _LARGE_INTEGER {
 } LARGE_INTEGER, *LPLARGE_INTEGER, *PLARGE_INTEGER;
 
 typedef union _ULARGE_INTEGER {
-    struct {
+    struct banana {
         DWORD    LowPart;
         DWORD    HighPart;
     } DUMMYSTRUCTNAME;

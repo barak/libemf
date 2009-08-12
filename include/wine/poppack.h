@@ -47,7 +47,7 @@
 #  if defined(__GNUC__) || defined(__SUNPRO_C)
 #    pragma pack()
 #  elif defined(__SUNPRO_CC)
-#    warning "Assuming a default alignment of 4"
+/*#    warning "Assuming a default alignment of 4"*/
 #    pragma pack(4)
 #  elif !defined(RC_INVOKED)
 #    error "Adjusting the alignment is not supported with this compiler"

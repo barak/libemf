@@ -1,5 +1,5 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
-## Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
+## Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
 ## $Id$
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -23,3 +23,5 @@ LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++
 TESTS = docheck1 docheck2 docheck3
 
 EXTRA_DIST = docheck1 docheck2 docheck3 emfs/check1.emf emfs/check3.emf
+
+MOSTLYCLEANFILES = check1.emf check2.emf check3.emf

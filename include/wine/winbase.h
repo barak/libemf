@@ -104,7 +104,7 @@ typedef struct _DEBUG_EVENT {
     DWORD dwDebugEventCode;
     DWORD dwProcessId;
     DWORD dwThreadId;
-    union {
+    union u11 {
         EXCEPTION_DEBUG_INFO      Exception;
         CREATE_THREAD_DEBUG_INFO  CreateThread;
         CREATE_PROCESS_DEBUG_INFO CreateProcessInfo;
@@ -244,7 +244,7 @@ typedef struct
     BYTE cbOverhead;
     BYTE iRegionIndex;
     WORD wFlags;
-    union {
+    union u21 {
         struct {
             HANDLE hMem;
             DWORD dwReserved[3];
@@ -630,9 +630,9 @@ typedef struct _SYSTEM_POWER_STATUS
 
 typedef struct tagSYSTEM_INFO
 {
-    union {
+    union u3 {
 	DWORD	dwOemId; /* Obsolete field - do not use */
-	struct {
+	struct splits {
 		WORD wProcessorArchitecture;
 		WORD wReserved;
 	} DUMMYSTRUCTNAME;
@@ -668,7 +668,7 @@ DECL_WINELIB_TYPE_AW(ENUMRESLANGPROC)
 typedef struct _LDT_ENTRY {
     WORD	LimitLow;
     WORD	BaseLow;
-    union {
+    union u4 {
 	struct {
 	    BYTE	BaseMid;
 	    BYTE	Flags1;/*Declare as bytes to avoid alignment problems */

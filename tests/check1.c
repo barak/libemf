@@ -1,6 +1,6 @@
 /*
  * Checkout program for the EMF library
- * Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
+ * Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
  * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  *
  */
 
-#include <emf.h>
+#include <libEMF/emf.h>
 
 static XFORM xform = { 2., 0., 0., 2., -3., -4. };
 
@@ -130,8 +130,13 @@ int main ( int argc, char* argv[] )
 
   FillPath( metaDC );
   StrokePath( metaDC );
+  StrokeAndFillPath( metaDC );
 
   SetPixel( metaDC, 123, 456, RGB(0x24,0x68,0xac) );
+
+  SaveDC( metaDC );
+  SetMetaRgn( metaDC );
+  RestoreDC( metaDC, 1 );
 
   pen = ExtCreatePen( PS_SOLID, 1, &lbrush, 0, 0 );
   SelectObject( metaDC, pen );

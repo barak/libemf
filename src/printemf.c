@@ -1,6 +1,6 @@
 /*
  * Edit the contents of an EMF file.
- * Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
+ * Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
  * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include <emf.h>
+#include <libEMF/emf.h>
 
 const char* USAGE = "usage: %s filename\n";
 

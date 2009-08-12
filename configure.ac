@@ -1,12 +1,12 @@
 # Process this file with autoconf to produce a configure script.
-# Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
+# Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 # $Id$
 
-AC_INIT(libEMF, 1.0, libemf@lignumcomputing.com)
+AC_INIT(libEMF, 1.0.4, dallenbarnett@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(libEMF, 1.0)
+AM_INIT_AUTOMAKE(libEMF, 1.0.4)
 AM_CONFIG_HEADER([config/config.h])
-AC_CONFIG_SRCDIR([include/emf.h])
+AC_CONFIG_SRCDIR([include/libEMF/emf.h])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -91,7 +91,7 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)
 AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
 AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
 
-AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \
+AC_CONFIG_FILES([Makefile include/Makefile include/libEMF/Makefile libemf/Makefile \
 src/Makefile doc/Makefile tests/Makefile])
 
 AC_OUTPUT

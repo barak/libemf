@@ -18,5 +18,6 @@
 
 lib_LTLIBRARIES = libEMF.la
 libEMF_la_SOURCES = libemf.cpp libemf.h
-libEMF_la_LDFLAGS = -version-info 1:0:0
+libEMF_la_LIBADD = ${CXX_STD_LIB} ${CXX_RUNTIME_LIB}
+libEMF_la_LDFLAGS = -no-undefined -version-info 1:0:0
 INCLUDES = -I$(top_srcdir)/include

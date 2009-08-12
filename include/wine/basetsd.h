@@ -33,8 +33,11 @@ typedef unsigned short __uint16;
 typedef int          __int32;
 typedef unsigned int __uint32;
 
-typedef long long          __int64;
-typedef unsigned long long __uint64;
+// wogl
+//typedef long long          __int64;
+//typedef unsigned long long __uint64;
+typedef long          __int64;
+typedef unsigned long __uint64;
 
 #if defined(_WIN64)
 

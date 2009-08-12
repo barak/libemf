@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <iostream>
+#include <climits>
+
 #include "libemf.h"
 
 namespace EMF {
@@ -48,7 +51,8 @@ namespace EMF {
       be32 = !be16;
 
     if ( be32 != be16 ) {
-      cerr << "endian-ness not consistent between short's and int's!" << endl;
+      std::cerr << "endian-ness not consistent between short's and int's!"
+		<< std::endl;
       ::abort();
     }
 
@@ -691,10 +695,10 @@ extern "C" {
     // Note: No effort is made to preserve the contents of an existing
     // metafile!
 
-    FILE* fp = 0;
+    ::FILE* fp = 0;
 
     if ( filename ) {
-      fp = fopen( filename, "w" );
+      fp = ::fopen( filename, "w" );
       if ( fp == 0 ) return 0;
     }
 
@@ -735,7 +739,7 @@ extern "C" {
     // a file with a wide character filename, so, we have to convert
     // it back to ASCII and hope for the best.
 
-    FILE* fp = 0;
+    ::FILE* fp = 0;
     char* filename_a = 0;
 
     if ( filename ) {
@@ -747,7 +751,7 @@ extern "C" {
       for ( int i=0; i<=n_char_w; i++ )
 	filename_a[i] = *filename++;
 
-      fp = fopen( filename_a, "w" );
+      fp = ::fopen( filename_a, "w" );
 
       if ( fp == 0 ) return 0;
     }
@@ -772,7 +776,7 @@ extern "C" {
    * constructor for details).
    * \return handle to a metafile device context.
    */
-  HDC CreateEnhMetaFileWithFILEA ( HDC referenceContext, FILE* fp,
+  HDC CreateEnhMetaFileWithFILEA ( HDC referenceContext, ::FILE* fp,
 				   const RECT* size, LPCSTR description )
   {
     // All this does is promote the ASCII strings to UNICODE (after a fashion)
@@ -812,8 +816,8 @@ extern "C" {
    * constructor for details).
    * \return handle to a metafile device context.
    */
-  HDC CreateEnhMetaFileWithFILEW ( HDC referenceContext, FILE* fp, const RECT* size,
-				   LPCWSTR description )
+  HDC CreateEnhMetaFileWithFILEW ( HDC referenceContext, ::FILE* fp,
+				   const RECT* size, LPCWSTR description )
   {
     (void)referenceContext;
     EMF::METAFILEDEVICECONTEXT* dc =
@@ -853,10 +857,18 @@ extern "C" {
 
     if ( dc->fp ) {
 
+#if 1
+#if 0
       std::for_each( dc->records.begin(), dc->records.end(),
 		     std::bind2nd( std::mem_fun1( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
-      fclose( dc->fp );
+#else
+      std::for_each( dc->records.begin(), dc->records.end(),
+		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
+				   dc->ds ) );
+#endif
+#endif
+      ::fclose( dc->fp );
 
       dc->fp = 0;
     }
@@ -900,9 +912,15 @@ extern "C" {
 
     if ( dc->fp ) {
 
+#if 0
       std::for_each( dc->records.begin(), dc->records.end(),
 		     std::bind2nd( std::mem_fun1( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
+#else
+      std::for_each( dc->records.begin(), dc->records.end(),
+		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
+				   dc->ds ) );
+#endif
     }
 
     // There's no particular reason to distinguish between the context and
@@ -991,9 +1009,9 @@ extern "C" {
     for ( int i=0; i<=n_char_w; i++ )
       filename_a[i] = *filename++;
 
-    FILE* fp;
+    ::FILE* fp;
 
-    fp = fopen( filename_a, "r" );
+    fp = ::fopen( filename_a, "r" );
 
     delete[] filename_a;
 
@@ -1017,7 +1035,7 @@ extern "C" {
       return 0;
     }
 
-    rewind( fp );
+    ::rewind( fp );
 
     dc->header->unserialize( dc->ds );
 
@@ -1025,10 +1043,10 @@ extern "C" {
     dc->header->nBytes = dc->header->nSize;
     dc->header->nRecords = 1;
 
-    fseek( fp, emr.nSize, SEEK_SET );
+    ::fseek( fp, emr.nSize, SEEK_SET );
 
     while ( true ) {
-      long position = ftell( fp );
+      long position = ::ftell( fp );
 
       // Peek at this record.
 
@@ -1037,8 +1055,9 @@ extern "C" {
       if ( feof( fp ) ) break;
 
       if ( emr.nSize == 0 ) {
-	cerr << "GetEnhMetaFileW error: record size == 0. cannot continue" << endl;
-	fclose( fp );
+	std::cerr << "GetEnhMetaFileW error: record size == 0. cannot continue"
+		  << std::endl;
+	::fclose( fp );
 	return 0;
       }
 
@@ -1049,20 +1068,20 @@ extern "C" {
       EMF::METARECORDCTOR new_record = EMF::globalObjects.newRecord( emr.iType );
 
       if ( new_record != 0 ) {
-	fseek( fp, position, SEEK_SET );
+	::fseek( fp, position, SEEK_SET );
 	EMF::METARECORD* record = new_record( dc->ds );
 
 	dc->appendRecord( record );
       }
       else
-	cerr << "GetEnhMetaFileW warning: read unknown record type " << emr.iType
-	     << " of size " << emr.nSize << endl;
+	std::cerr << "GetEnhMetaFileW warning: read unknown record type "
+		  << emr.iType << " of size " << emr.nSize << std::endl;
 
       // Regardless, position ourselves at the next record.
-      fseek( fp, next_position, SEEK_SET );
+      ::fseek( fp, next_position, SEEK_SET );
     }
 
-    fclose( fp );
+    ::fclose( fp );
 
     return dc->handle;
   }

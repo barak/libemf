@@ -1,6 +1,6 @@
 /* -*- c++ -*-
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
- * Copyright (C) 2002 lignum Computing, Inc. <libemf@lignumcomputing.com>
+ * Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
  * $Id$
  *
  * This library is free software; you can redistribute it and/or
@@ -28,16 +28,16 @@
 #include <algorithm>
 
 #include <config.h>
-#include <emf.h>
+#include <libEMF/emf.h>
 
-#include <wine/w16.h>
+#include <libEMF/wine/w16.h>
 
 namespace EMF {
   /*!
    * The maximum number of pixels in the X direction. Effectively
    * the horizontal resolution of the metafile.
    */
-#if 0
+#if 1
   const int XMAX_PIXELS = 1024; /*(INT_MAX)*/
 #else
   const int XMAX_PIXELS = 1280; /*(INT_MAX)*/
@@ -46,7 +46,7 @@ namespace EMF {
    * The maximum number of pixels in the Y direction. Effectively
    * the vertical resolution of the metafile.
    */
-#if 0
+#if 1
   const int YMAX_PIXELS = 768; /*(INT_MAX)*/
 #else
   const int YMAX_PIXELS = 1024; /*(INT_MAX)*/
@@ -1315,7 +1315,7 @@ namespace EMF {
       offPixelFormat = 0;
       bOpenGL = FALSE;
       //
-#if 0
+#if 1
       szlMicrometers.cx = 1000 * szlMillimeters.cx;
       szlMicrometers.cy = 1000 * szlMillimeters.cy;
 #endif
@@ -1367,7 +1367,7 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
-#if 0
+#if 1
 	 << szlMicrometers
 #endif
 	 << WCHARSTR( description_w, description_size );
@@ -1388,7 +1388,7 @@ namespace EMF {
 
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
-#if 0
+#if 1
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
 #else
@@ -1396,7 +1396,7 @@ namespace EMF {
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
 #endif
 #undef OffsetOf
-#if 0
+#if 1
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
 #endif
@@ -1454,7 +1454,7 @@ namespace EMF {
 	printf( "\tcbPixelFormat\t\t: %ld\n", cbPixelFormat );
 	printf( "\toffPixelFormat\t\t: %ld\n", offPixelFormat );
 	printf( "\tbOpenGL\t\t\t: %ld\n", bOpenGL );
-#if 0
+#if 1
 	if ( sizeof(::ENHMETAHEADER) <= offDescription ) {
 	  edit_sizel( "szlMicrometers\t", szlMicrometers );
 	}
@@ -4319,6 +4319,18 @@ namespace EMF {
 
       emrtext.offString = emr.nSize;
       emr.nSize += string_size * sizeof(CHAR);
+#if 0
+/* 
+Test only - Problem: Windows requires this dx to be set - at least from 2K on
+but to calculate real dx values is hard 
+For pstoedit - this is "fixed" now by estimating dx in pstoedit
+*/
+      if ( !dx ) {
+	int * dxn = new  int [string_size];
+	for (unsigned int i=0; i < string_size; i++) dxn[i] = 10;
+	dx = dxn;
+      }
+#endif
 
       if ( dx ) {
 

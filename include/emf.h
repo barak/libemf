@@ -24,11 +24,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <wine/windef.h>
-#include <wine/winbase.h>
-#include <wine/wingdi.h>
-#include <wine/winuser.h>
-#include <wine/winerror.h>
+#include <libEMF/wine/windef.h>
+#include <libEMF/wine/winbase.h>
+#include <libEMF/wine/wingdi.h>
+#include <libEMF/wine/winuser.h>
+#include <libEMF/wine/winerror.h>
 
 #ifdef __cplusplus
 extern "C" {

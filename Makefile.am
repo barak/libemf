@@ -18,5 +18,5 @@
 
 SUBDIRS = include libemf src doc tests
 
-dist-hook:
-	rm -rf `find $(distdir)/doc -name CVS`
+#dist-hook:
+#	rm -rf `find $(distdir)/doc -name CVS`

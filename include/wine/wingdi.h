@@ -1930,9 +1930,10 @@ typedef struct {
     DWORD cbPixelFormat;
     DWORD offPixelFormat;
     DWORD bOpenGL;
-
+#if 1
     /* Fields for winver >= win98 */ 
     SIZEL szlMicrometers;
+#endif
 } ENHMETAHEADER, *PENHMETAHEADER, *LPENHMETAHEADER; 
 
 typedef struct {
@@ -2601,8 +2602,8 @@ typedef struct
     WORD   dmSize;
     WORD   dmDriverExtra;
     DWORD  dmFields;
-    union {
-      struct {
+    union u10 {
+      struct snort {
 	SHORT  dmOrientation;
 	SHORT  dmPaperSize;
 	SHORT  dmPaperLength;
@@ -2644,8 +2645,8 @@ typedef struct
     WORD   dmSize;
     WORD   dmDriverExtra;
     DWORD  dmFields;
-    union {
-      struct {
+    union u20 {
+      struct blorf {
 	SHORT  dmOrientation;
 	SHORT  dmPaperSize;
 	SHORT  dmPaperLength;
