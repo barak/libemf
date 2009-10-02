@@ -4575,7 +4575,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     EMRCREATEPEN ( DATASTREAM& ds );
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -4746,7 +4746,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       return true;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \return the size of the record.
      */
     int size ( void ) const { return emr.nSize; }
     /*!
@@ -4850,7 +4850,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     EMRCREATEPALETTE ( DATASTREAM& ds );
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -4959,7 +4959,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr >> rclBounds;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5015,7 +5015,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr >> rclBounds;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5069,7 +5069,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5122,7 +5122,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5175,7 +5175,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5229,7 +5229,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5283,7 +5283,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr >> iRelative;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5337,7 +5337,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       ds >> emr;
     }
     /*!
-     * \param fp Metafile file handle.
+     * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
@@ -5696,7 +5696,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      * Most graphics programs seem to want to handle the opening and closing
      * of files themselves, so this is an extension to the w32 interface.
      *
-     * \param fp stdio pointer to an open file. May be null.
+     * \param fp_ stdio pointer to an open file. May be null.
      * \param size the rectangle describing the position and size of the metafile
      * on the "page". May be null.
      * \param description_w a UNICODE string describing the metafile. The format

@@ -49,7 +49,7 @@ Example</a></h2>
 <span class="keywordtype">int</span> main ( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[] )
 {
 </pre></div><p>The first step is to create a device context for the metafile. The usual way this is accomplished is by acquiring a copy of the "desktop" device context and using it as a starting point for the metafile device context. libEMF supports the commands GetDesktopWindow() and GetDC(), but they are just dummy functions. The metafile device context has its own internal definitions.</p>
-<p>The metafile creation subroutine takes four arguments (the first of which, the reference device context as obtained above, is ignored). The second argument is the path name of the metafile; you can use whatever name is valid on the system, but SO/OO prefers the file to end with the .emf extension. The third argument gives the size and position of the metafile; since SO/OO ignores the position, the first two values should be zero; the second pair of values should give the desired physical width and height of the drawing in units of 1/1000-th centimeters. The last argument to the creation routine is the description of the metafile; by convention, this consists of two null-terminated strings with an extra '' at the end.</p>
+<p>The metafile creation subroutine takes four arguments (the first of which, the reference device context as obtained above, is ignored). The second argument is the path name of the metafile; you can use whatever name is valid on the system, but SO/OO prefers the file to end with the .emf extension. The third argument gives the size and position of the metafile; since SO/OO ignores the position, the first two values should be zero; the second pair of values should give the desired physical width and height of the drawing in units of 1/1000-th centimeters. The last argument to the creation routine is the description of the metafile; by convention, this consists of two null-terminated strings with an extra '\0' at the end.</p>
 <div class="fragment"><pre class="fragment">   HWND desktop = GetDesktopWindow();
    HDC dc = GetDC( desktop );
 
@@ -96,7 +96,7 @@ Example</a></h2>
 Acknowledgements</a></h2>
 <p>Special thanks to Wolfgang Glunz (<a href="mailto:wglunz@pstoedit.net">wglunz@pstoedit.net</a>) for suggestions and help testing.</p>
 <hr/>
- Copyright &copy; 2002 lignum Computing, Inc., &lt;A href=mailto:<a href="mailto:dallenbarnett@sourceforge.net">dallenbarnett@sourceforge.net</a>&gt;<a href="mailto:dallenbarnett@sourceforge.net">dallenbarnett@sourceforge.net</a></p>
+ Copyright &copy; 2002 lignum Computing, Inc., &lt;A HREF=mailto:<a href="mailto:dallenbarnett@sourceforge.net">dallenbarnett@sourceforge.net</a>&gt;<a href="mailto:dallenbarnett@sourceforge.net">dallenbarnett@sourceforge.net</a></p>
 <hr/>
  Hosted by <a href="http://sourceforge.net"></a> </p>
 </div>

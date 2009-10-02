@@ -99,7 +99,7 @@ first two values should be zero; the second pair of values should give
 the desired physical width and height of the drawing in units of
 1/1000-th centimeters. The last argument to the creation routine is
 the description of the metafile; by convention, this consists of two
-null-terminated strings with an extra '\0' at the end.
+null-terminated strings with an extra '\\0' at the end.
 
 \code
    HWND desktop = GetDesktopWindow();
@@ -175,13 +175,13 @@ boundary).
 Special thanks to Wolfgang Glunz (wglunz@pstoedit.net) for suggestions
 and help testing.
 
-<hr>
+<HR>
 Copyright &copy; 2002 lignum Computing, Inc., <A
-href="mailto:dallenbarnett@sourceforge.net>dallenbarnett@sourceforge.net</A>
+HREF="mailto:dallenbarnett@sourceforge.net>dallenbarnett@sourceforge.net</A>
 
-<hr>
-Hosted by <A href="http://sourceforge.net">
-<IMG src="http://sourceforge.net/sflogo.php?group_id=30708" width="88" height="31" align="middle" border="0" alt="SourceForge Logo"></A>
+<HR>
+Hosted by <A HREF="http://sourceforge.net">
+<IMG SRC="http://sourceforge.net/sflogo.php?group_id=30708" WIDTH="88" HEIGHT="31" ALIGN="middle" BORDER="0" ALT="SourceForge Logo"></A>
 */
 /*
 ;;; local variables: ***
