@@ -340,6 +340,7 @@ namespace EMF {
 	fread( &dword, sizeof(DWORD), 1, fp_ );
       return *this;
     }
+#if !defined( __x86_64__ )
     /*!
      * Output a long int to the stream (swabbed).
      * \param long long int to output.
@@ -374,6 +375,7 @@ namespace EMF {
 	fread( &long_, sizeof(LONG), 1, fp_ );
       return *this;
     }
+#endif /* __x86_64__ */
     /*!
      * Output a (long) int to the stream (swabbed).
      * \param int_ (long) int to output.
@@ -408,6 +410,7 @@ namespace EMF {
 	fread( &int_, sizeof(INT), 1, fp_ );
       return *this;
     }
+#if !defined(__x86_64__)
     /*!
      * Output a (long) unsigned int to the stream (swabbed).
      * \param uint (long) unsigned int to output.
@@ -442,6 +445,7 @@ namespace EMF {
 	fread( &uint, sizeof(UINT), 1, fp_ );
       return *this;
     }
+#endif /* !__x86_64__ */
     /*!
      * Output a single precision float to the stream (swabbed).
      * \param float_ single precision float to output.
