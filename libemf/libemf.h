@@ -985,8 +985,12 @@ namespace EMF {
   /* Miscellaneous editing routines */
   inline void edit_rectl ( const char* tag, const RECTL& rectl )
   {
-    printf( "\t%s\t: (%ld, %ld) - (%ld, %ld)\n", tag, rectl.left, rectl.top,
-	    rectl.right, rectl.bottom );
+#if defined(__x86_64__)
+    const char* FMT = "\t%s\t: (%d, %d) - (%d, %d)\n";
+#else
+    const char* FMT = "\t%s\t: (%ld, %ld) - (%ld, %ld)\n";
+#endif /* __x86_64__ */
+    printf( FMT, tag, rectl.left, rectl.top, rectl.right, rectl.bottom );
   }
 
   inline void edit_xform ( const char* tag, const XFORM& xform )
@@ -1001,31 +1005,55 @@ namespace EMF {
 
   inline void edit_color ( const char* tag, const COLORREF& color )
   {
-    printf( "\t%s\t: R(0x%02lx) G(0x%02lx) B(0x%02lx)\n", tag,
+#if defined(__x86_64__)
+    const char* FMT = "\t%s\t: R(0x%02x) G(0x%02x) B(0x%02x)\n";
+#else
+    const char* FMT = "\t%s\t: R(0x%02lx) G(0x%02lx) B(0x%02lx)\n";
+#endif /* __x86_64__ */
+    printf( FMT, tag,
 	    GetRValue( color ), GetGValue( color ), GetBValue( color ) );
   }
 
   inline void edit_sizel ( const char* tag, const SIZEL& size )
   {
-    printf( "\t%s\t: (%ld, %ld)\n", tag, size.cx, size.cy );
+#if defined(__x86_64__)
+    const char* FMT = "\t%s\t: (%d, %d)\n";
+#else
+    const char* FMT = "\t%s\t: (%ld, %ld)\n";
+#endif /* __x86_64__ */
+    printf( FMT, tag, size.cx, size.cy );
   }
 
   inline void edit_pointl ( const char* tag, const POINTL& point )
   {
-    printf( "\t%s\t: (%ld, %ld)\n", tag, point.x, point.y );
+#if defined(__x86_64__)
+    const char* FMT = "\t%s\t: (%d, %d)\n";
+#else
+    const char* FMT = "\t%s\t: (%ld, %ld)\n";
+#endif /* __x86_64__ */
+    printf( FMT, tag, point.x, point.y );
   }
 
   inline void edit_pointlarray ( const char* tag, const DWORD cptl,
 				  const POINTL* points )
   {
-    printf( "\tcptl%s\t: %ld\n", tag, cptl );
+#if defined(__x86_64__)
+    const char* FMT0 = "\tcptl%s\t: %d\n";
+    const char* FMT1 = "%d, %d\n";
+    const char* FMT2 = "\t\t%s  %d, %d\n";
+#else
+    const char* FMT0 = "\tcptl%s\t: %ld\n";
+    const char* FMT1 = "%ld, %ld\n";
+    const char* FMT2 = "\t\t%s  %ld, %ld\n";
+#endif /* __x86_64__ */
+    printf( FMT0, tag, cptl );
     printf( "\taptl%s\t: ", tag );
     if ( cptl > 0 )
-      printf( "%ld, %ld\n", points[0].x, points[0].y );
+      printf( FMT1, points[0].x, points[0].y );
     else
       puts( "" );
     for ( DWORD i = 1; i < cptl; i++ )
-      printf( "\t\t%s  %ld, %ld\n", tag, points[i].x, points[i].y );
+      printf( FMT2, tag, points[i].x, points[i].y );
   }
 
   inline void edit_point16array ( const char* tag, const unsigned int cpts,
@@ -1074,6 +1102,11 @@ namespace EMF {
 
   inline void edit_brush_style ( const char* tag, DWORD style )
   {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)";
+#else
+    const char* FMT = "unknown(%ld)";
+#endif /* __x86_64__ */
     printf( "\t%s\t: ", tag );
     switch ( style ) {
     case BS_SOLID: printf( "BS_SOLID" ); break;
@@ -1086,13 +1119,18 @@ namespace EMF {
     case BS_PATTERN8X8: printf( "BS_PATTERN8X8" ); break;
     case BS_DIBPATTERN8X8: printf( "BS_DIBPATTERN8X8" ); break;
     case BS_MONOPATTERN: printf( "BS_DIBPATTERN8X8" ); break;
-    default: printf( "unknown(%ld)", style );
+    default: printf( FMT, style );
     }
     printf( "\n" );
   }
 
   inline void edit_brush_hatch ( const char* tag, DWORD hatch )
   {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)";
+#else
+    const char* FMT = "unknown(%ld)";
+#endif /* __x86_64__ */
     printf( "\t%s\t: ", tag );
     switch ( hatch ) {
     case HS_HORIZONTAL: printf( "HS_HORIZONTAL" ); break;
@@ -1101,7 +1139,7 @@ namespace EMF {
     case HS_BDIAGONAL: printf( "HS_BDIAGONAL" ); break;
     case HS_CROSS: printf( "HS_CROSS" ); break;
     case HS_DIAGCROSS: printf( "HS_DIAGCROSS" ); break;
-    default: printf( "unknown(%ld)", hatch );
+    default: printf( FMT, hatch );
     }
     printf( "\n" );
   }
@@ -1434,19 +1472,42 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tiType\t\t\t: %d\n";
+      const char* FMT1 = "\tnSize\t\t\t: %d\n";
+      const char* FMT2 = "\tnBytes\t\t\t: %d\n";
+      const char* FMT3 = "\tnRecords\t\t: %d\n";
+      const char* FMT4 = "\tnDescription\t\t: %d\n";
+      const char* FMT5 = "\toffDescription\t\t: %d\n";
+      const char* FMT6 = "\tnPalEntries\t\t: %d\n";
+      const char* FMT7 = "\tcbPixelFormat\t\t: %d\n";
+      const char* FMT8 = "\toffPixelFormat\t\t: %d\n";
+      const char* FMT9 = "\tbOpenGL\t\t\t: %d\n";
+#else
+      const char* FMT0 = "\tiType\t\t\t: %ld\n";
+      const char* FMT1 = "\tnSize\t\t\t: %ld\n";
+      const char* FMT2 = "\tnBytes\t\t\t: %ld\n";
+      const char* FMT3 = "\tnRecords\t\t: %ld\n";
+      const char* FMT4 = "\tnDescription\t\t: %ld\n";
+      const char* FMT5 = "\toffDescription\t\t: %ld\n";
+      const char* FMT6 = "\tnPalEntries\t\t: %ld\n";
+      const char* FMT7 = "\tcbPixelFormat\t\t: %ld\n";
+      const char* FMT8 = "\toffPixelFormat\t\t: %ld\n";
+      const char* FMT9 = "\tbOpenGL\t\t\t: %ld\n";
+#endif
       printf( "*HEADER*\n" );
-      printf( "\tiType\t\t\t: %ld\n", iType );
-      printf( "\tnSize\t\t\t: %ld\n", nSize );
+      printf( FMT0, iType );
+      printf( FMT1, nSize );
       edit_rectl( "rclBounds\t", rclBounds );
       edit_rectl( "rclFrame\t", rclFrame );
       printf( "\tdSignature\t\t: %.4s\n", (const char*)&dSignature );
       printf( "\tnVersion\t\t: 0x%x\n", (unsigned int)nVersion );
-      printf( "\tnBytes\t\t\t: %ld\n", nBytes );
-      printf( "\tnRecords\t\t: %ld\n", nRecords );
+      printf( FMT2, nBytes );
+      printf( FMT3, nRecords );
       printf( "\tnHandles\t\t: %d\n", nHandles );
-      printf( "\tnDescription\t\t: %ld\n", nDescription );
-      printf( "\toffDescription\t\t: %ld\n", offDescription );
-      printf( "\tnPalEntries\t\t: %ld\n", nPalEntries );
+      printf( FMT4, nDescription );
+      printf( FMT5, offDescription );
+      printf( FMT6, nPalEntries );
       edit_sizel( "szlDevice\t", szlDevice );
       edit_sizel( "szlMillimeters\t", szlMillimeters );
 
@@ -1455,9 +1516,9 @@ namespace EMF {
 (const char*)((const ::ENHMETAHEADER*)a)))
 
       if ( OffsetOf( this, cbPixelFormat ) <= offDescription ) {
-	printf( "\tcbPixelFormat\t\t: %ld\n", cbPixelFormat );
-	printf( "\toffPixelFormat\t\t: %ld\n", offPixelFormat );
-	printf( "\tbOpenGL\t\t\t: %ld\n", bOpenGL );
+	printf( FMT7, cbPixelFormat );
+	printf( FMT8, offPixelFormat );
+	printf( FMT9, bOpenGL );
 #if 1
 	if ( sizeof(::ENHMETAHEADER) <= offDescription ) {
 	  edit_sizel( "szlMicrometers\t", szlMicrometers );
@@ -1793,11 +1854,22 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\txNum\t: %d\n";
+      const char* FMT1 = "\txDenom\t: %d\n";
+      const char* FMT2 = "\tyNum\t: %d\n";
+      const char* FMT3 = "\tyDenom\t: %d\n";
+#else
+      const char* FMT0 = "\txNum\t: %ld\n";
+      const char* FMT1 = "\txDenom\t: %ld\n";
+      const char* FMT2 = "\tyNum\t: %ld\n";
+      const char* FMT3 = "\tyDenom\t: %ld\n";
+#endif
       printf( "*SCALEVIEWPORTEXTEX*\n" );
-      printf( "\txNum\t: %ld\n", xNum );
-      printf( "\txDenom\t: %ld\n", xDenom );
-      printf( "\tyNum\t: %ld\n", yNum );
-      printf( "\tyDenom\t: %ld\n", yDenom );
+      printf( FMT0, xNum );
+      printf( FMT1, xDenom );
+      printf( FMT2, yNum );
+      printf( FMT3, yDenom );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1920,11 +1992,22 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\txNum\t: %d\n";
+      const char* FMT1 = "\txDenom\t: %d\n";
+      const char* FMT2 = "\tyNum\t: %d\n";
+      const char* FMT3 = "\tyDenom\t: %d\n";
+#else
+      const char* FMT0 = "\txNum\t: %ld\n";
+      const char* FMT1 = "\txDenom\t: %ld\n";
+      const char* FMT2 = "\tyNum\t: %ld\n";
+      const char* FMT3 = "\tyDenom\t: %ld\n";
+#endif
       printf( "*SCALEWINDOWEXTEX*\n" );
-      printf( "\txNum\t: %ld\n", xNum );
-      printf( "\txDenom\t: %ld\n", xDenom );
-      printf( "\tyNum\t: %ld\n", yNum );
-      printf( "\tyDenom\t: %ld\n", yDenom );
+      printf( FMT0, xNum );
+      printf( FMT1, xDenom );
+      printf( FMT2, yNum );
+      printf( FMT3, yDenom );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -1985,6 +2068,11 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)\n";
+#else
+    const char* FMT = "unknown(%ld)\n";
+#endif /* __x86_64__ */
       printf( "*MODIFYWORLDTRANSFORM*\n" );
       edit_xform( "xform", xform );
       printf( "\tiMode\t\t: " );
@@ -1992,7 +2080,7 @@ namespace EMF {
       case MWT_IDENTITY: printf( "MWT_IDENTITY\n" ); break;
       case MWT_LEFTMULTIPLY: printf( "MWT_LEFTMULTIPLY\n" ); break;
       case MWT_RIGHTMULTIPLY: printf( "MWT_RIGHTMULTIPLY\n" ); break;
-      default: printf( "unknown(%ld)\n", iMode );
+      default: printf( FMT, iMode );
       }
     }
 #endif /* ENABLE_EDITING */
@@ -2107,6 +2195,11 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT = "| unknown bits(0x%x)";
+#else
+    const char* FMT = "| unknown bits(0x%lx)";
+#endif /* __x86_64__ */
       unsigned int known_bits = TA_BASELINE+TA_CENTER+TA_UPDATECP+TA_RTLREADING;
       unsigned int unknown_bits = ~known_bits;
 
@@ -2131,7 +2224,7 @@ namespace EMF {
       if ( iMode & TA_RTLREADING )
 	printf( " | TA_RTLREADING" );
       if ( iMode & unknown_bits )
-	printf( " | unknown bits(0x%lx)", iMode & unknown_bits );
+	printf( FMT, iMode & unknown_bits );
       printf( "\n" );
     }
 #endif /* ENABLE_EDITING */
@@ -2300,12 +2393,17 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)\n";
+#else
+    const char* FMT = "unknown(%ld)\n";
+#endif /* __x86_64__ */
       printf( "*SETBKMODE*\n" );
       printf( "\tiMode\t: " );
       switch ( iMode ) {
       case TRANSPARENT: printf( "TRANSPARENT\n" ); break;
       case OPAQUE: printf( "OPAQUE\n" ); break;
-      default: printf( "unknown(%ld)\n", iMode );
+      default: printf( FMT, iMode );
       }
     }
 #endif /* ENABLE_EDITING */
@@ -2361,12 +2459,17 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)\n";
+#else
+    const char* FMT = "unknown(%ld)\n";
+#endif /* __x86_64__ */
       printf( "*SETPOLYFILLMODE*\n" );
       printf( "\tiMode: " );
       switch ( iMode ) {
       case ALTERNATE: printf( "ALTERNATE\n" ); break;
       case WINDING: printf( "WINDING\n" ); break;
-      default: printf( "unknown(%ld)\n", iMode );
+      default: printf( FMT, iMode );
       }
     }
 #endif /* ENABLE_EDITING */
@@ -2423,6 +2526,11 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT = "unknown(%d)\n";
+#else
+    const char* FMT = "unknown(%ld)\n";
+#endif /* __x86_64__ */
       printf( "*SETMAPMODE*\n" );
       printf( "\tiMode\t: " );
       switch ( iMode ) {
@@ -2434,7 +2542,7 @@ namespace EMF {
       case MM_TWIPS: printf( "MM_TWIPS\n" ); break;
       case MM_ISOTROPIC: printf( "MM_ISOTROPIC\n" ); break;
       case MM_ANISOTROPIC: printf( "MM_ANISOTROPIC\n" ); break;
-      default: printf( "unknown(%ld)\n", iMode );
+      default: printf( FMT, iMode );
       }
     }
 #endif /* ENABLE_EDITING */
@@ -2487,8 +2595,13 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT = "\tihObject\t: 0x%x\n";
+#else
+      const char* FMT = "\tihObject\t: 0x%lx\n";
+#endif /* __x86_64__ */
       printf( "*SELECTOBJECT*\n" );
-      printf( "\tihObject\t: 0x%lx\n", ihObject );
+      printf( FMT, ihObject );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -2540,8 +2653,13 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT = "\tihObject\t: 0x%x\n";
+#else
+      const char* FMT = "\tihObject\t: 0x%lx\n";
+#endif /* __x86_64__ */
       printf( "*DELETEOBJECT*\n" );
-      printf( "\tihObject\t: 0x%lx\n", ihObject );
+      printf( FMT, ihObject );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3461,24 +3579,39 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tnPolys\t\t: %d\n";
+      const char* FMT1 = "\tcptl\t\t: %d\n";
+      const char* FMT2 = "%d\n";
+      const char* FMT3 = "\t\t\t  %d\n";
+      const char* FMT4 = "%d, %d\n";
+      const char* FMT5 = "\t\t\t  %d, %d\n";
+#else
+      const char* FMT0 = "\tnPolys\t\t: %ld\n";
+      const char* FMT1 = "\tcptl\t\t: %ld\n";
+      const char* FMT2 = "%ld\n";
+      const char* FMT3 = "\t\t\t  %ld\n";
+      const char* FMT4 = "%ld, %ld\n";
+      const char* FMT5 = "\t\t\t  %ld, %ld\n";
+#endif /* __x86_64__ */
       printf( "*POLYPOLYGON*\n" );
       edit_rectl( "rclBounds", rclBounds );
-      printf( "\tnPolys\t\t: %ld\n", nPolys );
-      printf( "\tcptl\t\t: %ld\n", cptl );
+      printf( FMT0, nPolys );
+      printf( FMT1, cptl );
       printf( "\taPolyCounts\t: " );
       if ( nPolys > 0 )
-	printf( "%ld\n", lcounts[0] );
+	printf( FMT2, lcounts[0] );
       else
 	puts( "" );
       for ( unsigned int i = 1; i < nPolys; i++ )
-	printf( "\t\t\t  %ld\n", lcounts[i] );
+	printf( FMT3, lcounts[i] );
       printf( "\tapts\t\t: " );
       if ( cptl > 0 )
-	printf( "%ld, %ld\n", lpoints[0].x, lpoints[0].y );
+	printf( FMT4, lpoints[0].x, lpoints[0].y );
       else
 	puts( "" );
       for ( unsigned int i = 1; i < cptl; i++ )
-	printf( "\t\t\t  %ld, %ld\n", lpoints[i].x, lpoints[i].y );
+	printf( FMT5, lpoints[i].x, lpoints[i].y );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3636,17 +3769,28 @@ namespace EMF {
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tnPolys\t\t: %d\n";
+      const char* FMT1 = "\tcptl\t\t: %d\n";
+      const char* FMT2 = "%d\n";
+      const char* FMT3 = "\t\t\t  %d\n";
+#else
+      const char* FMT0 = "\tnPolys\t\t: %ld\n";
+      const char* FMT1 = "\tcptl\t\t: %ld\n";
+      const char* FMT2 = "%ld\n";
+      const char* FMT3 = "\t\t\t  %ld\n";
+#endif /* __x86_64__ */
       printf( "*POLYPOLYGON16*\n" );
       edit_rectl( "rclBounds", rclBounds );
-      printf( "\tnPolys\t\t: %ld\n", nPolys );
-      printf( "\tcpts\t\t: %ld\n", cpts );
+      printf( FMT0, nPolys );
+      printf( FMT1, cpts );
       printf( "\taPolyCounts\t: " );
       if ( nPolys > 0 )
-	printf( "%ld\n", lcounts[0] );
+	printf( FMT2, lcounts[0] );
       else
 	puts( "" );
       for ( unsigned int i = 1; i < nPolys; i++ )
-	printf( "\t\t\t  %ld\n", lcounts[i] );
+	printf( FMT3, lcounts[i] );
       printf( "\tapts\t\t: " );
       if ( cpts > 0 )
 	printf( "%d, %d\n", lpoints[0].x, lpoints[0].y );
@@ -4430,20 +4574,32 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+    const char* FMT0 = "unknown(%d)\n";
+    const char* FMT1 = "\tptlReference\t: (%d,%d)\n";
+    const char* FMT2 = "\tnChars\t\t: %d\n";
+    const char* FMT3 = "\toffString\t: %d\n";
+    const char* FMT4 = "\toffDx\t\t: %d\n";
+#else
+    const char* FMT0 = "unknown(%ld)\n";
+    const char* FMT1 = "\tptlReference\t: (%ld,%ld)\n";
+    const char* FMT2 = "\tnChars\t\t: %ld\n";
+    const char* FMT3 = "\toffString\t: %ld\n";
+    const char* FMT4 = "\toffDx\t\t: %ld\n";
+#endif /* __x86_64__ */
       printf( "*EXTTEXTOUTA*\n" );
       edit_rectl( "rclBounds", rclBounds );
       printf( "\tiGraphicsMode\t: " );
       switch ( iGraphicsMode ) {
       case GM_COMPATIBLE: printf( "GM_COMPATIBLE\n" ); break;
       case GM_ADVANCED: printf( "GM_ADVANCED\n" ); break;
-      default: printf( "unknown(%ld)\n", iGraphicsMode );
+      default: printf( FMT0, iGraphicsMode );
       }
       printf( "\texScale\t\t: %f\n", exScale );
       printf( "\teyScale\t\t: %f\n", eyScale );
-      printf( "\tptlReference\t: (%ld,%ld)\n", emrtext.ptlReference.x,
-	      emrtext.ptlReference.y );
-      printf( "\tnChars\t\t: %ld\n", emrtext.nChars );
-      printf( "\toffString\t: %ld\n", emrtext.offString );
+      printf( FMT1, emrtext.ptlReference.x, emrtext.ptlReference.y );
+      printf( FMT2, emrtext.nChars );
+      printf( FMT3, emrtext.offString );
       printf( "\tfOptions\t: " );
       if ( emrtext.fOptions == 0 )
 	printf( "None" );
@@ -4481,7 +4637,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       }
       printf( "\n" );
       edit_rectl( "rcl\t", emrtext.rcl );
-      printf( "\toffDx\t\t: %ld\n", emrtext.offDx );
+      printf( FMT4, emrtext.offDx );
       printf( "\tString:\n\t\t%s\n",  string_a );
 
       if ( emrtext.offDx != 0 ) {
@@ -4602,10 +4758,17 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tihPen\t\t: 0x%x\n";
+      const char* FMT1 = "\tlopn.lopnWidth\t: %d, %d\n";
+#else
+      const char* FMT0 = "\tihPen\t\t: 0x%lx\n";
+      const char* FMT1 = "\tlopn.lopnWidth\t: %ld, %ld\n";
+#endif /* __x86_64__ */
       printf( "*CREATEPEN*\n" );
-      printf( "\tihPen\t\t: 0x%lx\n", ihPen );
+      printf( FMT0, ihPen );
       edit_pen_style( "lopn.lopnStyle", lopn.lopnStyle );
-      printf( "\tlopn.lopnWidth\t: %ld, %ld\n", lopn.lopnWidth.x, lopn.lopnWidth.y );
+      printf( FMT1, lopn.lopnWidth.x, lopn.lopnWidth.y );
       edit_color( "lopn.lopnColor", lopn.lopnColor );
     }
 #endif /* ENABLE_EDITING */
@@ -4653,18 +4816,35 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tihPen\t\t\t: 0x%x\n";
+      const char* FMT1 = "\toffBmi\t\t\t: %d\n";
+      const char* FMT2 = "\tcbBmi\t\t\t: %d\n";
+      const char* FMT3 = "\toffBits\t\t\t: %d\n";
+      const char* FMT4 = "\tcbBits\t\t\t: %d\n";
+      const char* FMT5 = "\telp.elpWidth\t\t: %d\n";
+      const char* FMT6 = "\telp.elpNumEntries\t: %d\n";
+#else
+      const char* FMT0 = "\tihPen\t\t\t: 0x%lx\n";
+      const char* FMT1 = "\toffBmi\t\t\t: %ld\n";
+      const char* FMT2 = "\tcbBmi\t\t\t: %ld\n";
+      const char* FMT3 = "\toffBits\t\t\t: %ld\n";
+      const char* FMT4 = "\tcbBits\t\t\t: %ld\n";
+      const char* FMT5 = "\telp.elpWidth\t\t: %ld\n";
+      const char* FMT6 = "\telp.elpNumEntries\t: %ld\n";
+#endif /* __x86_64__ */
       printf( "*EXTCREATEPEN*\n" );
-      printf( "\tihPen\t\t\t: 0x%lx\n", ihPen );
-      printf( "\toffBmi\t\t\t: %ld\n",  offBmi );
-      printf( "\tcbBmi\t\t\t: %ld\n", cbBmi );
-      printf( "\toffBits\t\t\t: %ld\n", offBits );
-      printf( "\tcbBits\t\t\t: %ld\n", cbBits );
+      printf( FMT0, ihPen );
+      printf( FMT1,  offBmi );
+      printf( FMT2, cbBmi );
+      printf( FMT3, offBits );
+      printf( FMT4, cbBits );
       edit_pen_style( "elp.elpPenStyle\t", elp.elpPenStyle );
-      printf( "\telp.elpWidth\t\t: %ld\n", elp.elpWidth );
+      printf( FMT5, elp.elpWidth );
       edit_brush_style( "elp.elpBrushStyle", elp.elpBrushStyle );
       edit_color( "elp.elpColor\t", elp.elpColor );
       edit_brush_hatch( "elp.elpHatch\t", elp.elpHatch );
-      printf( "\telp.elpNumEntries\t: %ld\n", elp.elpNumEntries );
+      printf( FMT6, elp.elpNumEntries );
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4710,8 +4890,13 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT = "\tihBrush\t\t: 0x%x\n";
+#else
+      const char* FMT = "\tihBrush\t\t: 0x%lx\n";
+#endif /* __x86_64__ */
       printf( "*CREATEBRUSHINDIRECT*\n" );
-      printf( "\tihBrush\t\t: 0x%lx\n", ihBrush );
+      printf( FMT, ihBrush );
       edit_brush_style( "lb.lbStyle", lb.lbStyle );
       edit_color( "lb.lbColor", lb.lbColor );
       edit_brush_hatch( "lb.lbHatch", lb.lbHatch );
@@ -4765,12 +4950,33 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT0 = "\tihFont\t\t\t: %d\n";
+      const char* FMT1 = "\tlfHeight\t\t: %d\n";
+      const char* FMT2 = "\tlfWidth\t\t\t: %d\n";
+      const char* FMT3 = "\tlfEscapement\t\t: %d\n";
+      const char* FMT4 = "\tlfOrientation\t\t: %d\n";
+      const char* FMT5 = "\telfVersion\t\t: %d\n";
+      const char* FMT6 = "\telfStyleSize\t\t: %d\n";
+      const char* FMT7 = "\telfMatch\t\t: %d\n";
+      const char* FMT8 = "\telfCulture\t\t: %d\n";
+#else
+      const char* FMT0 = "\tihFont\t\t\t: %ld\n";
+      const char* FMT1 = "\tlfHeight\t\t: %ld\n";
+      const char* FMT2 = "\tlfWidth\t\t\t: %ld\n";
+      const char* FMT3 = "\tlfEscapement\t\t: %ld\n";
+      const char* FMT4 = "\tlfOrientation\t\t: %ld\n";
+      const char* FMT5 = "\telfVersion\t\t: %ld\n";
+      const char* FMT6 = "\telfStyleSize\t\t: %ld\n";
+      const char* FMT7 = "\telfMatch\t\t: %ld\n";
+      const char* FMT8 = "\telfCulture\t\t: %ld\n";
+#endif /* __x86_64__ */
       printf( "*EXTCREATEFONTINDIRECTW*\n" );
-      printf( "\tihFont\t\t\t: %ld\n", ihFont );
-      printf( "\tlfHeight\t\t: %ld\n", elfw.elfLogFont.lfHeight );
-      printf( "\tlfWidth\t\t\t: %ld\n", elfw.elfLogFont.lfWidth );
-      printf( "\tlfEscapement\t\t: %ld\n", elfw.elfLogFont.lfEscapement );
-      printf( "\tlfOrientation\t\t: %ld\n", elfw.elfLogFont.lfOrientation );
+      printf( FMT0, ihFont );
+      printf( FMT1, elfw.elfLogFont.lfHeight );
+      printf( FMT2, elfw.elfLogFont.lfWidth );
+      printf( FMT3, elfw.elfLogFont.lfEscapement );
+      printf( FMT4, elfw.elfLogFont.lfOrientation );
       printf( "\tlfWeight\t\t: " );
       switch ( elfw.elfLogFont.lfWeight ) {
       case FW_DONTCARE: printf( "FW_DONTCARE\n" ); break;
@@ -4816,11 +5022,11 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       }
       puts( "'" );
 
-      printf( "\telfVersion\t\t: %ld\n", elfw.elfVersion );
-      printf( "\telfStyleSize\t\t: %ld\n", elfw.elfStyleSize );
-      printf( "\telfMatch\t\t: %ld\n", elfw.elfMatch );
+      printf( FMT5, elfw.elfVersion );
+      printf( FMT6, elfw.elfStyleSize );
+      printf( FMT7, elfw.elfMatch );
       printf( "\telfVendorId\t\t: '%s'\n", elfw.elfVendorId );
-      printf( "\telfCulture\t\t: %ld\n", elfw.elfCulture );
+      printf( FMT8, elfw.elfCulture );
       printf( "\telfPanose\t\t:\n" );
       printf( "\t\tbFamilyType\t\t: %d\n", elfw.elfPanose.bFamilyType );
       printf( "\t\tbSerifStyle\t\t: %d\n", elfw.elfPanose.bSerifStyle );
@@ -5313,8 +5519,13 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
+#if defined(__x86_64__)
+      const char* FMT = "\tiRelative: %d\n";
+#else
+      const char* FMT = "\tiRelative: %ld\n";
+#endif /* __x86_64__ */
       printf( "*RESTOREDC*\n" );
-      printf( "\tiRelative: %ld\n", iRelative );
+      printf( FMT, iRelative );
     }
 #endif /* ENABLE_EDITING */
   };
