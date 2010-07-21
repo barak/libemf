@@ -1,6 +1,6 @@
 /*
  * Example program for the EMF library
- * Copyright (C) 2002, 2003 lignum Computing, Inc. <libemf@lignumcomputing.com>
+ * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
  * $Id$
  *
  * This program is free software; you can redistribute it and/or modify

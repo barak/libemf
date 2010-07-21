@@ -17,16 +17,16 @@ href=http://www.ecma.ch/ecma1/STAND/ECMA-234.HTM> ECMA-234</A>. The
 general purpose of this library is to create vector graphics files on
 POSIX systems which can be imported into <A
 href=http://www.sun.com/staroffice/>StarOffice</A>/<A
-href=http://www.openoffice.org>OpenOffice</A>.  The Enhanced MetaFile
+href=http://www.openoffice.org>OpenOffice.org</A>.  The Enhanced MetaFile
 (EMF) is one of the two color vector graphics format which is
-"vectorially" understood by SO/OO. (SO/OO can import Encapsulated
+"vectorially" understood by SO/OO.org. (SO/OO.org can import Encapsulated
 PostScript files, but will only display it if it has a bitmap preview
-image. SO/OO can also import a DXF file, but as near as I can tell,
+image. SO/OO.org can also import a DXF file, but as near as I can tell,
 this is only monochrome. OpenOffice now has an XML based file format;
 in the future, use of this format will probably supplant this
 library.) The EMF format also has the additional advantage that it can
 be "broken" into its constituent components and edited like any other
-SO/OO graphics object.
+SO/OO.org graphics object.
 
 My general interest in this library is for making scientific plots
 with <A href=http://www.gnuplot.org/>gnuplot</A> and <A
@@ -92,9 +92,9 @@ metafile device context has its own internal definitions.
 The metafile creation subroutine takes four arguments (the first of
 which, the reference device context as obtained above, is
 ignored). The second argument is the path name of the metafile; you
-can use whatever name is valid on the system, but SO/OO prefers the
+can use whatever name is valid on the system, but SO/OO.org prefers the
 file to end with the .emf extension. The third argument gives the size
-and position of the metafile; since SO/OO ignores the position, the
+and position of the metafile; since SO/OO.org ignores the position, the
 first two values should be zero; the second pair of values should give
 the desired physical width and height of the drawing in units of
 1/1000-th centimeters. The last argument to the creation routine is
@@ -164,7 +164,7 @@ memory they have consumed.
 }
 \endcode
 
-This is result of importing example.emf into OO and exporting the
+This is result of importing example.emf into OO.org and exporting the
 drawing as a PNG file (after using The GIMP to crop the transparent
 boundary).
 
@@ -176,12 +176,12 @@ Special thanks to Wolfgang Glunz (wglunz@pstoedit.net) for suggestions
 and help testing.
 
 <HR>
-Copyright &copy; 2002 lignum Computing, Inc., <A
-HREF="mailto:dallenbarnett@sourceforge.net>dallenbarnett@sourceforge.net</A>
+Copyright &copy; 2002 lignum Computing, Inc., dallenbarnett@users.sourceforge.net
 
+\htmlonly
 <HR>
-Hosted by <A HREF="http://sourceforge.net">
-<IMG SRC="http://sourceforge.net/sflogo.php?group_id=30708" WIDTH="88" HEIGHT="31" ALIGN="middle" BORDER="0" ALT="SourceForge Logo"></A>
+Hosted by <a href="http://sourceforge.net/projects/libemf"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=31968&amp;type=8" width="80" height="15" alt="Get ECMA-234 Metafile Library at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+\endhtmlonly
 */
 /*
 ;;; local variables: ***
