@@ -5780,15 +5780,17 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     EMRSETMITERLIMIT ( DATASTREAM& ds )
     {
-      ds >> emr >> eMiterLimit;
+       int miter_limit;
+       ds >> emr >> miter_limit;
+       eMiterLimit = float(miter_limit);
     }
     /*!
      * \param ds Metafile datastream.
      */
     bool serialize ( DATASTREAM ds )
     {
-      ds << emr << eMiterLimit;
-      return true;
+       ds << emr << (int)eMiterLimit;
+       return true;
     }
     /*!
      * Internally computed size of this record.
