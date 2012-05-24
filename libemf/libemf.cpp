@@ -158,6 +158,7 @@ namespace EMF {
     new_records[EMR_SAVEDC] = new_savedc;
     new_records[EMR_RESTOREDC] = new_restoredc;
     new_records[EMR_SETMETARGN] = new_setmetargn;
+    new_records[EMR_SETMITERLIMIT] = new_setmiterlimit;
   }
 
   GLOBALOBJECTS::~GLOBALOBJECTS ( void )
@@ -497,6 +498,11 @@ namespace EMF {
   METARECORD* GLOBALOBJECTS::new_setmetargn ( DATASTREAM& ds )
   {
     return new EMF::EMRSETMETARGN( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_setmiterlimit ( DATASTREAM& ds )
+  {
+    return new EMF::EMRSETMITERLIMIT( ds );
   }
 
   EMRCREATEPEN::EMRCREATEPEN ( PEN* pen, HGDIOBJ handle )
@@ -3327,6 +3333,30 @@ extern "C" {
 
     return 0; // Not really implemented.
   }
+   /*!
+    * Set the miter length for joins.
+    * \param context handle to metafile context.
+    * \param eNewLimit new miter join length.
+    * \param peOldLimit if not null, returns the old miter length limit.
+    */
+   BOOL SetMiterLimit ( HDC context, FLOAT eNewLimit, PFLOAT peOldLimit )
+   {
+      EMF::METAFILEDEVICECONTEXT* dc =
+         dynamic_cast<EMF::METAFILEDEVICECONTEXT*>( EMF::globalObjects.find( context ) );
+      if ( dc == 0 ) return FALSE;
+
+      EMF::EMRSETMITERLIMIT* setmiterlimit =
+         new EMF::EMRSETMITERLIMIT( eNewLimit );
+
+      dc->appendRecord( setmiterlimit );
+
+      if ( peOldLimit )
+         *peOldLimit = dc->miter_limit;
+
+      dc->miter_limit = eNewLimit;
+
+      return TRUE;
+   }
   /*!
    * Adds extra space between each character drawn.
    * \param context handle to metafile context.

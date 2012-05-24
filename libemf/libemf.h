@@ -1305,6 +1305,7 @@ namespace EMF {
     static EMF::METARECORD* new_savedc ( DATASTREAM& ds );
     static EMF::METARECORD* new_restoredc ( DATASTREAM& ds );
     static EMF::METARECORD* new_setmetargn ( DATASTREAM& ds );
+    static EMF::METARECORD* new_setmiterlimit ( DATASTREAM& ds );
   };
 
   extern GLOBALOBJECTS globalObjects;
@@ -5758,6 +5759,62 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
     }
   };
 
+  //! EMF SetMiterLimit
+  /*!
+   * Sets the length limit for miter joins.
+   */
+  class EMRSETMITERLIMIT : public METARECORD, ::EMRSETMITERLIMIT {
+  public:
+    /*!
+     * \param limit miter length limit.
+     */
+    EMRSETMITERLIMIT ( FLOAT limit )
+    {
+      emr.iType = EMR_SETMITERLIMIT;
+      emr.nSize = sizeof( ::EMRSETMITERLIMIT );
+      eMiterLimit = limit;
+    }
+    /*!
+     * Construct a SetMiterLimit record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMRSETMITERLIMIT ( DATASTREAM& ds )
+    {
+      ds >> emr >> eMiterLimit;
+    }
+    /*!
+     * \param ds Metafile datastream.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << eMiterLimit;
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+       SetMiterLimit( dc, eMiterLimit, 0 );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+      printf( "*SETMITERLIMIT*\n" );
+      printf( "\teMiterLimit\t: %f\n", eMiterLimit );
+    }
+#endif /* ENABLE_EDITING */
+  };
+
   //! Graphics Device Context
   /*!
    * Almost all GDI graphics calls require a device context (except those which
@@ -5849,6 +5906,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       bk_mode = OPAQUE;
       polyfill_mode = ALTERNATE;
       map_mode = MM_TEXT;
+      miter_limit = 10.f;
 
       handle = globalObjects.add( this );
     }
@@ -5892,6 +5950,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
     INT bk_mode;		//!< The current background mode.
     INT polyfill_mode;		//!< The current polygon fill mode.
     INT map_mode;		//!< The current mapping mode.
+    FLOAT miter_limit;          //!< The current miter length limit.
 
     /*!
      * For compatibility, it appears that metafile handles are reused as

@@ -63,6 +63,8 @@ int main ( int argc, char* argv[] )
   HBRUSH brush;
   HFONT font;
 
+  FLOAT old_miter_limit;
+
   SetViewportOrgEx( metaDC, 123, 456, 0 );
   SetViewportExtEx( metaDC, 789, 1011, 0 );
   ScaleViewportExtEx( metaDC, 1, 2, 1, 2, 0 );
@@ -92,6 +94,7 @@ int main ( int argc, char* argv[] )
   Rectangle( metaDC, 98, 76, 54, 32 );
   Ellipse( metaDC, 32, 54, 76, 98 );
 
+  SetMiterLimit( metaDC, 20.f, &old_miter_limit );
   Polyline( metaDC, plarray, 4 );
   Polyline( metaDC, plarrayl, 4 );
   PolylineTo( metaDC, pltoarray, 4 );
