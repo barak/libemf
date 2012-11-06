@@ -37,6 +37,10 @@
 # undef  WORDS_BIGENDIAN
 # undef  BITFIELDS_BIGENDIAN
 # define ALLOW_UNALIGNED_ACCESS
+#elif defined(__alpha__)
+# undef  WORDS_BIGENDIAN
+# undef  BITFIELDS_BIGENDIAN
+# undef  ALLOW_UNALIGNED_ACCESS
 #elif defined(__sparc__)
 # define WORDS_BIGENDIAN
 # define BITFIELDS_BIGENDIAN
@@ -238,7 +242,7 @@ typedef unsigned short  WORD,       *PWORD,    *LPWORD;
 typedef int             INT,        *PINT,     *LPINT;
 typedef unsigned int    UINT,       *PUINT,    *LPUINT;
 /* Not sure this is correct. Probably should depend on the compiler, too. */
-#if defined( __LP64__)
+#if defined( __LP64__) || defined(__alpha__)
 typedef unsigned int   DWORD,      *PDWORD,   *LPDWORD;
 typedef unsigned int   ULONG,      *PULONG,   *LPULONG;
 #else
@@ -284,7 +288,7 @@ typedef VOID           *PVOID,      *LPVOID;
 typedef BYTE            BOOLEAN,    *PBOOLEAN;
 typedef char            CHAR,       *PCHAR;
 typedef short           SHORT,      *PSHORT;
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(__alpha__)
 typedef int             LONG,       *PLONG,    *LPLONG;
 #else
 typedef long            LONG,       *PLONG,    *LPLONG;
@@ -897,7 +901,7 @@ PVOID WINAPI             RtlVirtualUnwind(ULONG,ULONG64,ULONG64,RUNTIME_FUNCTION
 #endif /* __x86_64__ */
 
 /* Alpha context definitions */
-#ifdef _ALPHA_
+#if defined(__alpha__)
 
 #define CONTEXT_ALPHA   0x00020000
  
