@@ -238,7 +238,7 @@ typedef unsigned short  WORD,       *PWORD,    *LPWORD;
 typedef int             INT,        *PINT,     *LPINT;
 typedef unsigned int    UINT,       *PUINT,    *LPUINT;
 /* Not sure this is correct. Probably should depend on the compiler, too. */
-#if defined( __x86_64__)
+#if defined( __LP64__)
 typedef unsigned int   DWORD,      *PDWORD,   *LPDWORD;
 typedef unsigned int   ULONG,      *PULONG,   *LPULONG;
 #else
@@ -284,7 +284,7 @@ typedef VOID           *PVOID,      *LPVOID;
 typedef BYTE            BOOLEAN,    *PBOOLEAN;
 typedef char            CHAR,       *PCHAR;
 typedef short           SHORT,      *PSHORT;
-#if defined(__x86_64__)
+#if defined(__LP64__)
 typedef int             LONG,       *PLONG,    *LPLONG;
 #else
 typedef long            LONG,       *PLONG,    *LPLONG;

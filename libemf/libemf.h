@@ -340,7 +340,7 @@ namespace EMF {
 	fread( &dword, sizeof(DWORD), 1, fp_ );
       return *this;
     }
-#if !defined( __x86_64__ )
+#if !defined( __LP64__ )
     /*!
      * Output a long int to the stream (swabbed).
      * \param long long int to output.
@@ -410,7 +410,7 @@ namespace EMF {
 	fread( &int_, sizeof(INT), 1, fp_ );
       return *this;
     }
-#if !defined(__x86_64__)
+#if !defined(__LP64__)
     /*!
      * Output a (long) unsigned int to the stream (swabbed).
      * \param uint (long) unsigned int to output.
@@ -985,7 +985,7 @@ namespace EMF {
   /* Miscellaneous editing routines */
   inline void edit_rectl ( const char* tag, const RECTL& rectl )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "\t%s\t: (%d, %d) - (%d, %d)\n";
 #else
     const char* FMT = "\t%s\t: (%ld, %ld) - (%ld, %ld)\n";
@@ -1005,7 +1005,7 @@ namespace EMF {
 
   inline void edit_color ( const char* tag, const COLORREF& color )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "\t%s\t: R(0x%02x) G(0x%02x) B(0x%02x)\n";
 #else
     const char* FMT = "\t%s\t: R(0x%02lx) G(0x%02lx) B(0x%02lx)\n";
@@ -1016,7 +1016,7 @@ namespace EMF {
 
   inline void edit_sizel ( const char* tag, const SIZEL& size )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "\t%s\t: (%d, %d)\n";
 #else
     const char* FMT = "\t%s\t: (%ld, %ld)\n";
@@ -1026,7 +1026,7 @@ namespace EMF {
 
   inline void edit_pointl ( const char* tag, const POINTL& point )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "\t%s\t: (%d, %d)\n";
 #else
     const char* FMT = "\t%s\t: (%ld, %ld)\n";
@@ -1037,7 +1037,7 @@ namespace EMF {
   inline void edit_pointlarray ( const char* tag, const DWORD cptl,
 				  const POINTL* points )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT0 = "\tcptl%s\t: %d\n";
     const char* FMT1 = "%d, %d\n";
     const char* FMT2 = "\t\t%s  %d, %d\n";
@@ -1102,7 +1102,7 @@ namespace EMF {
 
   inline void edit_brush_style ( const char* tag, DWORD style )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)";
 #else
     const char* FMT = "unknown(%ld)";
@@ -1126,7 +1126,7 @@ namespace EMF {
 
   inline void edit_brush_hatch ( const char* tag, DWORD hatch )
   {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)";
 #else
     const char* FMT = "unknown(%ld)";
@@ -1473,7 +1473,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tiType\t\t\t: %d\n";
       const char* FMT1 = "\tnSize\t\t\t: %d\n";
       const char* FMT2 = "\tnBytes\t\t\t: %d\n";
@@ -1855,7 +1855,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\txNum\t: %d\n";
       const char* FMT1 = "\txDenom\t: %d\n";
       const char* FMT2 = "\tyNum\t: %d\n";
@@ -1993,7 +1993,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\txNum\t: %d\n";
       const char* FMT1 = "\txDenom\t: %d\n";
       const char* FMT2 = "\tyNum\t: %d\n";
@@ -2069,7 +2069,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)\n";
 #else
     const char* FMT = "unknown(%ld)\n";
@@ -2196,7 +2196,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "| unknown bits(0x%x)";
 #else
     const char* FMT = "| unknown bits(0x%lx)";
@@ -2394,7 +2394,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)\n";
 #else
     const char* FMT = "unknown(%ld)\n";
@@ -2460,7 +2460,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)\n";
 #else
     const char* FMT = "unknown(%ld)\n";
@@ -2527,7 +2527,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT = "unknown(%d)\n";
 #else
     const char* FMT = "unknown(%ld)\n";
@@ -2596,7 +2596,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT = "\tihObject\t: 0x%x\n";
 #else
       const char* FMT = "\tihObject\t: 0x%lx\n";
@@ -2654,7 +2654,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT = "\tihObject\t: 0x%x\n";
 #else
       const char* FMT = "\tihObject\t: 0x%lx\n";
@@ -3580,7 +3580,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tnPolys\t\t: %d\n";
       const char* FMT1 = "\tcptl\t\t: %d\n";
       const char* FMT2 = "%d\n";
@@ -3770,7 +3770,7 @@ namespace EMF {
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tnPolys\t\t: %d\n";
       const char* FMT1 = "\tcptl\t\t: %d\n";
       const char* FMT2 = "%d\n";
@@ -4575,7 +4575,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
     const char* FMT0 = "unknown(%d)\n";
     const char* FMT1 = "\tptlReference\t: (%d,%d)\n";
     const char* FMT2 = "\tnChars\t\t: %d\n";
@@ -4759,7 +4759,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tihPen\t\t: 0x%x\n";
       const char* FMT1 = "\tlopn.lopnWidth\t: %d, %d\n";
 #else
@@ -4817,7 +4817,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tihPen\t\t\t: 0x%x\n";
       const char* FMT1 = "\toffBmi\t\t\t: %d\n";
       const char* FMT2 = "\tcbBmi\t\t\t: %d\n";
@@ -4891,7 +4891,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT = "\tihBrush\t\t: 0x%x\n";
 #else
       const char* FMT = "\tihBrush\t\t: 0x%lx\n";
@@ -4951,7 +4951,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT0 = "\tihFont\t\t\t: %d\n";
       const char* FMT1 = "\tlfHeight\t\t: %d\n";
       const char* FMT2 = "\tlfWidth\t\t\t: %d\n";
@@ -5520,7 +5520,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void edit ( void ) const
     {
-#if defined(__x86_64__)
+#if defined(__LP64__)
       const char* FMT = "\tiRelative: %d\n";
 #else
       const char* FMT = "\tiRelative: %ld\n";
