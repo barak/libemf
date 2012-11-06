@@ -41,6 +41,10 @@
 # undef  WORDS_BIGENDIAN
 # undef  BITFIELDS_BIGENDIAN
 # undef  ALLOW_UNALIGNED_ACCESS
+#elif defined(__arm__)
+# undef  WORDS_BIGENDIAN
+# undef  BITFIELDS_BIGENDIAN
+# undef  ALLOW_UNALIGNED_ACCESS
 #elif defined(__sparc__)
 # define WORDS_BIGENDIAN
 # define BITFIELDS_BIGENDIAN
@@ -1357,6 +1361,69 @@ typedef struct _CONTEXT
 } CONTEXT;
 
 #endif  /* __s390__ */
+
+#ifdef __arm__
+
+/* These definitions are taken directly from wine 
+ * http://source.winehq.org/git/wine.git/blob_plain/HEAD:/include/winnt.h */
+
+/* The following flags control the contents of the CONTEXT structure. */
+
+#define CONTEXT_ARM             0x0200000
+#define CONTEXT_CONTROL         (CONTEXT_ARM | 0x00000001)
+#define CONTEXT_INTEGER         (CONTEXT_ARM | 0x00000002)
+#define CONTEXT_FLOATING_POINT  (CONTEXT_ARM | 0x00000004)
+#define CONTEXT_DEBUG_REGISTERS (CONTEXT_ARM | 0x00000008)
+
+#define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_INTEGER)
+
+#define EXCEPTION_READ_FAULT    0
+#define EXCEPTION_WRITE_FAULT   1
+#define EXCEPTION_EXECUTE_FAULT 8
+
+typedef struct _CONTEXT {
+/* The flags values within this flag control the contents of
+ * a CONTEXT record.
+ *
+ * If the context record is used as an input parameter, then
+ * for each portion of the context record controlled by a flag
+ * whose value is set, it is assumed that that portion of the
+ * context record contains valid context. If the context record
+ * is being used to modify a thread's context, then only that
+ * portion of the threads context will be modified.
+ *
+ * If the context record is used as an IN OUT parameter to capture
+ * the context of a thread, then only those portions of the thread's
+ * context corresponding to set flags will be returned.
+ *
+ * The context record is never used as an OUT only parameter. */
+
+ULONG ContextFlags;
+
+/* This section is specified/returned if the ContextFlags word contains
+ *    the flag CONTEXT_INTEGER. */
+ULONG R0;
+ULONG R1;
+ULONG R2;
+ULONG R3;
+ULONG R4;
+ULONG R5;
+ULONG R6;
+ULONG R7;
+ULONG R8;
+ULONG R9;
+ULONG R10;
+ULONG Fp;
+ULONG Ip;
+
+/* These are selected by CONTEXT_CONTROL */
+ULONG Sp;
+ULONG Lr;
+ULONG Pc;
+ULONG Cpsr;
+} CONTEXT;
+
+#endif /* __arm__ */
 
 #if !defined(CONTEXT_FULL) && !defined(RC_INVOKED)
 #error You need to define a CONTEXT for your CPU
