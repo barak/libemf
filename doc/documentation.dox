@@ -16,20 +16,13 @@ libEMF is a C/C++ library which provides a drawing toolkit based on <A
 href=http://www.ecma.ch/ecma1/STAND/ECMA-234.HTM> ECMA-234</A>. The
 general purpose of this library is to create vector graphics files on
 POSIX systems which can be imported into <A
-href=http://www.sun.com/staroffice/>StarOffice</A>/<A
-href=http://www.openoffice.org>OpenOffice.org</A>.  The Enhanced MetaFile
-(EMF) is one of the two color vector graphics format which is
-"vectorially" understood by SO/OO.org. (SO/OO.org can import Encapsulated
-PostScript files, but will only display it if it has a bitmap preview
-image. SO/OO.org can also import a DXF file, but as near as I can tell,
-this is only monochrome. OpenOffice now has an XML based file format;
-in the future, use of this format will probably supplant this
-library.) The EMF format also has the additional advantage that it can
-be "broken" into its constituent components and edited like any other
-SO/OO.org graphics object.
+href=http://www.openoffice.org>OpenOffice.org</A> or <A
+href=http://www.libreoffice.org>LibreOffice</A>. Times have changed,
+though. These days, you can import SVGs, or even PDFs, into OpenOffice
+or LibreOffice. Those are much better choices than EMF files.
 
 My general interest in this library is for making scientific plots
-with <A href=http://www.gnuplot.org/>gnuplot</A> and <A
+with <A href=http://www.gnuplot.info/>gnuplot</A> and <A
 href=http://plasma-gate.weizmann.ac.il/Grace/>Grace</A>(forthcoming).
 Therefore, this software includes patches to those programs to add the
 EMF as an output option. This library is mostly limited to the
