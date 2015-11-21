@@ -23,6 +23,9 @@
 
 int main ( int argc, char* argv[] )
 {
+  (void)argc;
+  (void)argv;
+
   HWND desktop = GetDesktopWindow();
   HDC dc = GetDC( desktop );
 

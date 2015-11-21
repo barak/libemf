@@ -16,8 +16,8 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-INCLUDES = -I$(top_srcdir)/include
-check_PROGRAMS = check1 check2 check3 example1 example2
+AM_CPPFLAGS = -I$(top_srcdir)/include
+check_PROGRAMS = check1 check2 check3 check4 example1 example2
 LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++
 
 TESTS = docheck1 docheck2 docheck3

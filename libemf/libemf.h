@@ -26,11 +26,17 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <stdexcept>
 
 #include <config.h>
 #include <libEMF/emf.h>
 
 #include <libEMF/wine/w16.h>
+
+#ifdef ENABLE_EDITING
+#include <iconv.h>
+#include <errno.h>
+#endif
 
 namespace EMF {
   /*!
@@ -933,6 +939,42 @@ namespace EMF {
       *this >> palette.palVersion >> palette.palNumEntries;
       return *this;
     }
+  private:
+    /*!
+     * Wrap the fread function so that we can handle read errors,
+     * albeit not very nicely. This function is allowed to reach the
+     * end of file since you can't guess the size of the EMF file.
+     * \param[in,out] ptr pointer to buffer to fill.
+     * \param[in] size size in byte of item to read from stream.
+     * \param[in] nmemb number of items to read from stream.
+     * \param[in,out] stream FILE stream to read items from.
+     * \throw std::runtime_error if an error occurs other than end-of-file.
+     */
+    void fread ( void* ptr, size_t size, size_t nmemb, FILE* stream )
+    {
+      size_t res = ::fread( ptr, size, nmemb, stream );
+      if ( res < nmemb ) {
+        if ( ! feof( stream ) ) {
+          throw std::runtime_error( "error reading EMF stream" );
+        }
+      }
+    }
+    /*!
+     * Wrap the fwrite function so that we can handle read errors,
+     * albeit not very nicely.
+     * \param[in,out] ptr pointer to buffer to output.
+     * \param[in] size size in byte of item to write to stream.
+     * \param[in] nmemb number of items to write to stream.
+     * \param[in,out] stream FILE stream to write items to.
+     * \throw std::runtime_error if an error occurs.
+     */
+    void fwrite ( const void* ptr, size_t size, size_t nmemb, FILE* stream )
+    {
+      size_t res = ::fwrite( ptr, size, nmemb, stream );
+      if ( res < nmemb ) {
+        throw std::runtime_error( "error writing EMF stream" );
+      }
+    }
   };
 
   class METAFILEDEVICECONTEXT;
@@ -1291,6 +1333,7 @@ namespace EMF {
     static EMF::METARECORD* new_polylineto ( DATASTREAM& ds );
     static EMF::METARECORD* new_polylineto16 ( DATASTREAM& ds );
     static EMF::METARECORD* new_exttextouta ( DATASTREAM& ds );
+    static EMF::METARECORD* new_exttextoutw ( DATASTREAM& ds );
     static EMF::METARECORD* new_setpixelv ( DATASTREAM& ds );
     static EMF::METARECORD* new_createpen ( DATASTREAM& ds );
     static EMF::METARECORD* new_extcreatepen ( DATASTREAM& ds );
@@ -4641,6 +4684,275 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       printf( FMT4, emrtext.offDx );
       printf( "\tString:\n\t\t%s\n",  string_a );
 
+      if ( emrtext.offDx != 0 ) {
+	printf( "\tOffsets:\n\t\t" );
+	for ( unsigned int i = 0; i < emrtext.nChars; i++ )
+	  printf( "%d ", dx_i[i] );
+	printf( "\n" );
+      }
+    }
+#endif /* ENABLE_EDITING */
+  };
+  class EMREXTTEXTOUTW : public METARECORD, ::EMREXTTEXTOUTW {
+    PWSTR string_a;
+    int string_size;
+
+    INT* dx_i;
+  public:
+    /*!
+     * \param bounds bounding box of text string.
+     * \param graphicsMode (not entirely sure?)
+     * \param xScale width scale factor (of what?)
+     * \param yScale height scale factor (of what?)
+     * \param text a text metarecord containing the rendering style.
+     * \param string the text to render
+     * \param dx an array of positions for each character in string.
+     */
+    EMREXTTEXTOUTW ( const RECTL* bounds, DWORD graphicsMode, FLOAT xScale,
+		     FLOAT yScale, const PEMRTEXT text, LPCWSTR string,
+		     const INT* dx )
+    {
+      emr.iType = EMR_EXTTEXTOUTW;
+      emr.nSize = sizeof( ::EMREXTTEXTOUTW );
+
+      rclBounds = *bounds;
+
+      iGraphicsMode = graphicsMode;
+      exScale = xScale;
+      eyScale = yScale;
+
+      emrtext = *text;
+
+      string_size = ROUND_TO_LONG( emrtext.nChars );
+
+      string_a = new WCHAR[ string_size ];
+
+      memset( string_a, 0, sizeof(WCHAR) * string_size );
+
+      for ( unsigned int i=0; i<emrtext.nChars; i++ )
+	string_a[i] = *string++;
+
+      emrtext.offString = emr.nSize;
+      emr.nSize += string_size * sizeof(WCHAR);
+#if 0
+/* 
+Test only - Problem: Windows requires this dx to be set - at least from 2K on
+but to calculate real dx values is hard 
+For pstoedit - this is "fixed" now by estimating dx in pstoedit
+*/
+      if ( !dx ) {
+	int * dxn = new  int [string_size];
+	for (unsigned int i=0; i < string_size; i++) dxn[i] = 10;
+	dx = dxn;
+      }
+#endif
+
+      if ( dx ) {
+
+	dx_i = new INT[ emrtext.nChars ];
+
+	for ( unsigned int i=0; i<emrtext.nChars; i++ )
+	  dx_i[i] = *dx++;
+
+	emrtext.offDx = emr.nSize;
+	emr.nSize += emrtext.nChars * sizeof(INT);
+      }
+      else {
+	emrtext.offDx = 0;
+	dx_i = 0;
+      }
+    }
+    /*!
+     * Construct a ExtTextOutA record from the input stream.
+     * \param ds Metafile datastream.
+     */
+    EMREXTTEXTOUTW ( DATASTREAM& ds )
+    {
+      ds >> emr >> rclBounds >> iGraphicsMode >> exScale >> eyScale >> emrtext;
+
+      if ( emrtext.offString != 0 ) {
+	string_size = ROUND_TO_LONG( emrtext.nChars );
+
+	string_a = new WCHAR[ string_size ];
+
+	memset( string_a, 0, sizeof(WCHAR) * string_size );
+
+	WCHARSTR string( string_a, string_size );
+
+	ds >> string;
+      }
+      else
+	string_a = 0;
+
+      if ( emrtext.offDx ) {
+	dx_i = new INT[ emrtext.nChars ];
+
+	INTARRAY dx_is( dx_i, emrtext.nChars );
+
+	ds >> dx_is;
+      }
+      else
+	dx_i = 0;
+    }
+    /*!
+     * Destructor frees its copy of the string and its character
+     * offset array
+     */
+    ~EMREXTTEXTOUTW ( )
+    {
+      if ( string_a ) delete[] string_a;
+      if ( dx_i ) delete[] dx_i;
+    }
+    /*!
+     * \param fp Metafile file handle.
+     */
+    bool serialize ( DATASTREAM ds )
+    {
+      ds << emr << rclBounds << iGraphicsMode << exScale << eyScale
+	 << emrtext << WCHARSTR( string_a, string_size );
+      if ( dx_i )
+	ds << INTARRAY( dx_i, emrtext.nChars );
+      return true;
+    }
+    /*!
+     * Internally computed size of this record.
+     */
+    int size ( void ) const { return emr.nSize; }
+    /*!
+     * Execute this record in the context of the given device context.
+     * \param source the device context from which this record is taken.
+     * \param dc device context for execute.
+     */
+    void execute ( METAFILEDEVICECONTEXT* /*source*/, HDC dc ) const
+    {
+      RECT rect;
+      rect.left = emrtext.rcl.left;
+      rect.top = emrtext.rcl.top;
+      rect.right = emrtext.rcl.right;
+      rect.bottom = emrtext.rcl.bottom;
+
+      ExtTextOutW( dc, emrtext.ptlReference.x, emrtext.ptlReference.y,
+		   emrtext.fOptions, &rect, string_a, emrtext.nChars,
+		   dx_i );
+    }
+#ifdef ENABLE_EDITING
+    /*!
+     * Print it to stdout.
+     */
+    void edit ( void ) const
+    {
+#if defined(__LP64__)
+    const char* FMT0 = "unknown(%d)\n";
+    const char* FMT1 = "\tptlReference\t: (%d,%d)\n";
+    const char* FMT2 = "\tnChars\t\t: %d\n";
+    const char* FMT3 = "\toffString\t: %d\n";
+    const char* FMT4 = "\toffDx\t\t: %d\n";
+#else
+    const char* FMT0 = "unknown(%ld)\n";
+    const char* FMT1 = "\tptlReference\t: (%ld,%ld)\n";
+    const char* FMT2 = "\tnChars\t\t: %ld\n";
+    const char* FMT3 = "\toffString\t: %ld\n";
+    const char* FMT4 = "\toffDx\t\t: %ld\n";
+#endif /* __x86_64__ */
+      printf( "*EXTTEXTOUTA*\n" );
+      edit_rectl( "rclBounds", rclBounds );
+      printf( "\tiGraphicsMode\t: " );
+      switch ( iGraphicsMode ) {
+      case GM_COMPATIBLE: printf( "GM_COMPATIBLE\n" ); break;
+      case GM_ADVANCED: printf( "GM_ADVANCED\n" ); break;
+      default: printf( FMT0, iGraphicsMode );
+      }
+      printf( "\texScale\t\t: %f\n", exScale );
+      printf( "\teyScale\t\t: %f\n", eyScale );
+      printf( FMT1, emrtext.ptlReference.x, emrtext.ptlReference.y );
+      printf( FMT2, emrtext.nChars );
+      printf( FMT3, emrtext.offString );
+      printf( "\tfOptions\t: " );
+      if ( emrtext.fOptions == 0 )
+	printf( "None" );
+      else {
+	if ( emrtext.fOptions & ETO_GRAYED ) {
+	  printf( "ETO_GRAYED" );
+	  if ( emrtext.fOptions & ~ETO_GRAYED )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_OPAQUE ) {
+	  printf( "ETO_OPAQUE" );
+	  if ( emrtext.fOptions & ~(ETO_GRAYED | ETO_OPAQUE) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_CLIPPED ) {
+	  printf( "ETO_CLIPPED" );
+	  if ( emrtext.fOptions & ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED ) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_GLYPH_INDEX ) {
+	  printf( "ETO_GLYPH_INDEX" );
+	  if ( emrtext.fOptions &
+	       ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED | ETO_GLYPH_INDEX) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_RTLREADING ) {
+	  printf( "ETO_RTLREADING" );
+	  if ( emrtext.fOptions &
+	       ~(ETO_GRAYED | ETO_OPAQUE | ETO_CLIPPED | ETO_GLYPH_INDEX |
+		 ETO_RTLREADING) )
+	    printf( " | " );
+	}
+	if ( emrtext.fOptions & ETO_IGNORELANGUAGE )
+	  printf( "ETO_IGNORELANGUAGE" );
+      }
+      printf( "\n" );
+      edit_rectl( "rcl\t", emrtext.rcl );
+      printf( FMT4, emrtext.offDx );
+#if 0
+      printf( "\tString:\n\t\t%s\n",  string_a );
+#else
+      {
+        // iconv_open arguments are TO, FROM (not the other way around).
+        iconv_t cvt = iconv_open( "UTF-8", "UTF-16LE" );
+        std::vector<char> utf8_buffer( emrtext.nChars );
+        // Cannot predict the space necessary to hold the converted
+        // string. So, we loop until conversion is complete.
+        size_t size          = emrtext.nChars * sizeof(*string_a);
+        size_t in_bytes_left = size;
+        size_t converted     = 0;
+        char*  in_buffer     = (char*)string_a;
+        while ( 1 ) {
+          char* out_buffer      = &utf8_buffer[converted];
+          size_t out_bytes_left = size - converted;
+
+          size_t n = iconv( cvt, &in_buffer, &in_bytes_left,
+                            &out_buffer, &out_bytes_left );
+
+          converted = size - out_bytes_left;
+
+          if ( n == (size_t)-1 ) {
+            if ( errno == E2BIG ) {
+              size_t new_size = 2 * utf8_buffer.size();
+              utf8_buffer.resize( new_size );
+              size = utf8_buffer.size();
+            }
+            else {
+              // Real conversion error.
+              break;
+            }
+          }
+          else {
+            break;
+          }
+        }
+
+        iconv_close( cvt );
+
+        if ( converted == utf8_buffer.size() )
+          utf8_buffer.push_back( '\0' );
+        else
+          utf8_buffer[converted] = '\0';
+
+        printf( "\tString:\n\t\t%s\n",  &utf8_buffer[0] );
+      }
+#endif
       if ( emrtext.offDx != 0 ) {
 	printf( "\tOffsets:\n\t\t" );
 	for ( unsigned int i = 0; i < emrtext.nChars; i++ )

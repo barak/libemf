@@ -16,6 +16,6 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = printemf
 LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++ -lm

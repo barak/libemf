@@ -49,6 +49,9 @@ static LOGBRUSH lbrush = { BS_HATCHED, RGB(0x0,0x0,0xff), HS_DIAGCROSS };
 
 int main ( int argc, char* argv[] )
 {
+  (void)argc;
+  (void)argv;
+
   HWND desktop = GetDesktopWindow();
   HDC dc = GetDC( desktop );
 

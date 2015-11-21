@@ -144,6 +144,7 @@ namespace EMF {
     new_records[EMR_POLYLINETO] = new_polylineto;
     new_records[EMR_POLYLINETO16] = new_polylineto16;
     new_records[EMR_EXTTEXTOUTA] = new_exttextouta;
+    new_records[EMR_EXTTEXTOUTW] = new_exttextoutw;
     new_records[EMR_SETPIXELV] = new_setpixelv;
     new_records[EMR_CREATEPEN] = new_createpen;
     new_records[EMR_EXTCREATEPEN] = new_extcreatepen;
@@ -428,6 +429,11 @@ namespace EMF {
   METARECORD* GLOBALOBJECTS::new_exttextouta ( DATASTREAM& ds )
   {
     return new EMF::EMREXTTEXTOUTA( ds );
+  }
+
+  METARECORD* GLOBALOBJECTS::new_exttextoutw ( DATASTREAM& ds )
+  {
+    return new EMF::EMREXTTEXTOUTW( ds );
   }
 
   METARECORD* GLOBALOBJECTS::new_setpixelv ( DATASTREAM& ds )
@@ -2355,7 +2361,59 @@ extern "C" {
 
     return TRUE;
   }
-#if 0
+  /*!
+   * Draw a string of text at the given position and using the additional
+   * placement specifications.
+   * \param context handle to metafile context.
+   * \param x x position of text.
+   * \param y y position of text.
+   * \param flags additional rendering information, sum of the following attributes:
+   * \li ETO_GRAYED
+   * \li ETO_OPAQUE
+   * \li ETO_CLIPPED
+   * \li ETO_GLYPH_INDEX
+   * \li ETO_RTLREADING
+   * \li ETO_IGNORELANGUAGE
+   * \param rect optional clipping rectangle for text(?)
+   * \param string ASCII text string to render.
+   * \param count number of characters in string to draw.
+   * \param dx returns a list of where each glyph was drawn(?)
+   * \return true if text was successfully rendered.
+   */
+  BOOL ExtTextOutW ( HDC context, INT x, INT y, UINT flags,
+		     const RECT* rect, LPCWSTR string, UINT count,
+		     const INT* dx )
+  {
+    EMF::METAFILEDEVICECONTEXT* dc =
+      dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
+
+    if ( dc == 0 ) return FALSE;
+
+    RECTL bounds = { 0, 0, -1, -1 };
+
+    EMRTEXT text;
+    text.ptlReference.x = x;
+    text.ptlReference.y = y;
+    text.nChars = count;
+    text.fOptions = flags;
+    text.rcl = bounds;
+
+    if ( rect ) {
+      bounds.left = rect->left;
+      bounds.top = rect->top;
+      bounds.right = rect->right;
+      bounds.bottom = rect->bottom;
+    }
+
+    EMF::EMREXTTEXTOUTW* exttextoutw =
+      new EMF::EMREXTTEXTOUTW( &bounds, GM_COMPATIBLE, 1.0F, 1.0F, &text,
+			       string, dx );
+
+    dc->appendRecord( exttextoutw );
+
+    return TRUE;
+  }
+
   /*!
    * Draw a string of text at the given position and using the additional
    * placement specifications.
@@ -2368,9 +2426,9 @@ extern "C" {
    */
   BOOL TextOutW ( HDC context, INT x, INT y, LPCWSTR string, INT count )
   {
-    return ExtTextOutW( context, x, y, string, count );
+    return ExtTextOutW( context, x, y, 0, 0, string, count, 0 );
   }
-#endif
+
   /*!
    * Draw an arc. Not sure what the specification here means, though.
    * \param left x position of left edge of arc box.

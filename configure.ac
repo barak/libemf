@@ -2,11 +2,11 @@
 # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 # $Id$
 
-AC_INIT(libEMF, 1.0.7, dallenbarnett@users.sourceforge.net)
+AC_INIT([libEMF], 1.0.8, dallenbarnett@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(libEMF, 1.0.7)
 AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_SRCDIR([include/libEMF/emf.h])
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
@@ -81,7 +81,7 @@ fi
 # Adds a lot of code and data to the library, though.
 
 AC_ARG_ENABLE(editing,
-[  --enable-editing     enable EditEnhFile() function [default=no]],
+[  --enable-editing     enable EditEnhMetaFile() function [default=no]],
   enable_editing=$enableval, enable_editing=no)
 if test "x$enable_editing" = xyes; then
    AC_DEFINE(ENABLE_EDITING, 1)

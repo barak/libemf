@@ -25,6 +25,9 @@ const char* USAGE = "usage: %s emf\n";
 
 int main ( int argc, char* argv[] )
 {
+  (void)argc;
+  (void)argv;
+
   HWND desktop;
   HDC dc;
 

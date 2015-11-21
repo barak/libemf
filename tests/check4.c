@@ -1,7 +1,7 @@
 /*
- * Example program for the EMF library
- * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id$
+ * Checkout program for the EMF library
+ * Copyright (C) 2015 Allen Barnett <dallenbarnett@users.sourceforge.net>
+ * $Id: check3.c 54 2010-07-21 18:57:31Z dallenbarnett $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,6 @@
 
 #include <libEMF/emf.h>
 
-static int nplpl[] = { 3 };
-static POINT plpl[] = { { 0, 0 }, { 100, 100 }, { 100, 0 } };
-
 int main ( int argc, char* argv[] )
 {
   (void)argc;
@@ -32,25 +29,24 @@ int main ( int argc, char* argv[] )
   HWND desktop = GetDesktopWindow();
   HDC dc = GetDC( desktop );
 
-  PCSTR filename = "example1.emf";
-  PCSTR description = "Example metafile created\0with libEMF\0";
+  PCSTR filename = "check4.emf";
+  PCSTR description = "Test metafile created\0with libEMF\0";
 
-  HENHMETAFILE mfh;
-  HDC metaDC = CreateEnhMetaFile( dc, filename, 0, description );
+  RECT size = { 0, 0, 20000, 10000 }; /* 10cm x 20cm */
+  HDC metaDC = CreateEnhMetaFile( dc, filename, &size, description );
 
-  HPEN pen;
-  HBRUSH brush;
+  WCHAR the_string[] = { 'A', '=', 0x03c0, 'r', 0x00b2 };
+  HFONT font;
 
-  brush = CreateSolidBrush( RGB(0xff,0x00,0xff) );
-  SelectObject( metaDC, brush );
+  font = CreateFont( -32, 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET,
+		     OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		     DEFAULT_PITCH | FF_DONTCARE, "Helvetica" );
 
-  pen = CreatePen( PS_SOLID, 10, RGB(0x00,0xff,0x00) );
-  SelectObject( metaDC, pen );
+  SelectObject( metaDC, font );
+  TextOutW( metaDC, 50, 50, the_string, 5 );
 
-  PolyPolygon( metaDC, plpl, nplpl, 1 );
+  DeleteEnhMetaFile( CloseEnhMetaFile( metaDC ) );
 
-  mfh = CloseEnhMetaFile( metaDC );
-  DeleteEnhMetaFile( mfh );
   DeleteDC( metaDC );
 
   return 0;
