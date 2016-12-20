@@ -16,4 +16,16 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-SUBDIRS = libEMF
+nobase_include_HEADERS = libEMF/emf.h \
+libEMF/wine/winbase.h \
+libEMF/wine/windef.h \
+libEMF/wine/winerror.h \
+libEMF/wine/wingdi.h \
+libEMF/wine/winuser.h \
+libEMF/wine/winnt.h \
+libEMF/wine/basetsd.h \
+libEMF/wine/pshpack2.h \
+libEMF/wine/poppack.h \
+libEMF/wine/pshpack4.h \
+libEMF/wine/guiddef.h \
+libEMF/wine/w16.h

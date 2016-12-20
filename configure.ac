@@ -2,7 +2,7 @@
 # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 # $Id$
 
-AC_INIT([libEMF], 1.0.8, dallenbarnett@users.sourceforge.net)
+AC_INIT([libEMF], 1.0.9, dallenbarnett@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_SRCDIR([include/libEMF/emf.h])
@@ -12,8 +12,10 @@ AM_INIT_AUTOMAKE
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL
+#AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+
+LT_INIT
 
 # Checks for libraries.
 
@@ -91,7 +93,7 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)
 AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
 AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
 
-AC_CONFIG_FILES([Makefile include/Makefile include/libEMF/Makefile libemf/Makefile \
+AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \
 src/Makefile doc/Makefile tests/Makefile])
 
 AC_OUTPUT
