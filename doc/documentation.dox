@@ -35,9 +35,7 @@ systems. Therefore, if your graphics code only outputs PostScript,
 you can now easily convert it to EMF.
 
 <A href=http://sourceforge.net/projects/libemf>libEMF is hosted on
-SourceForge.</A> If you have questions or comments, try out the <A
-href=mailto:libemf-devel@lists.sourceforge.net>libEMF mailing
-list.</A>
+SourceForge.</A>
 
 \section compilation Compilation
 
