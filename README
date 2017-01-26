@@ -1,0 +1,18 @@
+libEMF Version 1.0
+
+libEMF is a library for generating Enhanced Metafiles on systems which
+don't natively support the ECMA-234 Graphics Device Interface
+(GDI). The library is intended to be used as a driver for other
+graphics programs such as Grace or gnuplot. Therefore, it implements a
+very limited subset of the GDI.
+
+The only additional configuration option beyond the usual GNU
+autotools options is --enable-editing, which activates the function
+EditEnhMetaFile(). This will print the contents of a metafile in
+memory to stdout.
+
+The documentation starts at doc/html/index.html.
+
+The software is available from SourceForge. See https://sourceforge.net/projects/libemf/
+
+Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>

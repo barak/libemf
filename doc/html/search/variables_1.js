@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['bk_5fcolor',['bk_color',['../classEMF_1_1METAFILEDEVICECONTEXT.html#a925dd79bd78134bf782da8538e7dd92a',1,'EMF::METAFILEDEVICECONTEXT']]],
+  ['bk_5fmode',['bk_mode',['../classEMF_1_1METAFILEDEVICECONTEXT.html#ae19e5d7b34631316a44953e95ee02999',1,'EMF::METAFILEDEVICECONTEXT']]],
+  ['brush',['brush',['../classEMF_1_1METAFILEDEVICECONTEXT.html#a59b33587e38c301e2b24a3c8651f2a8f',1,'EMF::METAFILEDEVICECONTEXT']]]
+];

@@ -1,0 +1,17 @@
+New in libEMF version 1.0
+
+	All of the poly* routines will now emit 16-bit records if
+	the coordinates are all small enough (reduces the size of
+	the metafile somewhat).
+
+New in libEMF version 0.5
+
+	Support for reading an existing EMF file.
+	Support for PlayEnhMetaFile, to replay a collected metafile.
+
+New in libEMF version 0.3
+
+	Support for writing EMF files on big-endian machines
+	Support of passing NULL as the initial EMF size. libEMF now
+	maintains more graphics state information.
+	Alpha Autoconf support
