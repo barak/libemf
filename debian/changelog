@@ -1,11 +1,5 @@
-libemf (1.0.8-0ubuntu0~yakketyppa1) yakkety; urgency=low
+libemf (1.0.9-1) unstable; urgency=medium
 
-  * New upstream release
+  * Initial release (closes: #417538)
 
- -- Scott Pakin <scott@pakin.org>  Tue, 11 Oct 2016 22:31:39 -0600
-
-libemf (1.0.7-0ubuntu0~yakketyppa1) yakkety; urgency=low
-
-  * Initial release
-
- -- Scott Pakin <scott@pakin.org>  Thu, 15 Jan 2015 23:39:26 -0700
+ -- Barak A. Pearlmutter <bap@debian.org>  Thu, 26 Jan 2017 14:45:04 +0100

@@ -24,6 +24,7 @@ License: GPL-2
 
 Files: debian/*
 Copyright: 2015 Scott Pakin <scott+gpg@pakin.org>
+	   2017 Barak A. Pearlmutter <bap@debian.org>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

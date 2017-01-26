@@ -1,10 +1,12 @@
 Source: libemf
 Priority: optional
-Maintainer: Scott Pakin <scott+gpg@pakin.org>
-Build-Depends: debhelper (>= 9), autotools-dev
-Standards-Version: 3.9.7
+Maintainer: Barak A. Pearlmutter <bap@debian.org>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 3.9.8
 Section: libs
 Homepage: http://libemf.sourceforge.net/
+Vcs-Git: git://anonscm.debian.org/collab-maint/libemf.git
+Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/buthead.git
 
 Package: libemf-dev
 Section: libdevel
