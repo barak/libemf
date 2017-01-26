@@ -1,0 +1,36 @@
+Source: libemf
+Priority: optional
+Maintainer: Scott Pakin <scott+gpg@pakin.org>
+Build-Depends: debhelper (>= 9), autotools-dev
+Standards-Version: 3.9.7
+Section: libs
+Homepage: http://libemf.sourceforge.net/
+
+Package: libemf-dev
+Section: libdevel
+Architecture: any
+Depends: libemf1 (= ${binary:Version}), ${misc:Depends}
+Description: Enhanced Metafile library (development)
+ libEMF is a C/C++ library which provides a drawing toolkit based on
+ ECMA-234.  The general purpose of this library is to create vector
+ graphics files on POSIX systems which can be imported into
+ OpenOffice.org or LibreOffice. Times have changed, though.  These
+ days, you can import SVGs, or even PDFs, into OpenOffice or
+ LibreOffice.  Those are much better choices than EMF files.
+ .
+ This package contains the static libraries and headers for developing
+ applications that use the libEMF library API.
+
+Package: libemf1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Enhanced Metafile library (run-time)
+ libEMF is a C/C++ library which provides a drawing toolkit based on
+ ECMA-234.  The general purpose of this library is to create vector
+ graphics files on POSIX systems which can be imported into
+ OpenOffice.org or LibreOffice. Times have changed, though.  These
+ days, you can import SVGs, or even PDFs, into OpenOffice or
+ LibreOffice.  Those are much better choices than EMF files.
+ .
+ This package contains the files necessary for running applications
+ that use the libEMF library.
