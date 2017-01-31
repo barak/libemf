@@ -2,18 +2,19 @@
 # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 # $Id: configure.ac 78 2016-12-20 20:57:57Z dallenbarnett $
 
-AC_INIT([libEMF], 1.0.9, dallenbarnett@users.sourceforge.net)
+AC_INIT([libEMF],[1.0.9],[dallenbarnett@users.sourceforge.net])
 AC_CONFIG_AUX_DIR(config)
-AM_CONFIG_HEADER([config/config.h])
-AC_CONFIG_SRCDIR([include/libEMF/emf.h])
-AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR([libemf/libemf.cpp])
+AC_CONFIG_HEADERS([config/config.h])
+AC_CONFIG_MACRO_DIRS([m4])
+AM_INIT_AUTOMAKE([-Wall])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
-#AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+AM_PROG_AR
 
 LT_INIT
 
@@ -65,13 +66,12 @@ AC_CHECK_HEADERS(pthread.h,
 
   save_LIBS=$LIBS
   LIBS="$LIBS -lpthread"
-  AC_TRY_LINK([#include <pthread.h>],[
-pthread_create (NULL, NULL, NULL, NULL)],[
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]], [[
+pthread_create (NULL, NULL, NULL, NULL)]])],[
     AC_MSG_RESULT(yes)
     CFLAGS="$CFLAGS -D_REENTRANT -DPTHREADS"
     CXXFLAGS="$CXXFLAGS -D_REENTRANT -DPTHREADS"
-    THREAD_LIBS="$THREAD_LIBS -lpthread"],
-    AC_MSG_RESULT(no)))
+    THREAD_LIBS="$THREAD_LIBS -lpthread"],[AC_MSG_RESULT(no)]))
   LIBS=$save_LIBS
 AC_SUBST(THREAD_LIBS)
 else

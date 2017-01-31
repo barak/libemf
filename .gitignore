@@ -10,6 +10,7 @@
 /config/
 /configure
 /libtool
+/m4/
 /src/printemf
 /tests/*.log
 /tests/*.trs
