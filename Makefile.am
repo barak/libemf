@@ -18,3 +18,9 @@
 
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = include libemf src tests
+
+if ENABLE_DOXYGEN
+# Include DOxygen support
+all: @DX_DOCDIR@/@PACKAGE@.tag
+@DX_RULES@
+endif
