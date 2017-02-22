@@ -94,6 +94,6 @@ AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
 AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
 
 AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \
-src/Makefile doc/Makefile tests/Makefile])
+src/Makefile tests/Makefile])
 
 AC_OUTPUT
