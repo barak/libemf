@@ -93,6 +93,24 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)
 AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
 AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
 
+# Check for DOxygen and enable its features
+
+# See /usr/share/aclocal/ax_prog_doxygen.m4 and
+# http://www.bioinf.uni-freiburg.de/~mmann/HowTo/automake.html#doxygenSupport
+
+DX_DOXYGEN_FEATURE(ON)
+DX_DOT_FEATURE(ON)
+DX_HTML_FEATURE(OFF)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN([${PACKAGE_NAME}])
+AM_CONDITIONAL(ENABLE_DOXYGEN,[test "x${DX_FLAG_doc}" = x1])
+
 AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \
 src/Makefile tests/Makefile])
 
