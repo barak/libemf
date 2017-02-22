@@ -106,7 +106,7 @@ namespace EMF {
    */
   struct CHARSTR {
     CHAR *const string_;	//!< Array of single byte characters.
-    const int length_;		//!< Number of single byte characers in array.
+    const int length_;		//!< Number of single byte characters in array.
     /*!
      * Simple constructor.
      * \param string pointer to array of single byte characters.
