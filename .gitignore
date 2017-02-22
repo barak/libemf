@@ -1,6 +1,7 @@
 *.la
 *.lo
 *.o
+.deps/
 .libs/
 /INSTALL
 /aclocal.m4
@@ -9,7 +10,9 @@
 /config.status
 /config/
 /configure
+/doxygen-doc/
 /libtool
+/m4/
 /src/printemf
 /tests/*.log
 /tests/*.trs
