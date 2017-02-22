@@ -1,7 +1,8 @@
 Source: libemf
 Priority: optional
 Maintainer: Barak A. Pearlmutter <bap@debian.org>
-Build-Depends: debhelper (>= 10)
+Build-Depends: debhelper (>= 10),
+	doxygen, doxygen-latex, autoconf-archive
 Standards-Version: 3.9.8
 Section: libs
 Homepage: http://libemf.sourceforge.net/
@@ -36,3 +37,18 @@ Description: Enhanced Metafile library (run-time)
  .
  This package contains the files necessary for running applications
  that use the libEMF library.
+
+Package: libemf-doc
+Section: doc
+Suggests: libjs-jquery
+Depends: ${misc:Depends}
+Architecture: all
+Description: Enhanced Metafile library (documentation)
+ libEMF is a C/C++ library which provides a drawing toolkit based on
+ ECMA-234.  The general purpose of this library is to create vector
+ graphics files on POSIX systems which can be imported into
+ OpenOffice.org or LibreOffice. Times have changed, though.  These
+ days, you can import SVGs, or even PDFs, into OpenOffice or
+ LibreOffice.  Those are much better choices than EMF files.
+ .
+ This package contains documentation for the libEMF library.

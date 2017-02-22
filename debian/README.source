@@ -1,5 +1,0 @@
-The files in doc/* are not installed in any binary package.  For this
-reason, I do not think it worthwhile to mangle the upstream tarball in
-order to deal with generated javascript files and such below doc/.
-
- -- Barak A. Pearlmutter <bap@debian.org>, Thu, 26 Jan 2017 17:30:36 +0000

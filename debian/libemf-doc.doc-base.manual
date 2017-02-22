@@ -1,0 +1,8 @@
+Document: libemf-manual
+Title: libemf manual
+Author: Allen Barnett
+Abstract: API Manual for the libEMF library
+Section: Programming/C++
+
+Format: PDF
+Files: /usr/share/doc/libemf-doc/libemf.pdf
