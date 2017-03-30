@@ -5,6 +5,17 @@ Source: http://sourceforge.net/projects/libemf/files/libemf/
 Files: *
 Copyright: 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 License: GPL-2
+
+Files: include/libEMF/emf.h libemf/libemf.cpp libemf/libemf.h
+Copyright: 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
+License: LGPL-2
+
+Files: debian/*
+Copyright: 2015 Scott Pakin <scott+gpg@pakin.org>
+	   2017 Barak A. Pearlmutter <bap@debian.org>
+License: GPL-2+
+
+License: GPL-2
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; version 2 only of the License.
@@ -22,8 +33,6 @@ License: GPL-2
  On Debian systems, the complete text of the GNU General Public
  License can be found in "/usr/share/common-licenses/GPL-2".
 
-Files: include/libEMF/emf.h libemf/libemf.cpp libemf/libemf.h
-Copyright: 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 License: LGPL-2
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -43,9 +52,6 @@ License: LGPL-2
  On Debian systems, the complete text of the GNU Lesser General Public
  License version 2.1 can be found in "/usr/share/common-licenses/LGPL-2.1".
 
-Files: debian/*
-Copyright: 2015 Scott Pakin <scott+gpg@pakin.org>
-	   2017 Barak A. Pearlmutter <bap@debian.org>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
