@@ -1,7 +1,7 @@
 /*
  * Checkout program for the EMF library
  * Copyright (C) 2015 Allen Barnett <dallenbarnett@users.sourceforge.net>
- * $Id: check3.c 54 2010-07-21 18:57:31Z dallenbarnett $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
