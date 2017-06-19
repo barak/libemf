@@ -1,5 +1,5 @@
-libemf (1.0.9+git.8.dd72f19-1) unstable; urgency=medium
+libemf (1.0.9+git.9.e2f97d9-1) unstable; urgency=medium
 
   * Initial release (closes: #417538)
 
- -- Barak A. Pearlmutter <bap@debian.org>  Wed, 22 Feb 2017 11:46:04 +0000
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 19 Jun 2017 18:08:30 +0100
