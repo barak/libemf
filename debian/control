@@ -3,7 +3,7 @@ Priority: optional
 Maintainer: Barak A. Pearlmutter <bap@debian.org>
 Build-Depends: debhelper (>= 10),
 	doxygen, doxygen-latex, autoconf-archive
-Standards-Version: 3.9.8
+Standards-Version: 4.1.0
 Section: libs
 Homepage: http://libemf.sourceforge.net/
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/libemf.git
