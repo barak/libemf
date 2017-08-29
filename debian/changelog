@@ -1,3 +1,10 @@
+libemf (1.0.9+git.10.3231442-1) unstable; urgency=medium
+
+  * Incorporate Fedora aarch64 patch
+  * Restrict architecture list (closes: #872880)
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 29 Aug 2017 14:58:58 +0100
+
 libemf (1.0.9+git.9.e2f97d9-1) unstable; urgency=medium
 
   * Initial release (closes: #417538)
