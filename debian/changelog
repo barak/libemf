@@ -1,6 +1,7 @@
 libemf (1.0.9+git.10.3231442-2) UNRELEASED; urgency=medium
 
   * d/copyright: Use https protocol in Format field
+  * d/watch: Use https protocol
 
  -- Ondřej Nový <onovy@debian.org>  Mon, 01 Oct 2018 10:10:34 +0200
 

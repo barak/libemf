@@ -1,5 +1,5 @@
 version=4
-http://sf.net/libemf/ libemf-(.+)\.tar\.gz debian uupdate
+https://sf.net/libemf/ libemf-(.+)\.tar\.gz debian uupdate
 
 # To get the upstream SVN repo into the git packaging repo:
 # git svn init https://svn.code.sf.net/p/libemf/code --stdlayout
