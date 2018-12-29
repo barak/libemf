@@ -20,8 +20,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 check_PROGRAMS = check1 check2 check3 check4 example1 example2
 LDADD = $(top_builddir)/libemf/libEMF.la -lstdc++
 
-TESTS = docheck1 docheck2 docheck3
+TEST_EXTENSIONS = .sh
+TESTS = docheck1.sh docheck2.sh docheck3.sh
 
-EXTRA_DIST = docheck1 docheck2 docheck3 emfs/check1.emf emfs/check3.emf
+EXTRA_DIST = docheck1.sh docheck2.sh docheck3.sh emfs/check1.emf emfs/check3.emf
 
 MOSTLYCLEANFILES = check1.emf check2.emf check3.emf
+
+# Dependency of output from docheck1 for docheck2
+docheck2.log: docheck1.log
