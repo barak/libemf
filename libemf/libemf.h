@@ -944,8 +944,7 @@ namespace EMF {
   private:
     /*!
      * Wrap the fread function so that we can handle read errors,
-     * albeit not very nicely. This function is allowed to reach the
-     * end of file since you can't guess the size of the EMF file.
+     * albeit not very nicely.
      * \param[in,out] ptr pointer to buffer to fill.
      * \param[in] size size in byte of item to read from stream.
      * \param[in] nmemb number of items to read from stream.
@@ -956,9 +955,7 @@ namespace EMF {
     {
       size_t res = ::fread( ptr, size, nmemb, stream );
       if ( res < nmemb ) {
-        if ( ! feof( stream ) ) {
-          throw std::runtime_error( "error reading EMF stream" );
-        }
+        throw std::runtime_error( "error reading EMF stream" );
       }
     }
     /*!
