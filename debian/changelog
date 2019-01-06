@@ -1,3 +1,15 @@
+libemf (1.0.11-1) unstable; urgency=medium
+
+  * New upstream version
+  * bump policy
+  * debhelper 12
+  * move mods to upstream into debian/patches
+    - cannot rm -r doc/ so exclude doxygen-generated files (doc/*) from
+      upstream tarball to avoid about a zillion lintian issues.
+    - Similarly exclude autotools-generated files because they annoy me
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 07 Jan 2019 19:59:13 +0000
+
 libemf (1.0.9+git.10.3231442-2) unstable; urgency=medium
 
   [ Ondřej Nový ]
