@@ -1,0 +1,5 @@
+0001-autotools-updates.patch
+0002-autoconf-AS_HELP_STRING.patch
+0003-remove-doc-doxygen-subdir.patch
+0004-add-build-time-doxygen-support-via-autotools.patch
+0005-typo-in-doc-string.patch

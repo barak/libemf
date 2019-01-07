@@ -1,0 +1,21 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Wed, 22 Feb 2017 10:57:01 +0000
+Subject: typo in doc string
+
+---
+ libemf/libemf.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libemf/libemf.h b/libemf/libemf.h
+index 6772343..2b45fde 100644
+--- a/libemf/libemf.h
++++ b/libemf/libemf.h
+@@ -106,7 +106,7 @@ namespace EMF {
+    */
+   struct CHARSTR {
+     CHAR *const string_;	//!< Array of single byte characters.
+-    const int length_;		//!< Number of single byte characers in array.
++    const int length_;		//!< Number of single byte characters in array.
+     /*!
+      * Simple constructor.
+      * \param string pointer to array of single byte characters.

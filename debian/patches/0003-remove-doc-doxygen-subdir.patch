@@ -1,0 +1,35 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Wed, 22 Feb 2017 09:24:32 +0000
+Subject: remove doc doxygen subdir
+
+Would actually rm -rf doc, but quilt format patches don't like that.
+---
+ Makefile.am  | 5 +----
+ configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index da11831..9e522f8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -17,7 +17,4 @@
+ ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
+ 
+ ACLOCAL_AMFLAGS = -I m4
+-SUBDIRS = include libemf src doc tests
+-
+-dist-hook:
+-	rm -rf `find $(distdir)/doc -name .svn`
++SUBDIRS = include libemf src tests
+diff --git a/configure.ac b/configure.ac
+index 79b2cc9..be76594 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -94,6 +94,6 @@ AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
+ AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
+ 
+ AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \
+-src/Makefile doc/Makefile tests/Makefile])
++src/Makefile tests/Makefile])
+ 
+ AC_OUTPUT

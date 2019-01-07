@@ -1,0 +1,67 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Tue, 31 Jan 2017 13:44:35 +0000
+Subject: autotools updates
+
+---
+ Makefile.am  |  1 +
+ configure.ac | 18 +++++++++---------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2b7ef71..da11831 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -16,6 +16,7 @@
+ ## along with this program; if not, write to the Free Software
+ ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
+ 
++ACLOCAL_AMFLAGS = -I m4
+ SUBDIRS = include libemf src doc tests
+ 
+ dist-hook:
+diff --git a/configure.ac b/configure.ac
+index 36022db..89c0048 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2,18 +2,19 @@
+ # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
+ # $Id: configure.ac 83 2018-12-31 16:57:58Z dallenbarnett $
+ 
+-AC_INIT([libEMF], 1.0.11, dallenbarnett@users.sourceforge.net)
++AC_INIT([libEMF],[1.0.11],[dallenbarnett@users.sourceforge.net])
+ AC_CONFIG_AUX_DIR(config)
+-AM_CONFIG_HEADER([config/config.h])
+-AC_CONFIG_SRCDIR([include/libEMF/emf.h])
+-AM_INIT_AUTOMAKE
++AC_CONFIG_SRCDIR([libemf/libemf.cpp])
++AC_CONFIG_HEADERS([config/config.h])
++AC_CONFIG_MACRO_DIRS([m4])
++AM_INIT_AUTOMAKE([-Wall])
+ 
+ # Checks for programs.
+ AC_PROG_CXX
+ AC_PROG_CC
+ AC_PROG_INSTALL
+-#AC_PROG_LIBTOOL
+ AC_PROG_MAKE_SET
++AM_PROG_AR
+ 
+ LT_INIT
+ 
+@@ -65,13 +66,12 @@ AC_CHECK_HEADERS(pthread.h,
+ 
+   save_LIBS=$LIBS
+   LIBS="$LIBS -lpthread"
+-  AC_TRY_LINK([#include <pthread.h>],[
+-pthread_create (NULL, NULL, NULL, NULL)],[
++  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]], [[
++pthread_create (NULL, NULL, NULL, NULL)]])],[
+     AC_MSG_RESULT(yes)
+     CFLAGS="$CFLAGS -D_REENTRANT -DPTHREADS"
+     CXXFLAGS="$CXXFLAGS -D_REENTRANT -DPTHREADS"
+-    THREAD_LIBS="$THREAD_LIBS -lpthread"],
+-    AC_MSG_RESULT(no)))
++    THREAD_LIBS="$THREAD_LIBS -lpthread"],[AC_MSG_RESULT(no)]))
+   LIBS=$save_LIBS
+ AC_SUBST(THREAD_LIBS)
+ else
