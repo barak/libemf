@@ -1,6 +1,14 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libemf
 Source: http://sourceforge.net/projects/libemf/files/libemf/
+Files-Excluded:
+	doc
+	*/Makefile.in
+	INSTALL
+	Makefile.in
+	aclocal.m4
+	config
+	configure
 
 Files: *
 Copyright: 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
