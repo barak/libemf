@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ## Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
-## $Id$
+## $Id: Makefile.am 70 2015-11-21 21:14:35Z dallenbarnett $
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by

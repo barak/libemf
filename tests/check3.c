@@ -1,7 +1,7 @@
 /*
  * Checkout program for the EMF library
  * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id$
+ * $Id: check3.c 70 2015-11-21 21:14:35Z dallenbarnett $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

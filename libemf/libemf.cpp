@@ -1,7 +1,7 @@
 /*
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id$
+ * $Id: libemf.cpp 82 2018-12-31 16:54:24Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -868,18 +868,10 @@ extern "C" {
     // If it's a disk-based metafile, actually write it to disk
 
     if ( dc->fp ) {
-
-#if 1
-#if 0
-      std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun1( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
-#else
       std::for_each( dc->records.begin(), dc->records.end(),
 		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
-#endif
-#endif
+
       ::fclose( dc->fp );
 
       dc->fp = 0;
@@ -923,16 +915,9 @@ extern "C" {
     // If it's a disk-based metafile, actually write it to disk
 
     if ( dc->fp ) {
-
-#if 0
-      std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun1( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
-#else
       std::for_each( dc->records.begin(), dc->records.end(),
 		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
-#endif
     }
 
     // There's no particular reason to distinguish between the context and
@@ -1040,16 +1025,33 @@ extern "C" {
 
     ::EMR emr;
 
-    dc->ds >> emr;
+    // Peek at the first word to determine the file type.
+    size_t ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
-    if ( emr.iType != EMR_HEADER ) {
+    if ( ret == 0 || emr.iType != EMR_HEADER ) {
+      ::fclose( fp );
+      DeleteDC( dc->handle );
+      return 0;
+    }
+
+    ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
+
+    if ( ret == 0 ) {
+      ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
     }
 
     ::rewind( fp );
 
-    dc->header->unserialize( dc->ds );
+    try {
+      dc->header->unserialize( dc->ds );
+    }
+    catch ( const std::runtime_error& e ) {
+      ::fclose( fp );
+      DeleteDC( dc->handle );
+      return 0;
+    }
 
     // Strictly, the records are reattached so these must be recomputed:
     dc->header->nBytes = dc->header->nSize;
@@ -1060,17 +1062,27 @@ extern "C" {
     while ( true ) {
       long position = ::ftell( fp );
 
-      // Peek at this record.
+      // Peek at the next record type. This is the only context where
+      // EOF is not an error.
 
-      dc->ds >> emr;
+      ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
-      if ( feof( fp ) ) break;
+      if ( ret == 0 ) {
+        if ( ! feof( fp ) ) {
+          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+                    << std::endl;
+        }
+        break;
+      }
 
-      if ( emr.nSize == 0 ) {
-	std::cerr << "GetEnhMetaFileW error: record size == 0. cannot continue"
+      // Peek at the record size.
+
+      ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
+
+      if ( ret == 0 || emr.nSize == 0 ) {
+	std::cerr << "GetEnhMetaFileW read error. cannot continue"
 		  << std::endl;
-	::fclose( fp );
-	return 0;
+        break;
       }
 
       long next_position = position + emr.nSize;
@@ -1081,13 +1093,21 @@ extern "C" {
 
       if ( new_record != 0 ) {
 	::fseek( fp, position, SEEK_SET );
-	EMF::METARECORD* record = new_record( dc->ds );
+        try {
+          EMF::METARECORD* record = new_record( dc->ds );
 
-	dc->appendRecord( record );
+          dc->appendRecord( record );
+        }
+        catch ( const std::runtime_error& e ) {
+          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+                    << std::endl;
+          break;
+        }
       }
-      else
+      else {
 	std::cerr << "GetEnhMetaFileW warning: read unknown record type "
 		  << emr.iType << " of size " << emr.nSize << std::endl;
+      }
 
       // Regardless, position ourselves at the next record.
       ::fseek( fp, next_position, SEEK_SET );
@@ -1145,6 +1165,8 @@ extern "C" {
 
     std::for_each( dc->records.begin(), dc->records.end(),
 		   std::mem_fun( &EMF::METARECORD::edit ) );
+#else
+    (void)metafile;
 #endif /* ENABLE_EDITING */
   }
 
@@ -1347,6 +1369,7 @@ extern "C" {
 	  return sizeof( LOGBRUSH );
 	}
       }
+      break;
     case EMF::O_FONT:
       {
 	LPEXTLOGFONTW fontw = dynamic_cast< LPEXTLOGFONTW >( gobj );
@@ -1390,6 +1413,7 @@ extern "C" {
 	    return sizeof( LOGFONTA );
 	}
       }
+      break;
     case EMF::O_PEN:
       {
 	LPLOGPEN pen = dynamic_cast< LPLOGPEN >( gobj );
@@ -1398,6 +1422,7 @@ extern "C" {
 	  return sizeof( LOGPEN );
 	}
       }
+      break;
     case EMF::O_PALETTE:
       {
 	LPLOGPALETTE palette = dynamic_cast< LPLOGPALETTE >( gobj );
@@ -1406,6 +1431,7 @@ extern "C" {
 	  return sizeof( WORD );
 	}
       }
+      break;
     default:
       break;
     }

@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ## Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
-## $Id$
+## $Id: Makefile.am 54 2010-07-21 18:57:31Z dallenbarnett $
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,11 +16,7 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = include libemf src tests
+SUBDIRS = include libemf src doc tests
 
-if ENABLE_DOXYGEN
-# Include DOxygen support
-all: @DX_DOCDIR@/@PACKAGE@.tag
-@DX_RULES@
-endif
+dist-hook:
+	rm -rf `find $(distdir)/doc -name .svn`

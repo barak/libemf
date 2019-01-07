@@ -1,7 +1,7 @@
 /* -*- c++ -*-
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id$
+ * $Id: libemf.h 82 2018-12-31 16:54:24Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -106,7 +106,7 @@ namespace EMF {
    */
   struct CHARSTR {
     CHAR *const string_;	//!< Array of single byte characters.
-    const int length_;		//!< Number of single byte characters in array.
+    const int length_;		//!< Number of single byte characers in array.
     /*!
      * Simple constructor.
      * \param string pointer to array of single byte characters.
@@ -944,8 +944,7 @@ namespace EMF {
   private:
     /*!
      * Wrap the fread function so that we can handle read errors,
-     * albeit not very nicely. This function is allowed to reach the
-     * end of file since you can't guess the size of the EMF file.
+     * albeit not very nicely.
      * \param[in,out] ptr pointer to buffer to fill.
      * \param[in] size size in byte of item to read from stream.
      * \param[in] nmemb number of items to read from stream.
@@ -956,9 +955,7 @@ namespace EMF {
     {
       size_t res = ::fread( ptr, size, nmemb, stream );
       if ( res < nmemb ) {
-        if ( ! feof( stream ) ) {
-          throw std::runtime_error( "error reading EMF stream" );
-        }
+        throw std::runtime_error( "error reading EMF stream" );
       }
     }
     /*!
