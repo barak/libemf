@@ -1,3 +1,10 @@
+libemf (1.0.11-2) UNRELEASED; urgency=medium
+
+  * Pick patch from Fedora to fix build on arm64 (Closes: #919555)
+  * Handle EOF and other errors in an endianness-aware way (Closes: #919766)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 29 Jan 2019 21:51:03 +0700
+
 libemf (1.0.11-1) unstable; urgency=medium
 
   * New upstream version
