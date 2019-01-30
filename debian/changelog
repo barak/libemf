@@ -1,9 +1,13 @@
-libemf (1.0.11-2) UNRELEASED; urgency=medium
+libemf (1.0.11-2) unstable; urgency=medium
 
+  [ Balint Reczey ]
   * Pick patch from Fedora to fix build on arm64 (Closes: #919555)
   * Handle EOF and other errors in an endianness-aware way (Closes: #919766)
 
- -- Balint Reczey <rbalint@ubuntu.com>  Tue, 29 Jan 2019 21:51:03 +0700
+  [ Barak A. Pearlmutter ]
+  * Accept Balint Reczey patches, with thanks.
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 30 Jan 2019 19:48:13 +0000
 
 libemf (1.0.11-1) unstable; urgency=medium
 
