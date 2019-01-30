@@ -10,7 +10,7 @@ override_dh_auto_configure:
 	 --enable-doxygen-pdf --enable-doxygen-man --enable-doxygen-html
 
 override_dh_auto_build:
-	dh_auto_build -- all doxygen-doc
+	dh_auto_build -- all doxygen-doc doxygen-pdf
 
 override_dh_auto_test:
 	dh_auto_test -- -j1
