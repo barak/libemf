@@ -6,8 +6,10 @@ libemf (1.0.11-2) unstable; urgency=medium
 
   [ Barak A. Pearlmutter ]
   * Accept Balint Reczey patches, with thanks.
+  * Add build dependency for /usr/bin/dot used by doxygen
+  * Remove unnecessary/race-condition-causing build target
 
- -- Barak A. Pearlmutter <bap@debian.org>  Wed, 30 Jan 2019 19:48:13 +0000
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 30 Jan 2019 21:26:29 +0000
 
 libemf (1.0.11-1) unstable; urgency=medium
 
