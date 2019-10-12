@@ -1,4 +1,4 @@
-libemf (1.0.11-3) UNRELEASED; urgency=medium
+libemf (1.0.11-3) unstable; urgency=medium
 
   * Update standards version, no changes needed.
   * Set debhelper-compat version in Build-Depends.
