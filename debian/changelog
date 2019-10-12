@@ -1,6 +1,7 @@
 libemf (1.0.11-3) UNRELEASED; urgency=medium
 
   * Update standards version, no changes needed.
+  * Set debhelper-compat version in Build-Depends.
 
  -- Barak A. Pearlmutter <bap@debian.org>  Sat, 12 Oct 2019 15:14:22 +0100
 
