@@ -958,24 +958,13 @@ extern "C" {
     // and then use GetEnhMetaFileW
 
     if ( filename == 0 || *filename == '\0' ) return 0;
-#if 0
-    LPWSTR filename_w;
 
-    int filename_count = ::strlen( filename );
-
-    filename_w = new WCHAR[ filename_count + 1 ];
-
-    for ( int i=0; i<=filename_count; i++ )
-      filename_w[i] = (WCHAR)*filename++;
-#else
     int filename_count = ::strlen( filename );
 
     std::basic_string<WCHAR> filename_w( filename, filename + filename_count );
-#endif
+
     HENHMETAFILE handle =  GetEnhMetaFileW( filename_w.c_str() );
-#if 0
-    delete[] filename_w;
-#endif
+
     return handle;
   }
 
