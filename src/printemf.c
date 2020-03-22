@@ -38,6 +38,10 @@ int main ( int argc, char* argv[] )
 
     DeleteEnhMetaFile( metafile );
   }
+  else {
+    fprintf( stderr, "Error reading \"%s\"\n", argv[1] );
+    return 1;
+  }
 
   return 0;
 }

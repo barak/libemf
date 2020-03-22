@@ -747,32 +747,24 @@ extern "C" {
   HDC CreateEnhMetaFileW ( HDC referenceContext, LPCWSTR filename,
 			   const RECT* size, LPCWSTR description )
   {
-    // Well, the ANSI C library doesn't have any routines for opening
-    // a file with a wide character filename, so, we have to convert
-    // it back to ASCII and hope for the best.
-
     ::FILE* fp = 0;
-    char* filename_a = 0;
 
     if ( filename ) {
-      int n_char_w = 0;
+      // Well, the ANSI C library doesn't have any routines for
+      // opening a file with a wide character filename, so, we have to
+      // convert it back to ASCII and hope for the best.
       LPCWSTR w_tmp = filename;
+      int n_char_w = 0;
       while ( *w_tmp++ ) n_char_w++;
+      std::string filename_a( filename, filename + n_char_w );
 
-      filename_a = new char[n_char_w+1];
-      for ( int i=0; i<=n_char_w; i++ )
-	filename_a[i] = *filename++;
-
-      fp = ::fopen( filename_a, "w" );
+      fp = ::fopen( filename_a.c_str(), "w" );
 
       if ( fp == 0 ) return 0;
     }
 
     HDC dc = CreateEnhMetaFileWithFILEW ( referenceContext, fp, size,
 					  description );
-
-    if ( filename_a ) delete[] filename_a;
-
     return dc;
   }
 
@@ -966,7 +958,7 @@ extern "C" {
     // and then use GetEnhMetaFileW
 
     if ( filename == 0 || *filename == '\0' ) return 0;
-
+#if 0
     LPWSTR filename_w;
 
     int filename_count = ::strlen( filename );
@@ -975,11 +967,15 @@ extern "C" {
 
     for ( int i=0; i<=filename_count; i++ )
       filename_w[i] = (WCHAR)*filename++;
+#else
+    int filename_count = ::strlen( filename );
 
-    HENHMETAFILE handle =  GetEnhMetaFileW( filename_w );
-
+    std::basic_string<WCHAR> filename_w( filename, filename + filename_count );
+#endif
+    HENHMETAFILE handle =  GetEnhMetaFileW( filename_w.c_str() );
+#if 0
     delete[] filename_w;
-
+#endif
     return handle;
   }
 
@@ -995,22 +991,14 @@ extern "C" {
     // Unfortunately, the ANSI C library doesn't have a "wide" character
     // file fopen call, so we convert the file name back to ASCII and
     // hope for the best.
-
-    LPSTR filename_a;
-    int n_char_w = 0;
-
     LPCWSTR w_tmp = filename;
+    int n_char_w = 0;
     while ( *w_tmp++ ) n_char_w++;
-
-    filename_a = new char[n_char_w+1];
-    for ( int i=0; i<=n_char_w; i++ )
-      filename_a[i] = *filename++;
+    std::string filename_a( filename, filename + n_char_w );
 
     ::FILE* fp;
 
-    fp = ::fopen( filename_a, "r" );
-
-    delete[] filename_a;
+    fp = ::fopen( filename_a.c_str(), "r" );
 
     if ( fp == 0 )
       return 0;
@@ -1100,6 +1088,11 @@ extern "C" {
         }
         catch ( const std::runtime_error& e ) {
           std::cerr << "GetEnhMetaFileW read error. cannot continue"
+                    << std::endl;
+          break;
+        }
+        catch ( const std::bad_alloc& e ) {
+          std::cerr << "GetEnhMetaFileW out of memory. cannot continue"
                     << std::endl;
           break;
         }
