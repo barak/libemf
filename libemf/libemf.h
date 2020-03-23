@@ -81,6 +81,8 @@ namespace EMF {
    */
   static inline DWORD ROUND_TO_LONG ( DWORD n ) { return ((n+3)/4)*4; }
 
+  static bool bigEndian ( void );
+
   //! Represent a wide (UNICODE) character string in a simple way.
   /*!
    * Even (widechar) strings have to be byte swapped. This structure
@@ -223,8 +225,6 @@ namespace EMF {
   class DATASTREAM {
     bool swap_;
     ::FILE* fp_;
-
-    static bool bigEndian ( void );
   public:
     /*!
      * Constructor for DATASTREAM.
@@ -852,7 +852,7 @@ namespace EMF {
 	    << font.lfUnderline << font.lfStrikeOut << font.lfCharSet
 	    << font.lfOutPrecision << font.lfClipPrecision << font.lfQuality
 	    << font.lfPitchAndFamily
-	    << WCHARSTR( const_cast<WCHAR*const>(font.lfFaceName), LF_FACESIZE );
+	    << WCHARSTR( const_cast<WCHAR*>(font.lfFaceName), LF_FACESIZE );
       return *this;
     }
     /*!
@@ -896,12 +896,12 @@ namespace EMF {
     DATASTREAM& operator<< ( const EXTLOGFONTW& font )
     {
       *this << font.elfLogFont
-	    << WCHARSTR( const_cast<WCHAR*const>(font.elfFullName),
+	    << WCHARSTR( const_cast<WCHAR*>(font.elfFullName),
 			 LF_FULLFACESIZE )
-	    << WCHARSTR( const_cast<WCHAR*const>(font.elfStyle), LF_FACESIZE )
+	    << WCHARSTR( const_cast<WCHAR*>(font.elfStyle), LF_FACESIZE )
 	    << font.elfVersion << font.elfStyleSize << font.elfMatch
 	    << font.elfReserved
-	    << BYTEARRAY( const_cast<BYTE*const>(font.elfVendorId),
+	    << BYTEARRAY( const_cast<BYTE*>(font.elfVendorId),
 			  ELF_VENDOR_SIZE )
 	    << font.elfCulture << font.elfPanose;
       return *this;
@@ -4851,9 +4851,15 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       edit_rectl( "rcl\t", emrtext.rcl );
       printf( FMT4, emrtext.offDx );
       printf( "\tString:\n\t\t" );
-      for ( DWORD i = 0; i < emrtext.nChars; ++i ) {
-        putchar( string_a[i] );
+      if ( emrtext.nChars > 0 ) {
+        for ( DWORD i = 0; i < emrtext.nChars; ++i ) {
+          putchar( string_a[i] );
+        }
       }
+      else {
+        printf( "<empty>" );
+      }
+      putchar( '\n' );
       if ( emrtext.offDx != 0 ) {
 	printf( "\tOffsets:\n\t\t" );
 	for ( unsigned int i = 0; i < emrtext.nChars; i++ )
@@ -5138,7 +5144,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
         printf( "\tString:\n\t\t%s\n",  &utf8_buffer[0] );
       }
       else {
-        puts( "\tString:\n\t\t<empty>" );
+        puts( "\tString:\n\t\t<empty>\n" );
       }
 
       if ( emrtext.offDx != 0 and emrtext.nChars > 0 ) {

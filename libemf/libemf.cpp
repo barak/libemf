@@ -33,7 +33,7 @@ namespace EMF {
    * the byte swapping is not consistent between short's and int's.
    * \return true if big-endian.
    */
-  bool DATASTREAM::bigEndian ( void )
+  bool bigEndian ( void )
   {
     bool be16, be32;
     short ns = 0x1234;
@@ -60,6 +60,20 @@ namespace EMF {
     // are as expected as well...
 
     return be32;
+  }
+
+  /*!
+   * Swab a single DWORD to the correct endian-ness.
+   * \param[in] a - word to swab.
+   * \return the swabbed (or not) value of a.
+   */
+  DWORD swab ( DWORD a )
+  {
+    if ( not bigEndian() ) {
+      return a;
+    }
+#include <byteswap.h>
+    return bswap_32(a);
   }
 
   /*!
@@ -1005,6 +1019,8 @@ extern "C" {
     // Peek at the first word to determine the file type.
     size_t ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
+    emr.iType = EMF::swab( emr.iType );
+
     if ( ret == 0 || emr.iType != EMR_HEADER ) {
       ::fclose( fp );
       DeleteDC( dc->handle );
@@ -1012,6 +1028,8 @@ extern "C" {
     }
 
     ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
+
+    emr.nSize = EMF::swab( emr.nSize );
 
     if ( ret == 0 ) {
       ::fclose( fp );
@@ -1044,6 +1062,8 @@ extern "C" {
 
       ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
+      emr.iType = EMF::swab( emr.iType );
+
       if ( ret == 0 ) {
         if ( ! feof( fp ) ) {
           std::cerr << "GetEnhMetaFileW read error. cannot continue"
@@ -1055,6 +1075,8 @@ extern "C" {
       // Peek at the record size.
 
       ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
+
+      emr.nSize = EMF::swab( emr.nSize );
 
       if ( ret == 0 || emr.nSize == 0 ) {
 	std::cerr << "GetEnhMetaFileW read error. cannot continue"
