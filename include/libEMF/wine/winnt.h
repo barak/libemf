@@ -65,6 +65,10 @@
 # undef  WORDS_BIGENDIAN
 # undef  BITFIELDS_BIGENDIAN
 # undef  ALLOW_UNALIGNED_ACCESS
+#elif defined(__MIPSEB__)
+# define  WORDS_BIGENDIAN
+# define  BITFIELDS_BIGENDIAN
+# undef  ALLOW_UNALIGNED_ACCESS
 #elif !defined(RC_INVOKED)
 # error Unknown CPU architecture!
 #endif
@@ -1013,7 +1017,7 @@ typedef struct _CONTEXT
 #endif  /* _ALPHA_ */
 
 /* Mips context definitions */
-#ifdef _MIPS_
+#if defined(_MIPS_) || defined(__MIPS__) || defined(__mips__)
 
 #define CONTEXT_R4000   0x00010000
 
