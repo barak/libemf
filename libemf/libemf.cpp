@@ -226,10 +226,19 @@ namespace EMF {
    */
   OBJECT* GLOBALOBJECTS::find ( const HGDIOBJ handle )
   {
-    if ( handle & ENHMETA_STOCK_OBJECT )
-      return objects[ handle & (~ENHMETA_STOCK_OBJECT) ];
-    else
+    if ( handle & ENHMETA_STOCK_OBJECT ) {
+      size_t o = handle & (~ENHMETA_STOCK_OBJECT);
+      if ( o >= objects.size() ) {
+        return nullptr;
+      }
+      return objects[o];
+    }
+    else {
+      if ( handle >= objects.size() ) {
+        return nullptr;
+      }
       return objects[ handle ];
+    }
   }
 
   /*!
@@ -558,7 +567,8 @@ namespace EMF {
     // destination dc wants to see. emf_handles is manipulated when
     // a Create* object record is executed.
 
-    if ( !( ihObject & ENHMETA_STOCK_OBJECT ) )
+    if ( !( ihObject & ENHMETA_STOCK_OBJECT ) and
+         source->emf_handles.find( ihObject ) != source->emf_handles.end() )
       DeleteObject( source->emf_handles[ihObject] );
   }
 
@@ -1003,8 +1013,12 @@ extern "C" {
 
     fp = ::fopen( filename_a.c_str(), "r" );
 
-    if ( fp == 0 )
+    if ( fp == 0 ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                << strerror( errno ) 
+                << std::endl;
       return 0;
+    }
 
     // Create an implicit device context for this metafile. This
     // also creates an implicit metafile header.
@@ -1022,6 +1036,8 @@ extern "C" {
     emr.iType = EMF::swab( emr.iType );
 
     if ( ret == 0 || emr.iType != EMR_HEADER ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: Not an EMF"
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1032,6 +1048,8 @@ extern "C" {
     emr.nSize = EMF::swab( emr.nSize );
 
     if ( ret == 0 ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: Header too short"
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1043,6 +1061,9 @@ extern "C" {
       dc->header->unserialize( dc->ds );
     }
     catch ( const std::runtime_error& e ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                << e.what()
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1066,7 +1087,8 @@ extern "C" {
 
       if ( ret == 0 ) {
         if ( ! feof( fp ) ) {
-          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+          std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                    << strerror( errno )
                     << std::endl;
         }
         break;
@@ -1079,7 +1101,15 @@ extern "C" {
       emr.nSize = EMF::swab( emr.nSize );
 
       if ( ret == 0 || emr.nSize == 0 ) {
-	std::cerr << "GetEnhMetaFileW read error. cannot continue"
+        std::string message;
+        if ( ret == 0 ) {
+          message = strerror( errno );
+        }
+        else {
+          message = "record size == 0";
+        }
+	std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                  << message
 		  << std::endl;
         break;
       }
@@ -1098,7 +1128,8 @@ extern "C" {
           dc->appendRecord( record );
         }
         catch ( const std::runtime_error& e ) {
-          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+          std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                    << e.what()
                     << std::endl;
           break;
         }
@@ -1460,12 +1491,6 @@ extern "C" {
 
     // Add a deletion record for this object to every device context
     // into which it has been selected(!) [Now this makes sense.]
-
-//      for ( std::vector<EMF::OBJECT*>::const_iterator o = EMF::globalObjects.begin();
-//  	  o != EMF::globalObjects.end();
-//  	  o++ ) {
-//        if ( *o != 0 && (*o)->getType() == EMF::O_METAFILEDEVICECONTEXT ) {
-//  	EMF::METAFILEDEVICECONTEXT* dc = (EMF::METAFILEDEVICECONTEXT*)*o;
 
     for ( std::map<HDC,HGDIOBJ>::const_iterator c = gobj->contexts.begin();
 	  c != gobj->contexts.end();

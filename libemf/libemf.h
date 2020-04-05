@@ -956,7 +956,7 @@ namespace EMF {
     {
       size_t res = ::fread( ptr, size, nmemb, stream );
       if ( res < nmemb ) {
-        throw std::runtime_error( "error reading EMF stream" );
+        throw std::runtime_error( "Premature EOF on EMF stream" );
       }
     }
     /*!
@@ -3705,6 +3705,20 @@ namespace EMF {
 
       ds >> counts;
 
+      // Counts have to add up to less than the number of points
+      // we have. DWORD is unsigned so we most care about overflow.
+      DWORD n{0}, n_old{0};
+      for ( DWORD c{0}; c < nPolys; ++c ) {
+        n_old = n;
+        n += cbuffer[c];
+        if ( n < n_old ) {
+          throw std::runtime_error( "Unsigned overflow" );
+        }
+      }
+      if ( n > cptl ) {
+        throw std::runtime_error( "Too few points" );
+      }
+
       std::unique_ptr<POINTL[]> pbuffer( new POINTL[cptl] );
 
       POINTLARRAY points( pbuffer.get(), cptl );
@@ -3900,6 +3914,20 @@ namespace EMF {
       DWORDARRAY counts( cbuffer.get(), nPolys );
 
       ds >> counts;
+
+      // Counts have to add up to less than the number of points
+      // we have. DWORD is unsigned so we most care about overflow.
+      DWORD n{0}, n_old{0};
+      for ( DWORD c{0}; c < nPolys; ++c ) {
+        n_old = n;
+        n += cbuffer[c];
+        if ( n < n_old ) {
+          throw std::runtime_error( "Unsigned overflow" );
+        }
+      }
+      if ( n > cpts ) {
+        throw std::runtime_error( "Too few points" );
+      }
 
       std::unique_ptr<POINT16[]> pbuffer( new POINT16[cpts] );
 

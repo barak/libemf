@@ -20,6 +20,14 @@ add_executable( check4 check4.c )
 target_link_libraries( check4 emf )
 #add_test( check4 ${tests_SOURCE_DIR}/docheck4.sh )
 
+# A couple of other examples.
+
+add_executable( example1 example1.c )
+target_link_libraries( example1 emf )
+
+add_executable( example2 example2.c )
+target_link_libraries( example2 emf )
+
 # For consonance with the automake test script:
 
 set_tests_properties( check1 check2 check3 PROPERTIES
