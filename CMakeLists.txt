@@ -18,3 +18,7 @@ endif()
 
 enable_testing()
 add_subdirectory( tests )
+
+install( DIRECTORY include/
+         DESTINATION include
+         FILES_MATCHING PATTERN "*.h" )

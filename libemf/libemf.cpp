@@ -1683,6 +1683,9 @@ extern "C" {
   BOOL ScaleViewportExtEx ( HDC context, INT x_num, INT x_den,
 			    INT y_num, INT y_den, LPSIZE size )
   {
+    // Avoid nonsense results.
+    if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
+
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 
@@ -1763,6 +1766,9 @@ extern "C" {
   BOOL ScaleWindowExtEx ( HDC context, INT x_num, INT x_den,
 			  INT y_num, INT y_den, LPSIZE size )
   {
+    // Avoid nonsense results.
+    if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
+
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 

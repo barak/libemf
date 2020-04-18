@@ -45,7 +45,7 @@ HENHMETAFILE CloseEnhMetaFileWithFILE( HDC context );
  * This function will only produce output if the library has been compiled with
  * editing enabled (e.g., ./configure --enable-editing).
  */
-void EditEnhMetaFile ( HENHMETAFILE metafile );
+void WINAPI EditEnhMetaFile ( HENHMETAFILE metafile );
 #ifdef __cplusplus
 }
 #endif                                                                          

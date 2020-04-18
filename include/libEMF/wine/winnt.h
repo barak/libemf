@@ -136,7 +136,11 @@
 #endif /* __WINE__ */
 
 #define CALLBACK    __stdcall
+#if 0
 #define WINAPI      __stdcall
+#else
+#define WINAPI      __attribute__((visibility("default")))
+#endif
 #define APIPRIVATE  __stdcall
 #define PASCAL      __stdcall
 #define CDECL       __cdecl

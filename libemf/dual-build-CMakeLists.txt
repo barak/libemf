@@ -1,0 +1,12 @@
+# Build both the static and the shared library.
+
+include_directories( ${config_BINARY_DIR} ${libEMF_SOURCE_DIR}/include )
+
+add_library( emf-objlib OBJECT libemf.cpp )
+
+set_property( TARGET emf-objlib PROPERTY POSITION_INDEPENDENT_CODE 1 )
+
+add_library( emf SHARED $<TARGET_OBJECTS:emf-objlib> )
+add_library( emf-static STATIC $<TARGET_OBJECTS:emf-objlib> )
+
+set_target_properties(emf-static PROPERTIES OUTPUT_NAME emf)

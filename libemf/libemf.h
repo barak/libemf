@@ -6625,10 +6625,13 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       // *** Note, it's possible for the global transformation matrix to
       // affect this too. ***
 
-      device_point.x = (LONG)( (float)( p.x - window_org.x ) / window_ext.cx *
+      int window_width  = window_ext.cx <= 0 ? 1 : window_ext.cx;
+      int window_height = window_ext.cy <= 0 ? 1 : window_ext.cy;
+
+      device_point.x = (LONG)( (float)( p.x - window_org.x ) / window_width *
 	viewport_ext.cx + viewport_org.x );
 
-      device_point.y = (LONG)( (float)( p.y - window_org.y ) / window_ext.cy *
+      device_point.y = (LONG)( (float)( p.y - window_org.y ) / window_height *
 	viewport_ext.cy + viewport_org.y );
 
       // If the user didn't specify a bounding rectangle in the constructor,
@@ -6637,16 +6640,18 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
 	min_device_point.x = device_point.x;
 	if ( update_frame ) {
 	  header->rclBounds.left = min_device_point.x - 10;
+          int device_width = header->szlDevice.cx <= 0 ? 1 : header->szlDevice.cx;
 	  header->rclFrame.left = (LONG)floor( (float)header->rclBounds.left *
-	    header->szlMillimeters.cx * 100 / header->szlDevice.cx );
+	    header->szlMillimeters.cx * 100 / device_width );
 	}
       }
       else if ( device_point.x > max_device_point.x ) {
 	max_device_point.x = device_point.x;
 	if ( update_frame ) {
 	  header->rclBounds.right = max_device_point.x + 10;
+          int device_width = header->szlDevice.cx <= 0 ? 1 : header->szlDevice.cx;
 	  header->rclFrame.right = (LONG)ceil( (float)header->rclBounds.right *
-	    header->szlMillimeters.cx * 100 / header->szlDevice.cx );
+	    header->szlMillimeters.cx * 100 / device_width );
 	}
       }
 
@@ -6654,16 +6659,18 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
 	min_device_point.y = device_point.y;
 	if ( update_frame ) {
 	  header->rclBounds.top = min_device_point.y - 10;
+          int device_height = header->szlDevice.cy <= 0 ? 1 : header->szlDevice.cy;
 	  header->rclFrame.top = (LONG)floor( (float)header->rclBounds.top *
-	    header->szlMillimeters.cy * 100 / header->szlDevice.cy );
+	    header->szlMillimeters.cy * 100 / device_height );
 	}
       }
       else if ( device_point.y > max_device_point.y ) {
 	max_device_point.y = device_point.y;
 	if ( update_frame ) {
 	  header->rclBounds.bottom = max_device_point.y + 10;
+          int device_height = header->szlDevice.cy <= 0 ? 1 : header->szlDevice.cy;
 	  header->rclFrame.bottom = (LONG)ceil( (float)header->rclBounds.bottom *
-	    header->szlMillimeters.cy * 100 / header->szlDevice.cy );
+	    header->szlMillimeters.cy * 100 / device_height );
 	}
       }
     }
