@@ -179,8 +179,7 @@ namespace EMF {
   GLOBALOBJECTS::~GLOBALOBJECTS ( void )
   {
     // Just clean up for memory checkers' sakes
-    std::vector<OBJECT*>::const_iterator igo = objects.begin();
-    for ( ; igo != objects.end(); igo++ )
+    for ( auto igo = objects.begin(); igo != objects.end(); igo++ )
       if ( *igo != 0 ) delete *igo;
     objects.clear();
     new_records.clear();
@@ -194,10 +193,9 @@ namespace EMF {
   HGDIOBJ GLOBALOBJECTS::add ( OBJECT* object )
   {
     HGDIOBJ handle;
-    std::vector<OBJECT*>::iterator igo;
 
     // See if there are any free slots
-    igo = std::find( objects.begin(), objects.end(), (OBJECT*)0 );
+    auto igo = std::find( objects.begin(), objects.end(), (OBJECT*)0 );
 
     if ( igo != objects.end() ) {
       handle = igo - objects.begin();
@@ -249,9 +247,7 @@ namespace EMF {
    */
   void GLOBALOBJECTS::remove ( const OBJECT* object )
   {
-    std::vector<OBJECT*>::iterator igo;
-
-    igo = std::find( objects.begin(), objects.end(), object );
+    auto igo = std::find( objects.begin(), objects.end(), object );
 
     if ( igo != objects.end() ) {
       delete *igo;
@@ -265,8 +261,7 @@ namespace EMF {
    */
   METARECORDCTOR GLOBALOBJECTS::newRecord ( DWORD iType ) const
   {
-    std::map<DWORD,METARECORDCTOR>::const_iterator
-      new_record = new_records.find( iType );
+    auto new_record = new_records.find( iType );
 
     if ( new_record != new_records.end() )
       return new_record->second;
@@ -1172,9 +1167,7 @@ extern "C" {
 
     source->emf_handles.clear();
 
-    for ( std::vector<EMF::METARECORD*>::iterator r = source->records.begin();
-	  r != source->records.end();
-	  r++ ) {
+    for ( auto r = source->records.begin(); r != source->records.end(); r++ ) {
       (*r)->execute( source, context );
     }
 
@@ -1340,7 +1333,7 @@ extern "C" {
 
     if ( !( obj & ENHMETA_STOCK_OBJECT ) ) {
       // Has this object been written to the (metafile) device context before?
-      std::map<HDC,HGDIOBJ>::const_iterator c = gobj->contexts.find( context );
+      auto c = gobj->contexts.find( context );
 
       if ( c != gobj->contexts.end() ) {
 	handle = c->second;
@@ -1492,9 +1485,7 @@ extern "C" {
     // Add a deletion record for this object to every device context
     // into which it has been selected(!) [Now this makes sense.]
 
-    for ( std::map<HDC,HGDIOBJ>::const_iterator c = gobj->contexts.begin();
-	  c != gobj->contexts.end();
-	  c++ ) {
+    for ( auto c = gobj->contexts.begin(); c != gobj->contexts.end(); c++ ) {
 
       HDC context = c->first;
 

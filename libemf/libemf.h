@@ -1297,13 +1297,12 @@ namespace EMF {
     /*!
      * \return an iterator pointing to the first global object.
      */
-    std::vector<EMF::OBJECT*>::const_iterator begin ( void ) const
-    { return objects.begin(); }
+    auto begin ( void ) const { return objects.begin(); }
+
     /*!
      * \return an iterator pointing to (one past) the final global object.
      */
-    std::vector<EMF::OBJECT*>::const_iterator end ( void ) const
-    { return objects.end(); }
+    auto end ( void ) const { return objects.end(); }
 
     METARECORDCTOR newRecord ( DWORD iType ) const;
 
@@ -1518,9 +1517,7 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
-#if 1
 	 << szlMicrometers
-#endif
 	 << WCHARSTR( description_w, description_size );
       return true;
     }
@@ -1539,18 +1536,12 @@ namespace EMF {
 
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
-#if 1
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#else
-      if ( sizeof(::ENHMETAHEADER) <= offDescription )
-	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#endif
 #undef OffsetOf
-#if 1
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
-#endif
+
       // Should now probably check that the offset is correct...
 
       int description_size_to_read = ( nSize - offDescription ) / sizeof(WCHAR);
@@ -3754,7 +3745,7 @@ namespace EMF {
       // (but DWORD and INT are not)
       std::vector<INT> countsv( lcounts, lcounts + nPolys );
 
-      PolyPolygon( dc, (POINT*)lpoints, &countsv[0], nPolys );
+      PolyPolygon( dc, (POINT*)lpoints, countsv.data(), nPolys );
     }
 #ifdef ENABLE_EDITING
     /*!
@@ -3963,7 +3954,7 @@ namespace EMF {
       // (but DWORD and INT are not)
       std::vector<INT> counts( lcounts, lcounts + nPolys );
 
-      PolyPolygon16( dc, lpoints, &counts[0], nPolys );
+      PolyPolygon16( dc, lpoints, counts.data(), nPolys );
     }
 #ifdef ENABLE_EDITING
     /*!
@@ -5169,7 +5160,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
         else
           utf8_buffer[converted] = '\0';
 
-        printf( "\tString:\n\t\t%s\n",  &utf8_buffer[0] );
+        printf( "\tString:\n\t\t%s\n",  utf8_buffer.data() );
       }
       else {
         puts( "\tString:\n\t\t<empty>\n" );
@@ -6564,7 +6555,9 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void clearHandle ( DWORD handle )
     {
-      handles[handle] = false;
+      if ( handle < handles.size() ) {
+        handles[handle] = false;
+      }
     }
     /*!
      * Add this record to the metafile.
@@ -6596,9 +6589,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void deleteMetafile ( void )
     {
-      for ( std::vector<METARECORD*>::const_iterator r = records.begin();
-	    r != records.end();
-	    r++ ) {
+      for ( auto r = records.begin(); r != records.end(); r++ ) {
 	delete *r;
       }
       records.clear();
