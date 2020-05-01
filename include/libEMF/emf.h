@@ -1,7 +1,7 @@
 /*
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: emf.h 54 2010-07-21 18:57:31Z dallenbarnett $
+ * $Id: emf.h 93 2020-04-18 13:30:11Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ HENHMETAFILE CloseEnhMetaFileWithFILE( HDC context );
  * This function will only produce output if the library has been compiled with
  * editing enabled (e.g., ./configure --enable-editing).
  */
-void EditEnhMetaFile ( HENHMETAFILE metafile );
+void WINAPI EditEnhMetaFile ( HENHMETAFILE metafile );
 #ifdef __cplusplus
 }
 #endif                                                                          

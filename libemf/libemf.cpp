@@ -1,7 +1,7 @@
 /*
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: libemf.cpp 82 2018-12-31 16:54:24Z dallenbarnett $
+ * $Id: libemf.cpp 94 2020-04-25 18:46:06Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ namespace EMF {
    * the byte swapping is not consistent between short's and int's.
    * \return true if big-endian.
    */
-  bool DATASTREAM::bigEndian ( void )
+  bool bigEndian ( void )
   {
     bool be16, be32;
     short ns = 0x1234;
@@ -60,6 +60,20 @@ namespace EMF {
     // are as expected as well...
 
     return be32;
+  }
+
+  /*!
+   * Swab a single DWORD to the correct endian-ness.
+   * \param[in] a - word to swab.
+   * \return the swabbed (or not) value of a.
+   */
+  DWORD swab ( DWORD a )
+  {
+    if ( not bigEndian() ) {
+      return a;
+    }
+#include <byteswap.h>
+    return bswap_32(a);
   }
 
   /*!
@@ -165,8 +179,7 @@ namespace EMF {
   GLOBALOBJECTS::~GLOBALOBJECTS ( void )
   {
     // Just clean up for memory checkers' sakes
-    std::vector<OBJECT*>::const_iterator igo = objects.begin();
-    for ( ; igo != objects.end(); igo++ )
+    for ( auto igo = objects.begin(); igo != objects.end(); igo++ )
       if ( *igo != 0 ) delete *igo;
     objects.clear();
     new_records.clear();
@@ -180,10 +193,9 @@ namespace EMF {
   HGDIOBJ GLOBALOBJECTS::add ( OBJECT* object )
   {
     HGDIOBJ handle;
-    std::vector<OBJECT*>::iterator igo;
 
     // See if there are any free slots
-    igo = std::find( objects.begin(), objects.end(), (OBJECT*)0 );
+    auto igo = std::find( objects.begin(), objects.end(), (OBJECT*)0 );
 
     if ( igo != objects.end() ) {
       handle = igo - objects.begin();
@@ -212,10 +224,19 @@ namespace EMF {
    */
   OBJECT* GLOBALOBJECTS::find ( const HGDIOBJ handle )
   {
-    if ( handle & ENHMETA_STOCK_OBJECT )
-      return objects[ handle & (~ENHMETA_STOCK_OBJECT) ];
-    else
+    if ( handle & ENHMETA_STOCK_OBJECT ) {
+      size_t o = handle & (~ENHMETA_STOCK_OBJECT);
+      if ( o >= objects.size() ) {
+        return nullptr;
+      }
+      return objects[o];
+    }
+    else {
+      if ( handle >= objects.size() ) {
+        return nullptr;
+      }
       return objects[ handle ];
+    }
   }
 
   /*!
@@ -226,9 +247,7 @@ namespace EMF {
    */
   void GLOBALOBJECTS::remove ( const OBJECT* object )
   {
-    std::vector<OBJECT*>::iterator igo;
-
-    igo = std::find( objects.begin(), objects.end(), object );
+    auto igo = std::find( objects.begin(), objects.end(), object );
 
     if ( igo != objects.end() ) {
       delete *igo;
@@ -242,8 +261,7 @@ namespace EMF {
    */
   METARECORDCTOR GLOBALOBJECTS::newRecord ( DWORD iType ) const
   {
-    std::map<DWORD,METARECORDCTOR>::const_iterator
-      new_record = new_records.find( iType );
+    auto new_record = new_records.find( iType );
 
     if ( new_record != new_records.end() )
       return new_record->second;
@@ -544,7 +562,8 @@ namespace EMF {
     // destination dc wants to see. emf_handles is manipulated when
     // a Create* object record is executed.
 
-    if ( !( ihObject & ENHMETA_STOCK_OBJECT ) )
+    if ( !( ihObject & ENHMETA_STOCK_OBJECT ) and
+         source->emf_handles.find( ihObject ) != source->emf_handles.end() )
       DeleteObject( source->emf_handles[ihObject] );
   }
 
@@ -747,32 +766,24 @@ extern "C" {
   HDC CreateEnhMetaFileW ( HDC referenceContext, LPCWSTR filename,
 			   const RECT* size, LPCWSTR description )
   {
-    // Well, the ANSI C library doesn't have any routines for opening
-    // a file with a wide character filename, so, we have to convert
-    // it back to ASCII and hope for the best.
-
     ::FILE* fp = 0;
-    char* filename_a = 0;
 
     if ( filename ) {
-      int n_char_w = 0;
+      // Well, the ANSI C library doesn't have any routines for
+      // opening a file with a wide character filename, so, we have to
+      // convert it back to ASCII and hope for the best.
       LPCWSTR w_tmp = filename;
+      int n_char_w = 0;
       while ( *w_tmp++ ) n_char_w++;
+      std::string filename_a( filename, filename + n_char_w );
 
-      filename_a = new char[n_char_w+1];
-      for ( int i=0; i<=n_char_w; i++ )
-	filename_a[i] = *filename++;
-
-      fp = ::fopen( filename_a, "w" );
+      fp = ::fopen( filename_a.c_str(), "w" );
 
       if ( fp == 0 ) return 0;
     }
 
     HDC dc = CreateEnhMetaFileWithFILEW ( referenceContext, fp, size,
 					  description );
-
-    if ( filename_a ) delete[] filename_a;
-
     return dc;
   }
 
@@ -967,18 +978,11 @@ extern "C" {
 
     if ( filename == 0 || *filename == '\0' ) return 0;
 
-    LPWSTR filename_w;
-
     int filename_count = ::strlen( filename );
 
-    filename_w = new WCHAR[ filename_count + 1 ];
+    std::basic_string<WCHAR> filename_w( filename, filename + filename_count );
 
-    for ( int i=0; i<=filename_count; i++ )
-      filename_w[i] = (WCHAR)*filename++;
-
-    HENHMETAFILE handle =  GetEnhMetaFileW( filename_w );
-
-    delete[] filename_w;
+    HENHMETAFILE handle =  GetEnhMetaFileW( filename_w.c_str() );
 
     return handle;
   }
@@ -995,25 +999,21 @@ extern "C" {
     // Unfortunately, the ANSI C library doesn't have a "wide" character
     // file fopen call, so we convert the file name back to ASCII and
     // hope for the best.
-
-    LPSTR filename_a;
-    int n_char_w = 0;
-
     LPCWSTR w_tmp = filename;
+    int n_char_w = 0;
     while ( *w_tmp++ ) n_char_w++;
-
-    filename_a = new char[n_char_w+1];
-    for ( int i=0; i<=n_char_w; i++ )
-      filename_a[i] = *filename++;
+    std::string filename_a( filename, filename + n_char_w );
 
     ::FILE* fp;
 
-    fp = ::fopen( filename_a, "r" );
+    fp = ::fopen( filename_a.c_str(), "r" );
 
-    delete[] filename_a;
-
-    if ( fp == 0 )
+    if ( fp == 0 ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                << strerror( errno ) 
+                << std::endl;
       return 0;
+    }
 
     // Create an implicit device context for this metafile. This
     // also creates an implicit metafile header.
@@ -1028,7 +1028,11 @@ extern "C" {
     // Peek at the first word to determine the file type.
     size_t ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
+    emr.iType = EMF::swab( emr.iType );
+
     if ( ret == 0 || emr.iType != EMR_HEADER ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: Not an EMF"
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1036,7 +1040,11 @@ extern "C" {
 
     ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
 
+    emr.nSize = EMF::swab( emr.nSize );
+
     if ( ret == 0 ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: Header too short"
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1048,6 +1056,9 @@ extern "C" {
       dc->header->unserialize( dc->ds );
     }
     catch ( const std::runtime_error& e ) {
+      std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                << e.what()
+                << std::endl;
       ::fclose( fp );
       DeleteDC( dc->handle );
       return 0;
@@ -1067,9 +1078,12 @@ extern "C" {
 
       ret = ::fread( &emr.iType, sizeof(emr.iType), 1, fp );
 
+      emr.iType = EMF::swab( emr.iType );
+
       if ( ret == 0 ) {
         if ( ! feof( fp ) ) {
-          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+          std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                    << strerror( errno )
                     << std::endl;
         }
         break;
@@ -1079,8 +1093,18 @@ extern "C" {
 
       ret = ::fread( &emr.nSize, sizeof(emr.nSize), 1, fp );
 
+      emr.nSize = EMF::swab( emr.nSize );
+
       if ( ret == 0 || emr.nSize == 0 ) {
-	std::cerr << "GetEnhMetaFileW read error. cannot continue"
+        std::string message;
+        if ( ret == 0 ) {
+          message = strerror( errno );
+        }
+        else {
+          message = "record size == 0";
+        }
+	std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                  << message
 		  << std::endl;
         break;
       }
@@ -1099,7 +1123,13 @@ extern "C" {
           dc->appendRecord( record );
         }
         catch ( const std::runtime_error& e ) {
-          std::cerr << "GetEnhMetaFileW read error. cannot continue"
+          std::cerr << "GetEnhMetaFileW read error. cannot continue: "
+                    << e.what()
+                    << std::endl;
+          break;
+        }
+        catch ( const std::bad_alloc& e ) {
+          std::cerr << "GetEnhMetaFileW out of memory. cannot continue"
                     << std::endl;
           break;
         }
@@ -1137,9 +1167,7 @@ extern "C" {
 
     source->emf_handles.clear();
 
-    for ( std::vector<EMF::METARECORD*>::iterator r = source->records.begin();
-	  r != source->records.end();
-	  r++ ) {
+    for ( auto r = source->records.begin(); r != source->records.end(); r++ ) {
       (*r)->execute( source, context );
     }
 
@@ -1305,7 +1333,7 @@ extern "C" {
 
     if ( !( obj & ENHMETA_STOCK_OBJECT ) ) {
       // Has this object been written to the (metafile) device context before?
-      std::map<HDC,HGDIOBJ>::const_iterator c = gobj->contexts.find( context );
+      auto c = gobj->contexts.find( context );
 
       if ( c != gobj->contexts.end() ) {
 	handle = c->second;
@@ -1457,15 +1485,7 @@ extern "C" {
     // Add a deletion record for this object to every device context
     // into which it has been selected(!) [Now this makes sense.]
 
-//      for ( std::vector<EMF::OBJECT*>::const_iterator o = EMF::globalObjects.begin();
-//  	  o != EMF::globalObjects.end();
-//  	  o++ ) {
-//        if ( *o != 0 && (*o)->getType() == EMF::O_METAFILEDEVICECONTEXT ) {
-//  	EMF::METAFILEDEVICECONTEXT* dc = (EMF::METAFILEDEVICECONTEXT*)*o;
-
-    for ( std::map<HDC,HGDIOBJ>::const_iterator c = gobj->contexts.begin();
-	  c != gobj->contexts.end();
-	  c++ ) {
+    for ( auto c = gobj->contexts.begin(); c != gobj->contexts.end(); c++ ) {
 
       HDC context = c->first;
 
@@ -1654,6 +1674,9 @@ extern "C" {
   BOOL ScaleViewportExtEx ( HDC context, INT x_num, INT x_den,
 			    INT y_num, INT y_den, LPSIZE size )
   {
+    // Avoid nonsense results.
+    if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
+
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 
@@ -1734,6 +1757,9 @@ extern "C" {
   BOOL ScaleWindowExtEx ( HDC context, INT x_num, INT x_den,
 			  INT y_num, INT y_den, LPSIZE size )
   {
+    // Avoid nonsense results.
+    if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
+
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 
