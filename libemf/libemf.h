@@ -1,7 +1,7 @@
 /* -*- c++ -*-
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: libemf.h 82 2018-12-31 16:54:24Z dallenbarnett $
+ * $Id: libemf.h 94 2020-04-25 18:46:06Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@
 #include <functional>
 #include <algorithm>
 #include <stdexcept>
+#include <memory>
 
 #include <config.h>
 #include <libEMF/emf.h>
@@ -78,7 +79,9 @@ namespace EMF {
   /*!
    * Rounds up a byte count to a multiple of four bytes.
    */
-  static inline int ROUND_TO_LONG ( int n ) { return ((n+3)/4)*4; }
+  static inline DWORD ROUND_TO_LONG ( DWORD n ) { return ((n+3)/4)*4; }
+
+  static bool bigEndian ( void );
 
   //! Represent a wide (UNICODE) character string in a simple way.
   /*!
@@ -222,8 +225,6 @@ namespace EMF {
   class DATASTREAM {
     bool swap_;
     ::FILE* fp_;
-
-    static bool bigEndian ( void );
   public:
     /*!
      * Constructor for DATASTREAM.
@@ -851,7 +852,7 @@ namespace EMF {
 	    << font.lfUnderline << font.lfStrikeOut << font.lfCharSet
 	    << font.lfOutPrecision << font.lfClipPrecision << font.lfQuality
 	    << font.lfPitchAndFamily
-	    << WCHARSTR( const_cast<WCHAR*const>(font.lfFaceName), LF_FACESIZE );
+	    << WCHARSTR( const_cast<WCHAR*>(font.lfFaceName), LF_FACESIZE );
       return *this;
     }
     /*!
@@ -895,12 +896,12 @@ namespace EMF {
     DATASTREAM& operator<< ( const EXTLOGFONTW& font )
     {
       *this << font.elfLogFont
-	    << WCHARSTR( const_cast<WCHAR*const>(font.elfFullName),
+	    << WCHARSTR( const_cast<WCHAR*>(font.elfFullName),
 			 LF_FULLFACESIZE )
-	    << WCHARSTR( const_cast<WCHAR*const>(font.elfStyle), LF_FACESIZE )
+	    << WCHARSTR( const_cast<WCHAR*>(font.elfStyle), LF_FACESIZE )
 	    << font.elfVersion << font.elfStyleSize << font.elfMatch
 	    << font.elfReserved
-	    << BYTEARRAY( const_cast<BYTE*const>(font.elfVendorId),
+	    << BYTEARRAY( const_cast<BYTE*>(font.elfVendorId),
 			  ELF_VENDOR_SIZE )
 	    << font.elfCulture << font.elfPanose;
       return *this;
@@ -955,7 +956,7 @@ namespace EMF {
     {
       size_t res = ::fread( ptr, size, nmemb, stream );
       if ( res < nmemb ) {
-        throw std::runtime_error( "error reading EMF stream" );
+        throw std::runtime_error( "Premature EOF on EMF stream" );
       }
     }
     /*!
@@ -1296,13 +1297,12 @@ namespace EMF {
     /*!
      * \return an iterator pointing to the first global object.
      */
-    std::vector<EMF::OBJECT*>::const_iterator begin ( void ) const
-    { return objects.begin(); }
+    auto begin ( void ) const { return objects.begin(); }
+
     /*!
      * \return an iterator pointing to (one past) the final global object.
      */
-    std::vector<EMF::OBJECT*>::const_iterator end ( void ) const
-    { return objects.end(); }
+    auto end ( void ) const { return objects.end(); }
 
     METARECORDCTOR newRecord ( DWORD iType ) const;
 
@@ -1423,8 +1423,8 @@ namespace EMF {
    */
   class ENHMETAHEADER : public METARECORD, public ::ENHMETAHEADER {
 
-    LPWSTR description_w;
-    int description_size;
+    LPWSTR description_w{ nullptr };
+    int description_size{ 0 };
 
   public:
     /*!
@@ -1482,7 +1482,10 @@ namespace EMF {
 	description_size =
 	  (record_size - sizeof( ::ENHMETAHEADER )) / sizeof( WCHAR );
 
-	description_w = new WCHAR[ description_size ];
+        std::unique_ptr<WCHAR[]>
+          description_tmp( new WCHAR[ description_size ] );
+
+        description_w = description_tmp.release();
 
 	memset( description_w, 0, sizeof(WCHAR) * description_size );
 
@@ -1514,9 +1517,7 @@ namespace EMF {
 	 << nDescription << offDescription << nPalEntries
 	 << szlDevice << szlMillimeters
 	 << cbPixelFormat << offPixelFormat << bOpenGL
-#if 1
 	 << szlMicrometers
-#endif
 	 << WCHARSTR( description_w, description_size );
       return true;
     }
@@ -1535,26 +1536,33 @@ namespace EMF {
 
 #define OffsetOf( a, b ) ((unsigned int)(((char*)&(((::ENHMETAHEADER*)a)->b)) - \
 (char*)((::ENHMETAHEADER*)a)))
-#if 1
       if ( OffsetOf( this, szlMicrometers ) <= offDescription )
 	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#else
-      if ( sizeof(::ENHMETAHEADER) <= offDescription )
-	ds >> cbPixelFormat >> offPixelFormat >> bOpenGL;
-#endif
 #undef OffsetOf
-#if 1
       if ( sizeof(::ENHMETAHEADER) <= offDescription )
 	ds >> szlMicrometers;
-#endif
+
       // Should now probably check that the offset is correct...
 
-      description_size = ( nSize - offDescription ) / sizeof(WCHAR);
-      description_w = new WCHAR[ description_size ];
+      int description_size_to_read = ( nSize - offDescription ) / sizeof(WCHAR);
 
-      WCHARSTR description( description_w, description_size );
+      if ( description_size_to_read < (int)nDescription ) {
+        throw std::runtime_error( "record size inconsistent with description size" );
+      }
+
+      description_size = max( 2, description_size_to_read );
+
+      std::unique_ptr<WCHAR[]> buffer( new WCHAR[description_size] );
+
+      WCHARSTR description( buffer.get(), description_size_to_read );
 
       ds >> description;
+
+      description_w = buffer.release();
+
+      // Make sure it's terminated properly.
+      description_w[description_size-1] = 0;
+      description_w[description_size-2] = 0;
 
       return true;
     }
@@ -3189,7 +3197,7 @@ namespace EMF {
    * Draw a series of connected lines.
    */
   class EMRPOLYLINE : public METARECORD, ::EMRPOLYLINE {
-    POINTL* lpoints;
+    POINTL* lpoints{nullptr};
   public:
     /*!
      * \param bounds overall bounding box of polyline.
@@ -3230,11 +3238,17 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cptl;
 
-      lpoints = new POINTL[cptl];
+      if ( emr.nSize - (sizeof(::EMRPOLYLINE)-sizeof(POINTL) ) <
+           sizeof(POINTL) * cptl ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> buffer( new POINTL[cptl] );
+      POINTLARRAY points( buffer.get(), cptl );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * \param ds Metafile datastream.
@@ -3267,14 +3281,7 @@ namespace EMF {
     {
       printf( "*POLYLINE*\n" );
       edit_rectl( "rclBounds", rclBounds );
-#if 0
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
-#else
       edit_pointlarray( "\t", cptl, lpoints );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3284,7 +3291,7 @@ namespace EMF {
    * Draw a series of connected lines using 16-bit points.
    */
   class EMRPOLYLINE16 : public METARECORD, ::EMRPOLYLINE16 {
-    POINT16* lpoints;
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polyline.
@@ -3350,11 +3357,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cpts;
 
-      lpoints = new POINT16[cpts];
+      if ( emr.nSize - (sizeof(::EMRPOLYLINE16)-sizeof(POINT16) ) <
+           sizeof(POINT16) * cpts ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> buffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( buffer.get(), cpts );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * \param ds Metafile datastream.
@@ -3397,7 +3411,7 @@ namespace EMF {
    * Draw a filled polygon.
    */
   class EMRPOLYGON : public METARECORD, ::EMRPOLYGON {
-    POINTL* lpoints;
+    POINTL* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polygon.
@@ -3431,11 +3445,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cptl;
 
-      lpoints = new POINTL[cptl];
+      if ( emr.nSize - (sizeof(::EMRPOLYGON) - sizeof(POINTL)) <
+           cptl * sizeof(POINTL) ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> buffer( new POINTL[cptl] );
+
+      POINTLARRAY points( buffer.get(), cptl );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -3475,14 +3496,7 @@ namespace EMF {
     {
       printf( "*POLYGON*\n" );
       edit_rectl( "rclBounds", rclBounds );
-#if 0
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
-#else
       edit_pointlarray( "\t", cptl, lpoints );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -3492,7 +3506,7 @@ namespace EMF {
    * Draw a filled polygon (with 16-bit points).
    */
   class EMRPOLYGON16 : public METARECORD, ::EMRPOLYGON16 {
-    POINT16* lpoints;
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polygon.
@@ -3551,11 +3565,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cpts;
 
-      lpoints = new POINT16[cpts];
+      if ( emr.nSize - (sizeof(::EMRPOLYGON16) - sizeof(POINT16)) <
+           cpts * sizeof(POINT16) ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> buffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( buffer.get(), cpts );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -3605,8 +3626,8 @@ namespace EMF {
    * Draw several filled polygons.
    */
   class EMRPOLYPOLYGON : public METARECORD, ::EMRPOLYPOLYGON {
-    DWORD* lcounts;
-    POINTL* lpoints;
+    DWORD* lcounts{ nullptr };
+    POINTL* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polygon.
@@ -3664,17 +3685,40 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> nPolys >> cptl;
 
-      lcounts = new DWORD[nPolys];
+      if ( emr.nSize - ( sizeof( ::EMRPOLYPOLYGON ) - sizeof(POINTL) - sizeof(DWORD) ) <
+           sizeof( POINTL ) * cptl + sizeof( DWORD ) * nPolys ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      DWORDARRAY counts( lcounts, nPolys );
+      std::unique_ptr<DWORD[]> cbuffer( new DWORD[nPolys] );
+
+      DWORDARRAY counts( cbuffer.get(), nPolys );
 
       ds >> counts;
 
-      lpoints = new POINTL[cptl];
+      // Counts have to add up to less than the number of points
+      // we have. DWORD is unsigned so we most care about overflow.
+      DWORD n{0}, n_old{0};
+      for ( DWORD c{0}; c < nPolys; ++c ) {
+        n_old = n;
+        n += cbuffer[c];
+        if ( n < n_old ) {
+          throw std::runtime_error( "Unsigned overflow" );
+        }
+      }
+      if ( n > cptl ) {
+        throw std::runtime_error( "Too few points" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> pbuffer( new POINTL[cptl] );
+
+      POINTLARRAY points( pbuffer.get(), cptl );
 
       ds >> points;
+
+      // Don't do this until we won't have any more exceptions.
+      lcounts = cbuffer.release();
+      lpoints = pbuffer.release();
     }
     /*!
      * \param ds Metafile datastream.
@@ -3701,7 +3745,7 @@ namespace EMF {
       // (but DWORD and INT are not)
       std::vector<INT> countsv( lcounts, lcounts + nPolys );
 
-      PolyPolygon( dc, (POINT*)lpoints, &countsv[0], nPolys );
+      PolyPolygon( dc, (POINT*)lpoints, countsv.data(), nPolys );
     }
 #ifdef ENABLE_EDITING
     /*!
@@ -3751,8 +3795,8 @@ namespace EMF {
    * Draw several filled polygons (with 16-bit points).
    */
   class EMRPOLYPOLYGON16 : public METARECORD, ::EMRPOLYPOLYGON16 {
-    DWORD* lcounts;
-    POINT16* lpoints;
+    DWORD* lcounts{ nullptr };
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polygon.
@@ -3851,17 +3895,39 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> nPolys >> cpts;
 
-      lcounts = new DWORD[nPolys];
+      if ( emr.nSize - ( sizeof( ::EMRPOLYPOLYGON16 ) - sizeof(POINT16) - sizeof(DWORD) ) <
+           sizeof( POINT16 ) * cpts + sizeof( DWORD ) * nPolys ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      DWORDARRAY counts( lcounts, nPolys );
+      std::unique_ptr<DWORD[]> cbuffer( new DWORD[nPolys] );
+
+      DWORDARRAY counts( cbuffer.get(), nPolys );
 
       ds >> counts;
 
-      lpoints = new POINT16[cpts];
+      // Counts have to add up to less than the number of points
+      // we have. DWORD is unsigned so we most care about overflow.
+      DWORD n{0}, n_old{0};
+      for ( DWORD c{0}; c < nPolys; ++c ) {
+        n_old = n;
+        n += cbuffer[c];
+        if ( n < n_old ) {
+          throw std::runtime_error( "Unsigned overflow" );
+        }
+      }
+      if ( n > cpts ) {
+        throw std::runtime_error( "Too few points" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> pbuffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( pbuffer.get(), cpts );
 
       ds >> points;
+
+      lcounts = cbuffer.release();
+      lpoints = pbuffer.release();
     }
     /*!
      * \param ds Metafile datastream.
@@ -3888,7 +3954,7 @@ namespace EMF {
       // (but DWORD and INT are not)
       std::vector<INT> counts( lcounts, lcounts + nPolys );
 
-      PolyPolygon16( dc, lpoints, &counts[0], nPolys );
+      PolyPolygon16( dc, lpoints, counts.data(), nPolys );
     }
 #ifdef ENABLE_EDITING
     /*!
@@ -3934,7 +4000,7 @@ namespace EMF {
    * Draw a polygonal Bezier curve to (what?)
    */
   class EMRPOLYBEZIER : public METARECORD, ::EMRPOLYBEZIER {
-    POINTL* lpoints;
+    POINTL* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -3968,11 +4034,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cptl;
 
-      lpoints = new POINTL[cptl];
+      if ( emr.nSize - (sizeof( ::EMRPOLYBEZIER ) - sizeof(POINTL)) <
+           sizeof( POINTL ) * cptl ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> buffer( new POINTL[cptl] );
+
+      POINTLARRAY points( buffer.get(), cptl );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4012,14 +4085,7 @@ namespace EMF {
     {
       printf( "*POLYBEZIER*\n" );
       edit_rectl( "rclBounds", rclBounds );
-#if 0
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
-#else
       edit_pointlarray( "\t", cptl, lpoints );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4029,7 +4095,7 @@ namespace EMF {
    * Draw a polygonal Bezier curve to (what?) using 16-bit points.
    */
   class EMRPOLYBEZIER16 : public METARECORD, ::EMRPOLYBEZIER16 {
-    POINT16* lpoints;
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -4088,11 +4154,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cpts;
 
-      lpoints = new POINT16[cpts];
+      if ( emr.nSize - (sizeof( ::EMRPOLYBEZIER16 ) - sizeof(POINT16)) <
+           sizeof( POINT16 ) * cpts ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> buffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( buffer.get(), cpts );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4142,7 +4215,7 @@ namespace EMF {
    * Draw a polygonal Bezier curve to (what?)
    */
   class EMRPOLYBEZIERTO : public METARECORD, ::EMRPOLYBEZIER {
-    POINTL* lpoints;
+    POINTL* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -4176,11 +4249,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cptl;
 
-      lpoints = new POINTL[cptl];
+      if ( emr.nSize - (sizeof( ::EMRPOLYBEZIERTO ) - sizeof(POINTL)) <
+           sizeof( POINTL ) * cptl ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> buffer( new POINTL[cptl] );
+
+      POINTLARRAY points( buffer.get(), cptl );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4220,14 +4300,7 @@ namespace EMF {
     {
       printf( "*POLYBEZIERTO*\n" );
       edit_rectl( "rclBounds", rclBounds );
-#if 0
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
-#else
       edit_pointlarray( "\t", cptl, lpoints );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4237,7 +4310,7 @@ namespace EMF {
    * Draw a polygonal Bezier curve to (what?) using 16-bit points
    */
   class EMRPOLYBEZIERTO16 : public METARECORD, ::EMRPOLYBEZIER16 {
-    POINT16* lpoints;
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -4296,11 +4369,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cpts;
 
-      lpoints = new POINT16[cpts];
+      if ( emr.nSize - (sizeof( ::EMRPOLYBEZIERTO16 ) - sizeof(POINT16)) <
+           sizeof( POINT16 ) * cpts ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> buffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( buffer.get(), cpts );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4350,7 +4430,7 @@ namespace EMF {
    * Draw a polygonal line curve to (what?)
    */
   class EMRPOLYLINETO : public METARECORD, ::EMRPOLYLINETO {
-    POINTL* lpoints;
+    POINTL* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -4384,11 +4464,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cptl;
 
-      lpoints = new POINTL[cptl];
+      if ( emr.nSize - (sizeof( ::EMRPOLYLINETO ) - sizeof(POINTL)) <
+           sizeof( POINTL ) * cptl ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINTLARRAY points( lpoints, cptl );
+      std::unique_ptr<POINTL[]> buffer( new POINTL[cptl] );
+
+      POINTLARRAY points( buffer.get(), cptl );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4428,14 +4515,7 @@ namespace EMF {
     {
       printf( "*POLYLINETO*\n" );
       edit_rectl( "rclBounds", rclBounds );
-#if 0
-      printf( "\tcptl              : %ld\n", cptl );
-      printf( "\taptl->\n" );
-      for ( unsigned int i = 0; i < cptl; i++ )
-	printf( "\t\t%ld, %ld\n", lpoints[i].x, lpoints[i].y );
-#else
       edit_pointlarray( "\t", cptl, lpoints );
-#endif
     }
 #endif /* ENABLE_EDITING */
   };
@@ -4445,7 +4525,7 @@ namespace EMF {
    * Draw a polygonal line curve to (what?)
    */
   class EMRPOLYLINETO16 : public METARECORD, ::EMRPOLYLINETO16 {
-    POINT16* lpoints;
+    POINT16* lpoints{ nullptr };
   public:
     /*!
      * \param bounds overall bounding box of polybezier curve.
@@ -4504,11 +4584,18 @@ namespace EMF {
     {
       ds >> emr >> rclBounds >> cpts;
 
-      lpoints = new POINT16[cpts];
+      if ( emr.nSize - (sizeof( ::EMRPOLYLINETO16 ) - sizeof(POINT16)) <
+           sizeof( POINT16 ) * cpts ) {
+        throw std::runtime_error( "Invalid record size" );
+      }
 
-      POINT16ARRAY points( lpoints, cpts );
+      std::unique_ptr<POINT16[]> buffer( new POINT16[cpts] );
+
+      POINT16ARRAY points( buffer.get(), cpts );
 
       ds >> points;
+
+      lpoints = buffer.release();
     }
     /*!
      * Destructor frees a copy of the points it buffered.
@@ -4560,10 +4647,10 @@ namespace EMF {
    * character positioning can be given in the dx array.
    */
   class EMREXTTEXTOUTA : public METARECORD, ::EMREXTTEXTOUTA {
-    PSTR string_a;
+    PSTR string_a{ nullptr };
     int string_size;
 
-    INT* dx_i;
+    INT* dx_i{ nullptr };
   public:
     /*!
      * \param bounds bounding box of text string.
@@ -4636,29 +4723,39 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
     {
       ds >> emr >> rclBounds >> iGraphicsMode >> exScale >> eyScale >> emrtext;
 
+      if ( emrtext.nChars > 0 and emrtext.offString == 0 ) {
+        throw std::runtime_error( "Invalid text specification" );
+      }
+
+      if ( emrtext.nChars > emr.nSize - emrtext.offString ) {
+        throw std::runtime_error( "Invalid text specification" );
+      }
+
+      std::unique_ptr<char[]> cbuffer;
+      std::unique_ptr<INT[]>  ibuffer;
+
       if ( emrtext.offString != 0 ) {
 	string_size = ROUND_TO_LONG( emrtext.nChars );
 
-	string_a = new CHAR[ string_size ];
+        cbuffer.reset( new char[string_size] );
 
-	memset( string_a, 0, sizeof(CHAR) * string_size );
+	memset( cbuffer.get(), 0, sizeof(CHAR) * string_size );
 
-	CHARSTR string( string_a, string_size );
+	CHARSTR string( cbuffer.get(), string_size );
 
 	ds >> string;
       }
-      else
-	string_a = 0;
 
       if ( emrtext.offDx ) {
-	dx_i = new INT[ emrtext.nChars ];
+        ibuffer.reset( new INT[emrtext.nChars] );
 
-	INTARRAY dx_is( dx_i, emrtext.nChars );
+        INTARRAY dx_is( ibuffer.get(), emrtext.nChars );
 
 	ds >> dx_is;
       }
-      else
-	dx_i = 0;
+
+      string_a = cbuffer.release();
+      dx_i     = ibuffer.release();
     }
     /*!
      * Destructor frees its copy of the string and its character
@@ -4772,8 +4869,16 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       printf( "\n" );
       edit_rectl( "rcl\t", emrtext.rcl );
       printf( FMT4, emrtext.offDx );
-      printf( "\tString:\n\t\t%s\n",  string_a );
-
+      printf( "\tString:\n\t\t" );
+      if ( emrtext.nChars > 0 ) {
+        for ( DWORD i = 0; i < emrtext.nChars; ++i ) {
+          putchar( string_a[i] );
+        }
+      }
+      else {
+        printf( "<empty>" );
+      }
+      putchar( '\n' );
       if ( emrtext.offDx != 0 ) {
 	printf( "\tOffsets:\n\t\t" );
 	for ( unsigned int i = 0; i < emrtext.nChars; i++ )
@@ -4790,10 +4895,10 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
    * character positioning can be given in the dx array.
    */
   class EMREXTTEXTOUTW : public METARECORD, ::EMREXTTEXTOUTW {
-    PWSTR string_a;
+    PWSTR string_a{ nullptr };
     int string_size;
 
-    INT* dx_i;
+    INT* dx_i{ nullptr };
   public:
     /*!
      * \param bounds bounding box of text string.
@@ -4866,29 +4971,39 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
     {
       ds >> emr >> rclBounds >> iGraphicsMode >> exScale >> eyScale >> emrtext;
 
-      if ( emrtext.offString != 0 ) {
+      if ( emrtext.nChars > 0 and emrtext.offString == 0 ) {
+        throw std::runtime_error( "Invalid text specification" );
+      }
+
+      if ( emrtext.nChars > emr.nSize - emrtext.offString ) {
+        throw std::runtime_error( "Invalid text specification" );
+      }
+
+      std::unique_ptr<WCHAR[]> cbuffer;
+      std::unique_ptr<INT[]>   ibuffer;
+
+      if ( emrtext.offString != 0 ) { // So, what is the point of this check?
 	string_size = ROUND_TO_LONG( emrtext.nChars );
 
-	string_a = new WCHAR[ string_size ];
+        cbuffer.reset( new WCHAR[string_size] );
 
-	memset( string_a, 0, sizeof(WCHAR) * string_size );
+        memset( cbuffer.get(), 0, sizeof(WCHAR) * string_size );
 
-	WCHARSTR string( string_a, string_size );
+        WCHARSTR string( cbuffer.get(), string_size );
 
 	ds >> string;
       }
-      else
-	string_a = 0;
 
       if ( emrtext.offDx ) {
-	dx_i = new INT[ emrtext.nChars ];
+        ibuffer.reset( new INT[ emrtext.nChars ] );
 
-	INTARRAY dx_is( dx_i, emrtext.nChars );
+	INTARRAY dx_is( ibuffer.get(), emrtext.nChars );
 
 	ds >> dx_is;
       }
-      else
-	dx_i = 0;
+
+      string_a = cbuffer.release();
+      dx_i     = ibuffer.release();
     }
     /*!
      * Destructor frees its copy of the string and its character
@@ -4951,7 +5066,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
     const char* FMT3 = "\toffString\t: %ld\n";
     const char* FMT4 = "\toffDx\t\t: %ld\n";
 #endif /* __x86_64__ */
-      printf( "*EXTTEXTOUTA*\n" );
+      printf( "*EXTTEXTOUTW*\n" );
       edit_rectl( "rclBounds", rclBounds );
       printf( "\tiGraphicsMode\t: " );
       switch ( iGraphicsMode ) {
@@ -5002,17 +5117,15 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       printf( "\n" );
       edit_rectl( "rcl\t", emrtext.rcl );
       printf( FMT4, emrtext.offDx );
-#if 0
-      printf( "\tString:\n\t\t%s\n",  string_a );
-#else
-      {
+
+      if ( emrtext.nChars > 0 ) {
         // iconv_open arguments are TO, FROM (not the other way around).
         iconv_t cvt = iconv_open( "UTF-8", "UTF-16LE" );
         std::vector<char> utf8_buffer( emrtext.nChars );
         // Cannot predict the space necessary to hold the converted
         // string. So, we loop until conversion is complete.
-        size_t size          = emrtext.nChars * sizeof(*string_a);
-        size_t in_bytes_left = size;
+        size_t size          = emrtext.nChars;
+        size_t in_bytes_left = emrtext.nChars * sizeof(*string_a);
         size_t converted     = 0;
         char*  in_buffer     = (char*)string_a;
         while ( 1 ) {
@@ -5047,10 +5160,13 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
         else
           utf8_buffer[converted] = '\0';
 
-        printf( "\tString:\n\t\t%s\n",  &utf8_buffer[0] );
+        printf( "\tString:\n\t\t%s\n",  utf8_buffer.data() );
       }
-#endif
-      if ( emrtext.offDx != 0 ) {
+      else {
+        puts( "\tString:\n\t\t<empty>\n" );
+      }
+
+      if ( emrtext.offDx != 0 and emrtext.nChars > 0 ) {
 	printf( "\tOffsets:\n\t\t" );
 	for ( unsigned int i = 0; i < emrtext.nChars; i++ )
 	  printf( "%d ", dx_i[i] );
@@ -6439,7 +6555,9 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void clearHandle ( DWORD handle )
     {
-      handles[handle] = false;
+      if ( handle < handles.size() ) {
+        handles[handle] = false;
+      }
     }
     /*!
      * Add this record to the metafile.
@@ -6471,9 +6589,7 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
      */
     void deleteMetafile ( void )
     {
-      for ( std::vector<METARECORD*>::const_iterator r = records.begin();
-	    r != records.end();
-	    r++ ) {
+      for ( auto r = records.begin(); r != records.end(); r++ ) {
 	delete *r;
       }
       records.clear();
@@ -6500,10 +6616,13 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
       // *** Note, it's possible for the global transformation matrix to
       // affect this too. ***
 
-      device_point.x = (LONG)( (float)( p.x - window_org.x ) / window_ext.cx *
+      int window_width  = window_ext.cx <= 0 ? 1 : window_ext.cx;
+      int window_height = window_ext.cy <= 0 ? 1 : window_ext.cy;
+
+      device_point.x = (LONG)( (float)( p.x - window_org.x ) / window_width *
 	viewport_ext.cx + viewport_org.x );
 
-      device_point.y = (LONG)( (float)( p.y - window_org.y ) / window_ext.cy *
+      device_point.y = (LONG)( (float)( p.y - window_org.y ) / window_height *
 	viewport_ext.cy + viewport_org.y );
 
       // If the user didn't specify a bounding rectangle in the constructor,
@@ -6512,16 +6631,18 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
 	min_device_point.x = device_point.x;
 	if ( update_frame ) {
 	  header->rclBounds.left = min_device_point.x - 10;
+          int device_width = header->szlDevice.cx <= 0 ? 1 : header->szlDevice.cx;
 	  header->rclFrame.left = (LONG)floor( (float)header->rclBounds.left *
-	    header->szlMillimeters.cx * 100 / header->szlDevice.cx );
+	    header->szlMillimeters.cx * 100 / device_width );
 	}
       }
       else if ( device_point.x > max_device_point.x ) {
 	max_device_point.x = device_point.x;
 	if ( update_frame ) {
 	  header->rclBounds.right = max_device_point.x + 10;
+          int device_width = header->szlDevice.cx <= 0 ? 1 : header->szlDevice.cx;
 	  header->rclFrame.right = (LONG)ceil( (float)header->rclBounds.right *
-	    header->szlMillimeters.cx * 100 / header->szlDevice.cx );
+	    header->szlMillimeters.cx * 100 / device_width );
 	}
       }
 
@@ -6529,16 +6650,18 @@ For pstoedit - this is "fixed" now by estimating dx in pstoedit
 	min_device_point.y = device_point.y;
 	if ( update_frame ) {
 	  header->rclBounds.top = min_device_point.y - 10;
+          int device_height = header->szlDevice.cy <= 0 ? 1 : header->szlDevice.cy;
 	  header->rclFrame.top = (LONG)floor( (float)header->rclBounds.top *
-	    header->szlMillimeters.cy * 100 / header->szlDevice.cy );
+	    header->szlMillimeters.cy * 100 / device_height );
 	}
       }
       else if ( device_point.y > max_device_point.y ) {
 	max_device_point.y = device_point.y;
 	if ( update_frame ) {
 	  header->rclBounds.bottom = max_device_point.y + 10;
+          int device_height = header->szlDevice.cy <= 0 ? 1 : header->szlDevice.cy;
 	  header->rclFrame.bottom = (LONG)ceil( (float)header->rclBounds.bottom *
-	    header->szlMillimeters.cy * 100 / header->szlDevice.cy );
+	    header->szlMillimeters.cy * 100 / device_height );
 	}
       }
     }
