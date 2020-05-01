@@ -2,6 +2,7 @@ libemf (1.0.11-4) UNRELEASED; urgency=medium
 
   * debian/copyright: use spaces rather than tabs to start continuation
     lines.
+  * Update standards version to 4.5.0, no changes needed.
 
  -- Barak A. Pearlmutter <bap@debian.org>  Fri, 01 May 2020 10:11:17 +0100
 
