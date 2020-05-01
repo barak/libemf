@@ -2472,7 +2472,7 @@ index 9e522f8..4c09886 100644
 +@DX_RULES@
 +endif
 diff --git a/configure.ac b/configure.ac
-index be76594..87befd8 100644
+index ee9cd95..67dafa8 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -93,6 +93,24 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)

@@ -7,10 +7,10 @@ Subject: typo in doc string
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libemf/libemf.h b/libemf/libemf.h
-index 6772343..2b45fde 100644
+index 6c1b937..05c3464 100644
 --- a/libemf/libemf.h
 +++ b/libemf/libemf.h
-@@ -106,7 +106,7 @@ namespace EMF {
+@@ -109,7 +109,7 @@ namespace EMF {
     */
    struct CHARSTR {
      CHAR *const string_;	//!< Array of single byte characters.

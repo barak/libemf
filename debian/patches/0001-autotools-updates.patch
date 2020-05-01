@@ -20,15 +20,15 @@ index 2b7ef71..da11831 100644
  
  dist-hook:
 diff --git a/configure.ac b/configure.ac
-index 36022db..89c0048 100644
+index 0901e08..473b2bf 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2,18 +2,19 @@
  # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- # $Id: configure.ac 83 2018-12-31 16:57:58Z dallenbarnett $
+ # $Id: configure.ac 88 2020-03-28 13:28:51Z dallenbarnett $
  
--AC_INIT([libEMF], 1.0.11, dallenbarnett@users.sourceforge.net)
-+AC_INIT([libEMF],[1.0.11],[dallenbarnett@users.sourceforge.net])
+-AC_INIT([libEMF], 1.0.12, dallenbarnett@users.sourceforge.net)
++AC_INIT([libEMF],[1.0.12],[dallenbarnett@users.sourceforge.net])
  AC_CONFIG_AUX_DIR(config)
 -AM_CONFIG_HEADER([config/config.h])
 -AC_CONFIG_SRCDIR([include/libEMF/emf.h])

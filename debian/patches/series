@@ -3,5 +3,3 @@
 0003-remove-doc-doxygen-subdir.patch
 0004-add-build-time-doxygen-support-via-autotools.patch
 0005-typo-in-doc-string.patch
-0006-Add-initial-patch-for-aarch64-support-likely-needs-m.patch
-0007-Handle-EOF-and-other-errors-in-an-endianness-aware-w.patch
