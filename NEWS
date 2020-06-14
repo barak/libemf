@@ -1,3 +1,22 @@
+Release note for libEMF version 1.0.13
+
+This release fixes a security issue:
+
+CVE-2020-13999
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.12 is vulnerable to
+Integer overflow condition in libemf.cpp:ScaleviewportExtEx function
+leading to Denial of Service
+VulnerabilityType : Integer Overflow
+Vendor of Product : https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.12
+Attack Type : Local ( Remote if libEMF is used anywhere in the web
+pipeline for processing EMF files )
+Impact: Denial of Service
+Has vendor confirmed or acknowledged the vulnerability? true
+
+------------------------------------------------------------------------
+
 Release note for libEMF version 1.0.12
 
         This release fixes a number of security issues:
