@@ -1,3 +1,12 @@
+libemf (1.0.13-1) unstable; urgency=medium
+
+  * New upstream version
+    - addresses security issue CVE-2020-13999 (closes: #963778)
+    - CVE-2020-11863, CVE-2020-11864, CVE-2020-11865, CVE-2020-11866 were
+      addressed in 1.0.12.
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Fri, 26 Jun 2020 23:21:35 +0100
+
 libemf (1.0.12-1) unstable; urgency=medium
 
   * New upstream version
