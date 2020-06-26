@@ -1,3 +1,70 @@
+Release note for libEMF version 1.0.13
+
+This release fixes a security issue:
+
+CVE-2020-13999
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.12 is vulnerable to
+Integer overflow condition in libemf.cpp:ScaleviewportExtEx function
+leading to Denial of Service
+VulnerabilityType : Integer Overflow
+Vendor of Product : https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.12
+Attack Type : Local ( Remote if libEMF is used anywhere in the web
+pipeline for processing EMF files )
+Impact: Denial of Service
+Has vendor confirmed or acknowledged the vulnerability? true
+
+------------------------------------------------------------------------
+
+Release note for libEMF version 1.0.12
+
+        This release fixes a number of security issues:
+
+CVE-2020-11863
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.11 allows denial of
+service (issue 1 of 2).
+VulnerabilityType : Denial of service
+Vendor of Product : https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.11
+Attack Type : Local
+Impact: Denial of Service
+Has vendor confirmed or acknowledged the vulnerability? true
+
+CVE-2020-11864
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.11 allows denial of
+service (issue 2 of 2).
+VulnerabilityType : Denial of service
+[Vendor of Product] : https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.11
+Attack Type : Local
+Impact Denial of Service : true
+Has vendor confirmed or acknowledged the vulnerability? true
+
+CVE-2020-11865
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.11 allows
+out-of-bounds memory access
+VulnerabilityType : Out of bounds memory access
+[Vendor of Product] : https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.11
+Attack Type : Local
+Impact: Information Disclosure
+Has vendor confirmed or acknowledged the vulnerability ? true
+
+CVE-2020-11866
+
+libEMF (aka ECMA-234 Metafile Library) through 1.0.11 allows a
+use-after-free
+VulnerabilityType:  Use after free
+Vendor of Product: https://packages.debian.org/source/sid/libemf
+Affected Product Code Base : libemf - <=1.0.11
+Attack Type : Local
+Impact:  Code execution
+Has vendor confirmed or acknowledged the vulnerability ? true
+
 New in libEMF version 1.0
 
 	All of the poly* routines will now emit 16-bit records if

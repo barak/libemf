@@ -1,7 +1,7 @@
 /*
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: libemf.cpp 94 2020-04-25 18:46:06Z dallenbarnett $
+ * $Id: libemf.cpp 98 2020-06-07 13:10:19Z dallenbarnett $
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1674,13 +1674,32 @@ extern "C" {
   BOOL ScaleViewportExtEx ( HDC context, INT x_num, INT x_den,
 			    INT y_num, INT y_den, LPSIZE size )
   {
-    // Avoid nonsense results.
+    // Avoid obvious nonsense results.
     if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
 
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 
     if ( dc == 0 ) return FALSE;
+
+    // Documentation says the numerator is computed first.
+    // Can we perform this operation? Numerator must not overflow and
+    // if it is negative, division must not overflow.
+    INT num{0};
+    if ( __builtin_smul_overflow( dc->viewport_ext.cx, x_num, &num ) ) {
+      return FALSE;
+    }
+    if ( num == INT_MIN and x_den == -1 ) {
+      return FALSE;
+    }
+    INT x_ext{ num / x_den };
+    if ( __builtin_smul_overflow( dc->viewport_ext.cy, y_num, &num ) ) {
+      return FALSE;
+    }
+    if ( num == INT_MIN and y_den == -1 ) {
+      return FALSE;
+    }
+    INT y_ext{ num / y_den };
 
     EMF::EMRSCALEVIEWPORTEXTEX* scaleviewportextex =
       new EMF::EMRSCALEVIEWPORTEXTEX( x_num, x_den, y_num, y_den );
@@ -1690,8 +1709,8 @@ extern "C" {
     if ( size != 0 )
       *size = dc->viewport_ext;
 
-    dc->viewport_ext.cx = dc->viewport_ext.cx * x_num / x_den;
-    dc->viewport_ext.cy = dc->viewport_ext.cy * y_num / y_den;
+    dc->viewport_ext.cx = x_ext;
+    dc->viewport_ext.cy = y_ext;
 
     return TRUE;
   }
@@ -1757,13 +1776,32 @@ extern "C" {
   BOOL ScaleWindowExtEx ( HDC context, INT x_num, INT x_den,
 			  INT y_num, INT y_den, LPSIZE size )
   {
-    // Avoid nonsense results.
+    // Avoid obvious nonsense results.
     if ( x_num == 0 or x_den == 0 or y_num == 0 or y_den == 0 ) return FALSE;
 
     EMF::METAFILEDEVICECONTEXT* dc =
       dynamic_cast<EMF::METAFILEDEVICECONTEXT*>(EMF::globalObjects.find( context ));
 
     if ( dc == 0 ) return FALSE;
+
+    // Documentation says the numerator is computed first.
+    // Can we perform this operation? Numerator must not overflow and
+    // if it is negative, division must not overflow.
+    INT num{0};
+    if ( __builtin_smul_overflow( dc->window_ext.cx, x_num, &num ) ) {
+      return FALSE;
+    }
+    if ( num == INT_MIN and x_den == -1 ) {
+      return FALSE;
+    }
+    INT x_ext{ num / x_den };
+    if ( __builtin_smul_overflow( dc->window_ext.cy, y_num, &num ) ) {
+      return FALSE;
+    }
+    if ( num == INT_MIN and y_den == -1 ) {
+      return FALSE;
+    }
+    INT y_ext{ num / y_den };
 
     EMF::EMRSCALEWINDOWEXTEX* scalewindowextex =
       new EMF::EMRSCALEWINDOWEXTEX( x_num, x_den, y_num, y_den );
@@ -1773,8 +1811,8 @@ extern "C" {
     if ( size != 0 )
       *size = dc->window_ext;
 
-    dc->window_ext.cx = dc->window_ext.cx * x_num / x_den;
-    dc->window_ext.cy = dc->window_ext.cy * y_num / y_den;
+    dc->window_ext.cx = x_ext;
+    dc->window_ext.cy = y_ext;
 
     return TRUE;
   }

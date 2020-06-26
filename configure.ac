@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
-# $Id: configure.ac 88 2020-03-28 13:28:51Z dallenbarnett $
+# $Id: configure.ac 98 2020-06-07 13:10:19Z dallenbarnett $
 
-AC_INIT([libEMF], 1.0.12, dallenbarnett@users.sourceforge.net)
+AC_INIT([libEMF], 1.0.13, dallenbarnett@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_SRCDIR([include/libEMF/emf.h])
