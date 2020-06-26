@@ -7,7 +7,7 @@ Subject: autoconf AS_HELP_STRING
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 473b2bf..b588090 100644
+index 6dfd778..7713fb1 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -43,7 +43,7 @@ AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])

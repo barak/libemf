@@ -22,7 +22,7 @@ index da11831..9e522f8 100644
 -	rm -rf `find $(distdir)/doc -name .svn`
 +SUBDIRS = include libemf src tests
 diff --git a/configure.ac b/configure.ac
-index b588090..ee9cd95 100644
+index 7713fb1..60988ad 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -94,6 +94,6 @@ AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
