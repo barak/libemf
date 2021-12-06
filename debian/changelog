@@ -1,3 +1,9 @@
+libemf (1.0.13-3) unstable; urgency=medium
+
+  * Merge doc-base files; one manual two formats (closes: #1001220)
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 06 Dec 2021 16:47:34 +0000
+
 libemf (1.0.13-2) unstable; urgency=medium
 
   * .la files are not installed on purpose (closes: #963990)
