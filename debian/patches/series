@@ -3,3 +3,4 @@
 0003-remove-doc-doxygen-subdir.patch
 0004-add-build-time-doxygen-support-via-autotools.patch
 0005-typo-in-doc-string.patch
+0006-add-support-riscv64.patch

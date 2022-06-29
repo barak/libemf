@@ -1,3 +1,10 @@
+libemf (1.0.13-5) unstable; urgency=medium
+
+  * Patch to actually support riscv64 (closes: #1013922) kindly provided
+    by Bo YU <tsu.yubo@gmail.com>
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 29 Jun 2022 14:15:38 +0100
+
 libemf (1.0.13-4) unstable; urgency=medium
 
   * Enable on architecture riscv64 (closes: #1013370)
