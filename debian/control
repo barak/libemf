@@ -13,7 +13,7 @@ Vcs-Browser: https://salsa.debian.org/debian/libemf
 
 Package: libemf-dev
 Section: libdevel
-Architecture: alpha amd64 arm armeb armel armhf arm64 i386 powerpc powerpcel powerpcspe ppc64 ppc64el s390 s390x sparc sparc64 x32 riscv64
+Architecture: alpha amd64 arm armeb armel armhf arm64 i386 powerpc powerpcel powerpcspe ppc64 ppc64el s390 s390x sparc sparc64 x32 riscv64 loong64
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends: libemf1 (= ${binary:Version}), ${misc:Depends}

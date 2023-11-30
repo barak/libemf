@@ -1,3 +1,9 @@
+libemf (1.0.13-7) unstable; urgency=medium
+
+  * Oops, also need to add loong64 to architecture list
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Thu, 30 Nov 2023 23:30:32 +0000
+
 libemf (1.0.13-6) unstable; urgency=medium
 
   * Patch to support loongarch64 (closes: #1057140) kindly provided by
