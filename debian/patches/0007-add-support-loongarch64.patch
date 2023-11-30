@@ -1,8 +1,15 @@
-Description: Add support for loongarch64 
-Last-Update: 2023-11-9
+From: Dandan Zhang <zhangdandan@loongson.cn>
+Date: Thu, 9 Nov 2023 12:00:00 +0000
+Subject: Add support for loongarch64
 
---- libemf-1.0.13.orig/include/libEMF/wine/winnt.h
-+++ libemf-1.0.13/include/libEMF/wine/winnt.h
+---
+ include/libEMF/wine/winnt.h | 74 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+
+diff --git a/include/libEMF/wine/winnt.h b/include/libEMF/wine/winnt.h
+index 1609f38..847e445 100644
+--- a/include/libEMF/wine/winnt.h
++++ b/include/libEMF/wine/winnt.h
 @@ -49,6 +49,10 @@
  # undef  WORDS_BIGENDIAN
  # undef  BITFIELDS_BIGENDIAN
