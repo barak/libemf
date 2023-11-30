@@ -2,6 +2,8 @@ libemf (1.0.13-6) unstable; urgency=medium
 
   * Patch to support loongarch64 (closes: #1057140) kindly provided by
     Dandan Zhang <zhangdandan@loongson.cn>
+  * Use secure URI in Homepage field.
+  * Update standards version to 4.6.2, no changes needed.
 
  -- Barak A. Pearlmutter <bap@debian.org>  Thu, 30 Nov 2023 21:48:48 +0000
 
