@@ -4,3 +4,4 @@
 0004-add-build-time-doxygen-support-via-autotools.patch
 0005-typo-in-doc-string.patch
 0006-add-support-riscv64.patch
+0007-add-support-loongarch64.patch
