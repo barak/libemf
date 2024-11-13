@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libemf
-Source: http://sourceforge.net/projects/libemf/files/libemf/
+Source: https://sourceforge.net/projects/libemf/files/libemf/
 Files-Excluded:
  	doc
  	*/Makefile.in
