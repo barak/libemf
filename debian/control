@@ -4,7 +4,7 @@ Maintainer: Barak A. Pearlmutter <bap@debian.org>
 Build-Depends: debhelper-compat (= 13),
 	autoconf-archive,
 	doxygen, doxygen-latex, graphviz
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Rules-Requires-Root: no
 Section: libs
 Homepage: https://libemf.sourceforge.net/
