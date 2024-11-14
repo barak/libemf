@@ -2472,10 +2472,10 @@ index 9e522f8..4c09886 100644
 +@DX_RULES@
 +endif
 diff --git a/configure.ac b/configure.ac
-index e421e9b..44d28cf 100644
+index 75e8cb0..2fa4785 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -92,6 +92,24 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)
+@@ -89,6 +89,24 @@ AM_CONDITIONAL(LIBEMF_DEBUG, test $enable_debug = yes)
  AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
  AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
  

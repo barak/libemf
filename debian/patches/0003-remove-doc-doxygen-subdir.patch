@@ -22,10 +22,10 @@ index da11831..9e522f8 100644
 -	rm -rf `find $(distdir)/doc -name .svn`
 +SUBDIRS = include libemf src tests
 diff --git a/configure.ac b/configure.ac
-index 462beb6..e421e9b 100644
+index 067580d..75e8cb0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -93,6 +93,6 @@ AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
+@@ -90,6 +90,6 @@ AM_CONDITIONAL(HAVE_THREADS, test $have_threads = yes)
  AM_CONDITIONAL(ENABLE_EDITING, test $enable_editing = no)
  
  AC_CONFIG_FILES([Makefile include/Makefile libemf/Makefile \

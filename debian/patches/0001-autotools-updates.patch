@@ -7,8 +7,8 @@ Subject: autotools updates
 - Remove obsolete autoconf macro STDC_HEADERS.
 ---
  Makefile.am  |  1 +
- configure.ac | 25 ++++++++++++-------------
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ configure.ac | 30 +++++++++++++-----------------
+ 2 files changed, 14 insertions(+), 17 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
 index 2b7ef71..da11831 100644
@@ -23,7 +23,7 @@ index 2b7ef71..da11831 100644
  
  dist-hook:
 diff --git a/configure.ac b/configure.ac
-index 8b47398..462beb6 100644
+index 8b47398..067580d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2,25 +2,25 @@
@@ -58,7 +58,19 @@ index 8b47398..462beb6 100644
  AC_CHECK_HEADERS([errno.h stddef.h stdlib.h string.h unistd.h limits.h])
  
  # Checks for typedefs, structures, and compiler characteristics.
-@@ -42,7 +42,7 @@ AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])
+@@ -29,10 +29,7 @@ AC_C_INLINE
+ AC_TYPE_SIZE_T
+ 
+ # Checks for library functions.
+-AC_FUNC_MALLOC
+-AC_FUNC_MEMCMP
+-AC_CHECK_LIB(m, ceil)
+-AC_CHECK_FUNCS([floor memset select])
++AC_SEARCH_LIBS([ceil], [m])
+ 
+ # Autoheader seems to complain about a lack of these (perhaps rightly)
+ AH_TEMPLATE(LIBEMF_DEBUG, [Turn on any addition debugging edits])
+@@ -42,7 +39,7 @@ AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])
  # disable threads
  
  AC_ARG_ENABLE(debug,
@@ -67,7 +79,7 @@ index 8b47398..462beb6 100644
    enable_debug=$enableval, enable_debug=no)
  if test "x$enable_debug" = xyes; then
    AC_DEFINE(LIBEMF_DEBUG, 1)
-@@ -56,7 +56,7 @@ your CFLAGS])
+@@ -56,7 +53,7 @@ your CFLAGS])
  fi
  
  AC_ARG_ENABLE(threads,
@@ -76,7 +88,7 @@ index 8b47398..462beb6 100644
    have_threads=$enableval, have_threads=yes)
  if test "x$have_threads" = xyes; then
  THREAD_LIBS=
-@@ -65,13 +65,12 @@ AC_CHECK_HEADERS(pthread.h,
+@@ -65,13 +62,12 @@ AC_CHECK_HEADERS(pthread.h,
  
    save_LIBS=$LIBS
    LIBS="$LIBS -lpthread"
@@ -93,7 +105,7 @@ index 8b47398..462beb6 100644
    LIBS=$save_LIBS
  AC_SUBST(THREAD_LIBS)
  else
-@@ -83,7 +82,7 @@ fi
+@@ -83,7 +79,7 @@ fi
  # Adds a lot of code and data to the library, though.
  
  AC_ARG_ENABLE(editing,
