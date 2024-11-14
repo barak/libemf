@@ -6,11 +6,11 @@ add support for riscv64 arch
 
 Original reference e2k code for supporting riscv64 arch
 ---
- include/libEMF/wine/winnt.h | 75 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ include/libEMF/wine/winnt.h | 77 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
 diff --git a/include/libEMF/wine/winnt.h b/include/libEMF/wine/winnt.h
-index 39e2f90..1609f38 100644
+index 39e2f90..48af0db 100644
 --- a/include/libEMF/wine/winnt.h
 +++ b/include/libEMF/wine/winnt.h
 @@ -69,6 +69,10 @@
@@ -24,11 +24,12 @@ index 39e2f90..1609f38 100644
  #elif !defined(RC_INVOKED)
  # error Unknown CPU architecture!
  #endif
-@@ -1582,6 +1586,77 @@ typedef struct _CONTEXT {
+@@ -1582,6 +1586,79 @@ typedef struct _CONTEXT {
  
  #endif /* __e2k__ */
  
-+#ifdef __riscv && __riscv_xlen==64
++#ifdef __riscv
++#if __riscv_xlen==64
 +/*
 + * FIXME:
 + *
@@ -96,6 +97,7 @@ index 39e2f90..1609f38 100644
 +    /* FIXME */
 +} CONTEXT;
 +
++#endif /* __riscv_xlen==64 */
 +#endif /* __riscv64__ */
 +
 +
