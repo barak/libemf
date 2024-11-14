@@ -4,3 +4,4 @@
 0005-typo-in-doc-string.patch
 0006-add-support-riscv64.patch
 0007-add-support-loongarch64.patch
+0008-deprecated.patch
