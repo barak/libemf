@@ -7,7 +7,7 @@ Subject: Add support for loongarch64
  1 file changed, 74 insertions(+)
 
 diff --git a/include/libEMF/wine/winnt.h b/include/libEMF/wine/winnt.h
-index 1609f38..847e445 100644
+index 48af0db..a7c5009 100644
 --- a/include/libEMF/wine/winnt.h
 +++ b/include/libEMF/wine/winnt.h
 @@ -49,6 +49,10 @@
