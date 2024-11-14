@@ -880,7 +880,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
+		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
 
       ::fclose( dc->fp );
@@ -927,7 +927,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
+		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
 				   dc->ds ) );
     }
 
@@ -1192,7 +1192,7 @@ extern "C" {
     if ( dc == 0 ) return;
 
     std::for_each( dc->records.begin(), dc->records.end(),
-		   std::mem_fun( &EMF::METARECORD::edit ) );
+		   std::mem_fn( &EMF::METARECORD::edit ) );
 #else
     (void)metafile;
 #endif /* ENABLE_EDITING */
