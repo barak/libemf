@@ -21,6 +21,13 @@
 #include <iostream>
 #include <climits>
 
+#ifdef __APPLE__
+#include <libkern/OSByteOrder.h>
+#define bswap_32(x) OSSwapInt32(x)
+#else
+#include <byteswap.h>
+#endif
+
 #include "libemf.h"
 
 namespace EMF {
@@ -72,7 +79,6 @@ namespace EMF {
     if ( not bigEndian() ) {
       return a;
     }
-#include <byteswap.h>
     return bswap_32(a);
   }
 

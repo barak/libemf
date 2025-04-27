@@ -1,3 +1,10 @@
+Release note for libEMF version 1.0.14
+
+Allow for compilation on macos with newer clang. Thanks to Hanspeter
+Niederstrasser for the patch.
+
+------------------------------------------------------------------------
+
 Release note for libEMF version 1.0.13
 
 This release fixes a security issue:
