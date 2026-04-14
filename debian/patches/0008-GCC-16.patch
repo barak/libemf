@@ -1,0 +1,69 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Tue, 14 Apr 2026 13:58:51 +0100
+Subject: GCC-16
+
+See https://bugs.debian.org/1133514
+
+The issue ...
+
+GCC-16 defaults to C++20+, where u8"..." string literals changed from
+const char* to const char8_t*. This caused autoconf's C++11 detection
+test to fail, so autoconf fell back to explicitly setting -std=gnu++11
+in CXX. But libemf.h uses C++14 auto return type deduction (without
+trailing return type), which is invalid in C++11.
+
+configure.ac: remove -std=gnu++11 flag, then make sure C++14 or later
+is available. This should still work when the autoconf bug above is
+fixed.
+
+libemf/libemf.cpp: replace two std::bind2nd calls with equivalent
+lambdas, as bind2nd was removed in C++17. This allows compilation in
+C++14 or later including C++20+ in particular.
+---
+ configure.ac      | 8 ++++++++
+ libemf/libemf.cpp | 6 ++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2fa4785..2f47e8d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,6 +11,14 @@ AM_INIT_AUTOMAKE([-Wall])
+ 
+ # Checks for programs.
+ AC_PROG_CXX
++# AC_PROG_CXX's C++11 detection test uses u8"..." string literals, which
++# changed from const char* to const char8_t* in C++20, causing the test to
++# fail with a C++20-defaulting compiler (e.g. GCC 16) and making autoconf
++# fall back to -std=gnu++11.  Strip whatever -std= flag it may have added
++# and explicitly require C++14 or later instead.
++CXX=`echo "$CXX" | sed 's/ -std=[[^ ]]*//g'`
++CXXCPP=`echo "$CXXCPP" | sed 's/ -std=[[^ ]]*//g'`
++AX_CXX_COMPILE_STDCXX([14], [], [mandatory])
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+diff --git a/libemf/libemf.cpp b/libemf/libemf.cpp
+index ab485cb..30441cc 100644
+--- a/libemf/libemf.cpp
++++ b/libemf/libemf.cpp
+@@ -880,8 +880,7 @@ extern "C" {
+ 
+     if ( dc->fp ) {
+       std::for_each( dc->records.begin(), dc->records.end(),
+-		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
+-				   dc->ds ) );
++		     [dc]( EMF::METARECORD* r ) { r->serialize( dc->ds ); } );
+ 
+       ::fclose( dc->fp );
+ 
+@@ -927,8 +926,7 @@ extern "C" {
+ 
+     if ( dc->fp ) {
+       std::for_each( dc->records.begin(), dc->records.end(),
+-		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
+-				   dc->ds ) );
++		     [dc]( EMF::METARECORD* r ) { r->serialize( dc->ds ); } );
+     }
+ 
+     // There's no particular reason to distinguish between the context and

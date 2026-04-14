@@ -1,9 +1,11 @@
-libemf (1.0.13-9) UNRELEASED; urgency=medium
+libemf (1.0.13-9) unstable; urgency=medium
 
   * Bump policy
   * Allow nodoc build, thus avoiding doxygen and latex which are slow.
+  * Patch to support C++14 or later, for GCC-16 ftbfs (closes: #1133514)
+  * Patch to allow test concurrency
 
- -- Barak A. Pearlmutter <bap@debian.org>  Tue, 14 Apr 2026 13:47:24 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 14 Apr 2026 15:14:39 +0100
 
 libemf (1.0.13-8) unstable; urgency=medium
 
