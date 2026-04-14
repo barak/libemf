@@ -880,8 +880,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
+		     [dc]( EMF::METARECORD* r ) { r->serialize( dc->ds ); } );
 
       ::fclose( dc->fp );
 
@@ -927,8 +926,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fn( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
+		     [dc]( EMF::METARECORD* r ) { r->serialize( dc->ds ); } );
     }
 
     // There's no particular reason to distinguish between the context and

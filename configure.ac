@@ -11,6 +11,14 @@ AM_INIT_AUTOMAKE([-Wall])
 
 # Checks for programs.
 AC_PROG_CXX
+# AC_PROG_CXX's C++11 detection test uses u8"..." string literals, which
+# changed from const char* to const char8_t* in C++20, causing the test to
+# fail with a C++20-defaulting compiler (e.g. GCC 16) and making autoconf
+# fall back to -std=gnu++11.  Strip whatever -std= flag it may have added
+# and explicitly require C++14 or later instead.
+CXX=`echo "$CXX" | sed 's/ -std=[[^ ]]*//g'`
+CXXCPP=`echo "$CXXCPP" | sed 's/ -std=[[^ ]]*//g'`
+AX_CXX_COMPILE_STDCXX([14], [], [mandatory])
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
