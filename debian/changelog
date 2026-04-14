@@ -1,3 +1,9 @@
+libemf (1.0.13-9) UNRELEASED; urgency=medium
+
+  * Bump policy
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 14 Apr 2026 13:07:01 +0100
+
 libemf (1.0.13-8) unstable; urgency=medium
 
   * Add loong64 harder (closes: #1072612)
