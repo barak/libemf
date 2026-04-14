@@ -1,3 +1,9 @@
+libemf (1.0.13-11) unstable; urgency=medium
+
+  * Fix build dependencies for full binary build with docs
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 14 Apr 2026 16:33:51 +0100
+
 libemf (1.0.13-10) unstable; urgency=medium
 
   * note that doxygen-doc/ is build debris (closes: 1046535)
