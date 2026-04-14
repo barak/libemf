@@ -7,10 +7,15 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 override_dh_auto_configure:
 	dh_auto_configure -- --enable-editing \
-	 --enable-doxygen-pdf --enable-doxygen-man --enable-doxygen-html
+	 $(if $(filter nodoc,$(DEB_BUILD_PROFILES)),,--enable-doxygen-pdf --enable-doxygen-man --enable-doxygen-html)
 
-override_dh_auto_build:
-	dh_auto_build -- all doxygen-doc doxygen-pdf
+override_dh_auto_build-arch:
+	dh_auto_build
+
+override_dh_auto_build-indep:
+ifeq (,$(filter nodoc,$(DEB_BUILD_PROFILES)))
+	dh_auto_build -- doxygen-doc doxygen-pdf
+endif
 
 override_dh_auto_test:
 	dh_auto_test -- -j1

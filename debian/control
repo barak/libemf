@@ -2,8 +2,8 @@ Source: libemf
 Priority: optional
 Maintainer: Barak A. Pearlmutter <bap@debian.org>
 Build-Depends: debhelper-compat (= 13),
-	autoconf-archive,
-	doxygen, doxygen-latex, graphviz
+	autoconf-archive
+Build-Depends-Indep: doxygen, doxygen-latex, graphviz
 Standards-Version: 4.7.4
 Section: libs
 Homepage: https://libemf.sourceforge.net/
