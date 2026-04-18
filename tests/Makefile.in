@@ -1017,8 +1017,9 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-# Dependency of output from docheck1 for docheck2
+# Dependency of output from docheck1 for docheck2 and docheck3
 docheck2.log: docheck1.log
+docheck3.log: docheck2.log
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -27,5 +27,6 @@ EXTRA_DIST = docheck1.sh docheck2.sh docheck3.sh emfs/check1.emf emfs/check3.emf
 
 MOSTLYCLEANFILES = check1.emf check2.emf check3.emf
 
-# Dependency of output from docheck1 for docheck2
+# Dependency of output from docheck1 for docheck2 and docheck3
 docheck2.log: docheck1.log
+docheck3.log: docheck2.log
