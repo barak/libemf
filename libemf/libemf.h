@@ -24,7 +24,6 @@
 #include <cmath>
 #include <vector>
 #include <map>
-#include <functional>
 #include <algorithm>
 #include <stdexcept>
 #include <memory>
