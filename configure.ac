@@ -47,6 +47,11 @@ AC_SEARCH_LIBS( [m], [ceil] )
 AH_TEMPLATE(LIBEMF_DEBUG, [Turn on any addition debugging edits])
 AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])
 
+# Enable Doxygen
+DX_DOXYGEN_FEATURE(ON)
+DX_INIT_DOXYGEN([$PACKAGE_NAME], [Doxyfile] )
+AC_CONFIG_FILES( [doc/Doxyfile] )
+
 # If you want to use Checker, then you have to enable debugging and
 # disable threads
 

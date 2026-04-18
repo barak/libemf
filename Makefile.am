@@ -21,3 +21,6 @@ SUBDIRS = include libemf src doc tests
 
 dist-hook:
 	rm -rf `find $(distdir)/doc -name .svn`
+
+docs:
+	$(MAKE) -C doc doxygen-run
