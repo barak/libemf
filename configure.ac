@@ -6,13 +6,15 @@ AC_INIT([libEMF],[1.0.14],[dallenbarnett@users.sourceforge.net])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_SRCDIR([include/libEMF/emf.h])
-AM_INIT_AUTOMAKE
+AC_CONFIG_MACRO_DIRS([m4])
+AM_INIT_AUTOMAKE([-Wall])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AM_PROG_AR
 
 LT_INIT
 
@@ -27,10 +29,11 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
-AC_CHECK_LIB(m, ceil)
-AC_CHECK_FUNCS([floor memset select])
+dnl AC_FUNC_MALLOC
+dnl AC_FUNC_MEMCMP
+dnl AC_CHECK_LIB(m, ceil)
+dnl AC_CHECK_FUNCS([floor memset select])
+AC_SEARCH_LIBS( [m], [ceil] )
 
 # Autoheader seems to complain about a lack of these (perhaps rightly)
 AH_TEMPLATE(LIBEMF_DEBUG, [Turn on any addition debugging edits])
@@ -40,7 +43,7 @@ AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])
 # disable threads
 
 AC_ARG_ENABLE(debug,
-[  --enable-debug          enable libEMF debugging [default=no]],
+AS_HELP_STRING([--enable-debug],[enable libEMF debugging [default=no]]),
   enable_debug=$enableval, enable_debug=no)
 if test "x$enable_debug" = xyes; then
   AC_DEFINE(LIBEMF_DEBUG, 1)
@@ -54,7 +57,7 @@ your CFLAGS])
 fi
 
 AC_ARG_ENABLE(threads,
-[  --enable-threads           enable threads [default=yes]],
+AS_HELP_STRING([--enable-threads],[enable threads [default=yes]]),
   have_threads=$enableval, have_threads=yes)
 if test "x$have_threads" = xyes; then
 THREAD_LIBS=
@@ -80,7 +83,7 @@ fi
 # Adds a lot of code and data to the library, though.
 
 AC_ARG_ENABLE(editing,
-[  --enable-editing     enable EditEnhMetaFile() function [default=no]],
+AS_HELP_STRING([--enable-editing],[enable EditEnhMetaFile() function [default=no]]),
   enable_editing=$enableval, enable_editing=no)
 if test "x$enable_editing" = xyes; then
    AC_DEFINE(ENABLE_EDITING, 1)
