@@ -1,0 +1,20 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Mon, 4 May 2026 19:03:56 +0100
+Subject: C++ fixes
+
+---
+ libemf/libemf.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libemf/libemf.cpp b/libemf/libemf.cpp
+index 6ae8f39..b66fb0f 100644
+--- a/libemf/libemf.cpp
++++ b/libemf/libemf.cpp
+@@ -20,6 +20,7 @@
+  */
+ #include <iostream>
+ #include <climits>
++#include <functional>
+ 
+ #ifdef __APPLE__
+ #include <libkern/OSByteOrder.h>
