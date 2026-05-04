@@ -1,0 +1,18 @@
+Upstream development uses svn. This can be checked out directly with
+
+   svn checkout https://svn.code.sf.net/p/libemf/code/trunk libemf-svn
+
+or using git with
+
+   git svn clone https://svn.code.sf.net/p/libemf/code libemf-svn --stdlayout
+
+or yanking into an existing git repository
+
+   git config --local svn-remote.svn.url 'https://svn.code.sf.net/p/libemf/code'
+   git config --local svn-remote.svn.fetch 'trunk:refs/remotes/svn/trunk'
+   git config --local svn-remote.svn.branches 'branches/*:refs/remotes/svn/branches/*'
+   git config --local svn-remote.svn.tags 'tags/*:refs/remotes/svn/tags/*'
+
+   git svn fetch
+
+ -- Barak A. Pearlmutter <bap@debian.org>, Mon, 4 May 2026 18:46:51 +0000
