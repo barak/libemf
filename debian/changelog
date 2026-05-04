@@ -1,3 +1,9 @@
+libemf (1.0.14-2) unstable; urgency=medium
+
+  * Restore silly files to placate debpush
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 04 May 2026 20:13:55 +0100
+
 libemf (1.0.14-1) unstable; urgency=medium
 
   * Update d/watch uscan support file to v5
