@@ -1,7 +1,7 @@
 /*
  * Edit the contents of an EMF file.
  * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: printemf.c 85 2020-03-22 15:25:17Z dallenbarnett $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

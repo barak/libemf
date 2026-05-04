@@ -1,6 +1,4 @@
-#!/bin/sh
-
-## Checkout script for libEMF.
+## Makefile.am -- Process this file with automake to produce Makefile.in
 ## Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
 ## $Id$
 ##
@@ -18,4 +16,6 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 30, Boston, MA 02111-1307, USA.
 
-./check1 && cmp -l ${srcdir}/emfs/check1.emf check1.emf
+@DX_RULES@
+
+EXTRA_DIST = doxygen-doc/html

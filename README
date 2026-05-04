@@ -11,8 +11,9 @@ autotools options is --enable-editing, which activates the function
 EditEnhMetaFile(). This will print the contents of a metafile in
 memory to stdout.
 
-The documentation starts at doc/html/index.html.
+The documentation starts at doc/doxygen-doc/html/index.html.
 
 The software is available from SourceForge. See https://sourceforge.net/projects/libemf/
 
 Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
+Copyright (C) 2026 Allen Barnett <dallenbarnett@sf.net>

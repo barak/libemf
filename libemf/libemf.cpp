@@ -1,7 +1,7 @@
 /*
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: libemf.cpp 98 2020-06-07 13:10:19Z dallenbarnett $
+ * $Id$
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,13 @@
  */
 #include <iostream>
 #include <climits>
+
+#ifdef __APPLE__
+#include <libkern/OSByteOrder.h>
+#define bswap_32(x) OSSwapInt32(x)
+#else
+#include <byteswap.h>
+#endif
 
 #include "libemf.h"
 
@@ -72,7 +79,6 @@ namespace EMF {
     if ( not bigEndian() ) {
       return a;
     }
-#include <byteswap.h>
     return bswap_32(a);
   }
 
@@ -880,8 +886,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
+                     [dc]( EMF::METARECORD* r ){ r->serialize(dc->ds); } );
 
       ::fclose( dc->fp );
 
@@ -927,8 +932,7 @@ extern "C" {
 
     if ( dc->fp ) {
       std::for_each( dc->records.begin(), dc->records.end(),
-		     std::bind2nd( std::mem_fun( &EMF::METARECORD::serialize ),
-				   dc->ds ) );
+                     [dc]( EMF::METARECORD* r ) { r->serialize( dc->ds ); } );
     }
 
     // There's no particular reason to distinguish between the context and
@@ -1192,7 +1196,7 @@ extern "C" {
     if ( dc == 0 ) return;
 
     std::for_each( dc->records.begin(), dc->records.end(),
-		   std::mem_fun( &EMF::METARECORD::edit ) );
+		   std::mem_fn( &EMF::METARECORD::edit ) );
 #else
     (void)metafile;
 #endif /* ENABLE_EDITING */

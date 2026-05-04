@@ -1,7 +1,7 @@
 /* -*- c++ -*-
  * EMF: A library for generating ECMA-234 Enhanced Metafiles
  * Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
- * $Id: libemf.h 94 2020-04-25 18:46:06Z dallenbarnett $
+ * $Id$
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,6 @@
 #include <cmath>
 #include <vector>
 #include <map>
-#include <functional>
 #include <algorithm>
 #include <stdexcept>
 #include <memory>
@@ -109,7 +108,7 @@ namespace EMF {
    */
   struct CHARSTR {
     CHAR *const string_;	//!< Array of single byte characters.
-    const int length_;		//!< Number of single byte characers in array.
+    const int length_;		//!< Number of single byte characters in array.
     /*!
      * Simple constructor.
      * \param string pointer to array of single byte characters.

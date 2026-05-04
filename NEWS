@@ -1,3 +1,15 @@
+Release note for libEMF version 1.0.14
+
+Allow for compilation on macos with newer clang. Thanks to Hanspeter
+Niederstrasser for the patch.
+Applied a number of patches from Barak Pearlmutter to improve the portability
+of the code.
+
+The documentation can now be built with "make docs" in the top level build
+directory.
+
+------------------------------------------------------------------------
+
 Release note for libEMF version 1.0.13
 
 This release fixes a security issue:

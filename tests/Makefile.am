@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ## Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
-## $Id: Makefile.am 80 2018-12-29 19:07:24Z dallenbarnett $
+## $Id$
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -27,5 +27,6 @@ EXTRA_DIST = docheck1.sh docheck2.sh docheck3.sh emfs/check1.emf emfs/check3.emf
 
 MOSTLYCLEANFILES = check1.emf check2.emf check3.emf
 
-# Dependency of output from docheck1 for docheck2
+# Dependency of output from docheck1 for docheck2 and docheck3
 docheck2.log: docheck1.log
+docheck3.log: docheck2.log

@@ -1,26 +1,34 @@
 # Process this file with autoconf to produce a configure script.
 # Copyright (C) 2002, 2003 lignum Computing, Inc. <dallenbarnett@users.sourceforge.net>
-# $Id: configure.ac 98 2020-06-07 13:10:19Z dallenbarnett $
+# $Id$
 
-AC_INIT([libEMF], 1.0.13, dallenbarnett@users.sourceforge.net)
+AC_INIT([libEMF],[1.0.14],[dallenbarnett@users.sourceforge.net])
 AC_CONFIG_AUX_DIR(config)
-AM_CONFIG_HEADER([config/config.h])
+AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_SRCDIR([include/libEMF/emf.h])
-AM_INIT_AUTOMAKE
+AC_CONFIG_MACRO_DIRS([m4])
+AM_INIT_AUTOMAKE([-Wall])
 
 # Checks for programs.
 AC_PROG_CXX
+# AC_PROG_CXX's C++11 detection test uses u8"..." string literals, which
+# changed from const char* to const char8_t* in C++20, causing the test to
+# fail with a C++20-defaulting compiler (e.g. GCC 16) and making autoconf
+# fall back to -std=gnu++11.  Strip whatever -std= flag it may have added
+# and explicitly require C++14 or later instead.
+CXX=`echo "$CXX" | sed 's/ -std=[[^ ]]*//g'`
+CXXCPP=`echo "$CXXCPP" | sed 's/ -std=[[^ ]]*//g'`
+AX_CXX_COMPILE_STDCXX([14], [], [mandatory])
 AC_PROG_CC
 AC_PROG_INSTALL
-#AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+AM_PROG_AR
 
 LT_INIT
 
 # Checks for libraries.
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([errno.h stddef.h stdlib.h string.h unistd.h limits.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -29,20 +37,26 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
-AC_CHECK_LIB(m, ceil)
-AC_CHECK_FUNCS([floor memset select])
+dnl AC_FUNC_MALLOC
+dnl AC_FUNC_MEMCMP
+dnl AC_CHECK_LIB(m, ceil)
+dnl AC_CHECK_FUNCS([floor memset select])
+AC_SEARCH_LIBS( [m], [ceil] )
 
 # Autoheader seems to complain about a lack of these (perhaps rightly)
 AH_TEMPLATE(LIBEMF_DEBUG, [Turn on any addition debugging edits])
 AH_TEMPLATE(ENABLE_EDITING, [Enable the EditEnhMetaFile() function])
 
+# Enable Doxygen
+DX_DOXYGEN_FEATURE(ON)
+DX_INIT_DOXYGEN([$PACKAGE_NAME], [Doxyfile] )
+AC_CONFIG_FILES( [doc/Doxyfile] )
+
 # If you want to use Checker, then you have to enable debugging and
 # disable threads
 
 AC_ARG_ENABLE(debug,
-[  --enable-debug          enable libEMF debugging [default=no]],
+AS_HELP_STRING([--enable-debug],[enable libEMF debugging [default=no]]),
   enable_debug=$enableval, enable_debug=no)
 if test "x$enable_debug" = xyes; then
   AC_DEFINE(LIBEMF_DEBUG, 1)
@@ -56,7 +70,7 @@ your CFLAGS])
 fi
 
 AC_ARG_ENABLE(threads,
-[  --enable-threads           enable threads [default=yes]],
+AS_HELP_STRING([--enable-threads],[enable threads [default=yes]]),
   have_threads=$enableval, have_threads=yes)
 if test "x$have_threads" = xyes; then
 THREAD_LIBS=
@@ -65,13 +79,12 @@ AC_CHECK_HEADERS(pthread.h,
 
   save_LIBS=$LIBS
   LIBS="$LIBS -lpthread"
-  AC_TRY_LINK([#include <pthread.h>],[
-pthread_create (NULL, NULL, NULL, NULL)],[
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]], [[
+pthread_create (NULL, NULL, NULL, NULL)]])],[
     AC_MSG_RESULT(yes)
     CFLAGS="$CFLAGS -D_REENTRANT -DPTHREADS"
     CXXFLAGS="$CXXFLAGS -D_REENTRANT -DPTHREADS"
-    THREAD_LIBS="$THREAD_LIBS -lpthread"],
-    AC_MSG_RESULT(no)))
+    THREAD_LIBS="$THREAD_LIBS -lpthread"],[AC_MSG_RESULT(no)]))
   LIBS=$save_LIBS
 AC_SUBST(THREAD_LIBS)
 else
@@ -83,7 +96,7 @@ fi
 # Adds a lot of code and data to the library, though.
 
 AC_ARG_ENABLE(editing,
-[  --enable-editing     enable EditEnhMetaFile() function [default=no]],
+AS_HELP_STRING([--enable-editing],[enable EditEnhMetaFile() function [default=no]]),
   enable_editing=$enableval, enable_editing=no)
 if test "x$enable_editing" = xyes; then
    AC_DEFINE(ENABLE_EDITING, 1)
